@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include "QsLog.h"
 #include "QsLogDest.h"
+#include "CustomLogger.h"
 #include <QDir>
 
 void registersQmlComponents()
@@ -42,6 +43,10 @@ void registersSingletonObjects()
 
 int main(int argc, char *argv[])
 {
+    atexit(appCleanup);
+    qRegisterMetaType<QMap<QString,QByteArray>>("QMap<QString,QByteArray>");
+    qInstallMessageHandler(customMessageHandler);
+
     QGuiApplication app(argc, argv);
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();

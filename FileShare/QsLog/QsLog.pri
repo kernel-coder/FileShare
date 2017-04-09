@@ -2,8 +2,10 @@ INCLUDEPATH += $$PWD
 #DEFINES += QS_LOG_LINE_NUMBERS
 SOURCES += $$PWD/QsLogDest.cpp \
     $$PWD/QsLog.cpp \
-    $$PWD/QsDebugOutput.cpp
+    $$PWD/QsDebugOutput.cpp \
+    $$PWD/CustomLogger.cpp
 
 HEADERS += $$PWD/QSLogDest.h \
     $$PWD/QsLog.h \
-    $$PWD/QsDebugOutput.h
+    $$PWD/QsDebugOutput.h \
+    $$PWD/CustomLogger.h
