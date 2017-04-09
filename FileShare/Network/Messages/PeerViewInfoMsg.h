@@ -9,7 +9,7 @@ class PeerViewInfoMsg : public Message
     Q_OBJECT
 public:
     PeerViewInfoMsg();
-    PeerViewInfoMsg(QString name,QColor color);
+    PeerViewInfoMsg(QString name);
     ~PeerViewInfoMsg();
 
     void setName(const QString name);

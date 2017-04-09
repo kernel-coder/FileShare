@@ -6,7 +6,7 @@ PeerViewInfoMsg::PeerViewInfoMsg()
 {
 }
 
-PeerViewInfoMsg::PeerViewInfoMsg(QString name, QColor color):mName(name)
+PeerViewInfoMsg::PeerViewInfoMsg(QString name):mName(name)
 {
 }
 

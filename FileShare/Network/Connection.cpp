@@ -39,7 +39,7 @@ void Connection::setStatus(ServerInfoMsg::MyStatus status)
 
 void Connection::sendClientViewInfo()
 {
-    PeerViewInfoMsg pvi(QSysInfo::machineHostName() ,GameSettings::me()->playerColor(Game::Player1));
+    PeerViewInfoMsg pvi(QSysInfo::machineHostName());
     sendMessage(&pvi);
 }
 
