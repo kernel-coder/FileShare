@@ -8,6 +8,7 @@ class PeerViewInfoMsg : public Message
     Q_OBJECT
 public:
     enum PeerStatus {Busy,Free};
+    Q_ENUMS(PeerStatus)
     PeerViewInfoMsg(const QString& name = "", PeerStatus status = Free, QObject* p = 0);
 
     MetaPropertyPublicSet_Ex(QString, name)

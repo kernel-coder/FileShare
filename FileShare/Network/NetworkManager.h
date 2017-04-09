@@ -28,6 +28,7 @@ public:
     static NetworkManager* me();
     ~NetworkManager();
 
+    MetaPropertyPublicSet_Ex(QString, username)
     MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
 
     bool sendMessage(Connection *pConn, Message *pMsg);

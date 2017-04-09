@@ -11,6 +11,7 @@
 #include "Messages/PeerViewInfoMsg.h"
 #include <QCoreApplication>
 #include <QSettings>
+#include <QSettings>
 
 NetworkManager* NetworkManager::me()
 {
@@ -26,6 +27,7 @@ NetworkManager::NetworkManager(QObject *parent) :
         QObject(parent)
 {
     QSettings s;
+    _username = s.value("username", QSysInfo::machineHostName()).toString();
     _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();
 
     mpPeerManager = new PeerManager(this, this);
@@ -35,7 +37,7 @@ NetworkManager::NetworkManager(QObject *parent) :
     connect(mpPeerManager, SIGNAL(newPeer(Connection*)),SLOT(newConnection(Connection*)));
     connect(&mServer, SIGNAL(newPeer(Connection*)),SLOT(newConnection(Connection*)));
     //connect(GameSettings::me(),SIGNAL(playerNameChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)));
-    //connect(GameSettings::me(),SIGNAL(playerColorChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)));
+    //connect(GameSettings::me(),SIGNAL(playerColorChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)))
 }
 
 

@@ -29,7 +29,7 @@ Connection::Connection(int sockId, QObject *parent) :
 
 void Connection::sendClientViewInfo()
 {
-    PeerViewInfoMsg pvi(QSysInfo::machineHostName(), NetworkManager::me()->status());
+    PeerViewInfoMsg pvi(NetworkManager::me()->username(), NetworkManager::me()->status());
     sendMessage(&pvi);
 }
 
