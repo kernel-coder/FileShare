@@ -35,7 +35,7 @@ public:
     void setPlayingWith(Connection *pPeer);
 
 signals:
-    void newParticipant(Connection *pConn);
+    void newParticipant(Connection *connection);
     void participantLeft(Connection *pConn);
     void chatMsgCame(Connection *pFrom,ChatMsg *pMsg);
     void playRequestCame(Connection *pFrom,PlayRequestMsg *pMsg);
@@ -46,7 +46,7 @@ signals:
     void newMsgCame();
 
 private slots:
-    void newConnection(Connection *pConnection);
+    void newConnection(Connection *connection);
     void connectionError(QAbstractSocket::SocketError socketError);
     void disconnected();
     void readyForUse();

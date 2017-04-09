@@ -35,7 +35,7 @@ static QObject* utilsProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
 
 void registersSingletonObjects()
 {
-    qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "Backend", netMgrProvider);
+    qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "NetMgr", netMgrProvider);
     qmlRegisterSingletonType<Utils>("com.kcl.fileshare", 1, 0, "Utils", utilsProvider);
 }
 
