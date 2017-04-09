@@ -3,6 +3,7 @@
 #include "Messages/PeerViewInfoMsg.h"
 #include "Messages/MsgSystem.h"
 #include <QMutexLocker>
+#include <QSysInfo>
 
 Connection::Connection(int nSocketDesciptor,ServerInfoMsg::MyStatus status,QObject *parent) :
     QTcpSocket(parent),mnBlockSize(0),mpPeerViewInfo(NULL),mStatus(status)
@@ -38,8 +39,8 @@ void Connection::setStatus(ServerInfoMsg::MyStatus status)
 
 void Connection::sendClientViewInfo()
 {
-    //PeerViewInfoMsg pvi(GameSettings::me()->playerName(Game::Player1),GameSettings::me()->playerColor(Game::Player1));
-    //sendMessage(&pvi);
+    PeerViewInfoMsg pvi(QSysInfo::machineHostName() ,GameSettings::me()->playerColor(Game::Player1));
+    sendMessage(&pvi);
 }
 
 bool Connection::sendMessage(Message *pMsg)

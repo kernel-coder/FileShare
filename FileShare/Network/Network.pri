@@ -1,4 +1,4 @@
-INCLUDEPATH += $$PWD $$PWD/Messages
+INCLUDEPATH += $$PWD
 QT += network
 
 HEADERS += \

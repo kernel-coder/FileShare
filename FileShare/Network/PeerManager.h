@@ -7,9 +7,11 @@
 #include <QUdpSocket>
 #include <QTimer>
 #include <QMutex>
+#include <QHash>
 
 class NetworkManager;
 class Connection;
+class ServerInfoMsg;
 
 class PeerManager : public QObject
 {

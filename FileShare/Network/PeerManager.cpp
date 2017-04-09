@@ -5,7 +5,10 @@
 #include <QNetworkInterface>
 #include "Messages/ServerInfoMsg.h"
 #include "Messages/MsgSystem.h"
+#include "Messages/PeerViewInfoMsg.h"
 #include <QMutexLocker>
+#include <QNetworkConfigurationManager>
+#include <QNetworkSession>
 
 static const qint32 BroadcastInterval = 30000;
 static const unsigned BroadcastPort = 45000;
@@ -16,8 +19,7 @@ PeerManager::PeerManager(NetworkManager *pNetManager, QObject *parent) :
     updateAddresses();
     mnServerPort = 0;
 
-    mBroadcastSocket.bind(QHostAddress::Any, BroadcastPort, QUdpSocket::ShareAddress
-                         | QUdpSocket::ReuseAddressHint);
+    mBroadcastSocket.bind(QHostAddress::Any, BroadcastPort, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
     connect(&mBroadcastSocket, SIGNAL(readyRead()),this, SLOT(readBroadcastDatagram()));
 
     mBroadcastTimer.setInterval(BroadcastInterval);
@@ -29,10 +31,12 @@ void PeerManager::setServerPort(int nPort)
     mnServerPort = nPort;
 }
 
+
 void PeerManager::startBroadcasting()
 {
     mBroadcastTimer.start();
 }
+
 
 bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 {
@@ -44,6 +48,7 @@ bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 
     return false;
 }
+
 
 void PeerManager::sendBroadcastDatagram()
 {
@@ -64,24 +69,24 @@ void PeerManager::sendBroadcastDatagram()
     }
 }
 
+
 QByteArray PeerManager::serverInfo()
 {
-    ServerInfoMsg msg(mnServerPort,mpNetManager->status());
+    ServerInfoMsg msg(mnServerPort, mpNetManager->status());
     QByteArray block;
     QDataStream dg(&block, QIODevice::WriteOnly);
     msg.write(dg);
-
     return block;
 }
+
 
 void PeerManager::readBroadcastDatagram()
 {
     QMutexLocker locker(&mMutex);
-
     QByteArray srvrInfo = serverInfo();
 
-    while (mBroadcastSocket.hasPendingDatagrams()){        
-        if(mBroadcastSocket.pendingDatagramSize() < srvrInfo.size()){
+    while (mBroadcastSocket.hasPendingDatagrams()) {
+        if(mBroadcastSocket.pendingDatagramSize() < srvrInfo.size()) {
             return;
         }
 
@@ -90,7 +95,7 @@ void PeerManager::readBroadcastDatagram()
         QByteArray datagram;
         datagram.resize(srvrInfo.size());
 
-        if (mBroadcastSocket.readDatagram(datagram.data(), datagram.size(),&senderIp, &senderPort) == -1){
+        if (mBroadcastSocket.readDatagram(datagram.data(), datagram.size(),&senderIp, &senderPort) == -1) {
             continue;
         }
 
@@ -98,7 +103,7 @@ void PeerManager::readBroadcastDatagram()
 
         Message *pMsg = MsgSystem::readAndContruct(stream);
 
-        if(!pMsg || (pMsg->typeId() != ServerInfoMsg::TypeID)){
+        if(!pMsg || (pMsg->typeId() != ServerInfoMsg::TypeID)) {
             continue;
         }
 
@@ -115,11 +120,10 @@ void PeerManager::readBroadcastDatagram()
         }
 
         Connection *pConn = mpNetManager->hasConnection(senderIp);
-
         if (pConn == NULL){
             Connection *pConnection = new Connection(pSIMsg->status(), this);
-            connect(pConnection,SIGNAL(connected()),SLOT(connected()));
-            pConnection->connectToHost(senderIp,nSenderServerPort);
+            connect(pConnection, SIGNAL(connected()), SLOT(connected()));
+            pConnection->connectToHost(senderIp, nSenderServerPort);
         }
         else{
             pConn->setStatus(pSIMsg->status());
@@ -127,28 +131,34 @@ void PeerManager::readBroadcastDatagram()
     }
 }
 
+
 void PeerManager::connected()
 {
     Connection *pConn = qobject_cast<Connection*>(sender());
-
-    if(pConn){
+    if(pConn) {
+        qDebug() << "connected to " << pConn->peerViewInfo()->name();
         emit newPeer(pConn);
-        //disconnect(pConn,SIGNAL(connected()),this,SLOT(connected()));
     }
 }
+
 
 void PeerManager::updateAddresses()
 {
     mBroadcastAddresses.clear();
     mIPAddresses.clear();
 
-    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()){
-        foreach (QNetworkAddressEntry entry, interface.addressEntries()){
-            QHostAddress broadcastAddress = entry.broadcast();
+    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+        if (interface.isValid() && interface.flags() && QNetworkInterface::IsRunning) {
+            qDebug() << "NI " << interface.humanReadableName();
+            foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+                QHostAddress broadcastAddress = entry.broadcast();
 
-            if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost){
-                mBroadcastAddresses << broadcastAddress;
-                mIPAddresses << entry.ip();
+                if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost && !broadcastAddress.isLoopback()
+                        && !mBroadcastAddresses.contains(broadcastAddress)) {
+                    qDebug() << "BD address found " << broadcastAddress.toString();
+                    mBroadcastAddresses << broadcastAddress;
+                    mIPAddresses << entry.ip();
+                }
             }
         }
     }

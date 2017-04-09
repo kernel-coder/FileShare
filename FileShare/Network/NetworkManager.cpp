@@ -7,7 +7,7 @@
 #include "Messages/PlayRequestResultMsg.h"
 #include "Messages/GameCanceledMsg.h"
 #include "Messages/LineAddedMsg.h"
-//#include "../Views/StatusViewer.h"
+#include "StatusViewer.h"
 #include "Messages/PeerViewInfoMsg.h"
 
 NetworkManager::NetworkManager(QObject *parent) :
@@ -100,7 +100,7 @@ void NetworkManager::readyForUse()
 
     mPeers.insert(pConnection->peerAddress(), pConnection);
     emit newParticipant(pConnection);
-    //StatusViewer::me()->showTempMsg(pConnection->peerViewInfo()->name() + tr("has just come in the network"),LONG_DURATION);
+    StatusViewer::me()->showTip(pConnection->peerViewInfo()->name() + tr("has just come in the network"), LONG_DURATION);
 }
 
 void NetworkManager::disconnectSignal(Connection *pConnection)
@@ -134,7 +134,7 @@ void NetworkManager::removeConnection(Connection *pConnection)
 
     pConnection->deleteLater();
 
-    //StatusViewer::me()->showTempMsg(pConnection->peerViewInfo()->name() + tr("has just left from the network"),LONG_DURATION);
+    StatusViewer::me()->showTip(pConnection->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
 }
 
 void NetworkManager::newMessageArrived(Connection *pConn, Message *pMsg)

@@ -1,5 +1,27 @@
 <RCC>
-    <qresource prefix="/">
-        <file>main.qml</file>
+    <qresource prefix="/qml">
+        <file>rsrc/qml/controls/BorderedButton.qml</file>
+        <file>rsrc/qml/controls/ButtonEx.qml</file>
+        <file>rsrc/qml/controls/ImageButton.qml</file>
+        <file>rsrc/qml/controls/ImageEx.qml</file>
+        <file>rsrc/qml/controls/LabelEx.qml</file>
+        <file>rsrc/qml/controls/ProgressBarEx.qml</file>
+        <file>rsrc/qml/controls/Tooltip.qml</file>
+        <file>rsrc/qml/main.qml</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>rsrc/images/btn-cancel.png</file>
+        <file>rsrc/images/btn-cancel-disabled.png</file>
+        <file>rsrc/images/btn-cancel-hovered.png</file>
+        <file>rsrc/images/btn-cancel-pressed.png</file>
+        <file>rsrc/images/btn-download.png</file>
+        <file>rsrc/images/btn-download-disabled.png</file>
+        <file>rsrc/images/btn-download-hovered.png</file>
+        <file>rsrc/images/btn-download-pressed.png</file>
+        <file>rsrc/images/btn-install.png</file>
+        <file>rsrc/images/btn-install-disabled.png</file>
+        <file>rsrc/images/btn-install-hovered.png</file>
+        <file>rsrc/images/btn-install-pressed.png</file>
+        <file>rsrc/images/logo.png</file>
     </qresource>
 </RCC>

@@ -6,7 +6,9 @@ ServerInfoMsg::ServerInfoMsg()
 {
 }
 
-ServerInfoMsg::ServerInfoMsg(const int nPort, MyStatus status):mnPort(nPort),mStatus(status)
+ServerInfoMsg::ServerInfoMsg(const int nPort, MyStatus status)
+    : mnPort(nPort)
+    , mStatus(status)
 {
 
 }
@@ -27,6 +29,7 @@ ServerInfoMsg::MyStatus ServerInfoMsg::status()
 {
     return mStatus;
 }
+
 
 void ServerInfoMsg::write(QDataStream &dataBuffer)
 {
