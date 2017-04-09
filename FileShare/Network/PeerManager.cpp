@@ -72,7 +72,7 @@ void PeerManager::sendBroadcastDatagram()
 
 QByteArray PeerManager::serverInfo()
 {
-    ServerInfoMsg msg(mnServerPort, mpNetManager->status());
+    ServerInfoMsg msg(mnServerPort);
     QByteArray block;
     QDataStream dg(&block, QIODevice::WriteOnly);
     msg.write(dg);
@@ -119,14 +119,11 @@ void PeerManager::readBroadcastDatagram()
             continue;
         }
 
-        Connection *pConn = mpNetManager->hasConnection(senderIp);
-        if (pConn == NULL){
-            Connection *pConnection = new Connection(pSIMsg->status(), this);
-            connect(pConnection, SIGNAL(connected()), SLOT(connected()));
-            pConnection->connectToHost(senderIp, nSenderServerPort);
-        }
-        else{
-            pConn->setStatus(pSIMsg->status());
+        Connection *conn = mpNetManager->hasConnection(senderIp);
+        if (conn == NULL){
+            conn = new Connection(0, this);
+            connect(conn, SIGNAL(connected()), SLOT(connected()));
+            conn->connectToHost(senderIp, nSenderServerPort);
         }
     }
 }
@@ -134,10 +131,9 @@ void PeerManager::readBroadcastDatagram()
 
 void PeerManager::connected()
 {
-    Connection *pConn = qobject_cast<Connection*>(sender());
-    if(pConn) {
-        qDebug() << "connected to " << pConn->peerViewInfo()->name();
-        emit newPeer(pConn);
+    Connection *conn = qobject_cast<Connection*>(sender());
+    if(conn) {
+        emit newPeer(conn);
     }
 }
 

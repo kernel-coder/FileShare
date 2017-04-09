@@ -13,6 +13,7 @@ MsgSystem::MsgSystem(QObject *parent) :
 {
 }
 
+
 Message * MsgSystem::readAndContruct(QDataStream &stream)
 {
     Message *pMsg = NULL;
@@ -49,14 +50,15 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
     return pMsg;
 }
 
-QString MsgSystem::readableStatus(ServerInfoMsg::MyStatus status)
+
+QString MsgSystem::readableStatus(PeerViewInfoMsg::PeerStatus status)
 {
     QString strReadable;
 
-    if(ServerInfoMsg::Free == status){
+    if(PeerViewInfoMsg::Free == status){
         strReadable = tr("free");
     }
-    else if(ServerInfoMsg::Busy == status){
+    else if(PeerViewInfoMsg::Busy == status){
         strReadable = tr("busy");
     }
 

@@ -7,13 +7,15 @@ Server::Server(QObject *parent) :
     listen(QHostAddress::Any);
 }
 
+
 Server::~Server()
 {
     close();
 }
 
-void Server::incomingConnection(int nSocketDescriptor)
+
+void Server::incomingConnection(int sockId)
 {
-    Connection *pConnection = new Connection(nSocketDescriptor);
+    Connection *pConnection = new Connection(sockId, this);
     emit newPeer(pConnection);
 }

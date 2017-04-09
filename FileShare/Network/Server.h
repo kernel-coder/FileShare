@@ -15,9 +15,8 @@ public:
 signals:
     void newPeer(Connection *pConnection);
 
-public slots:
 protected:
-    void incomingConnection(int socketDescriptor);
+    void incomingConnection(int sockId);
 
 };
 

@@ -2,46 +2,37 @@
 #include "Messages/Message.h"
 #include "Messages/PeerViewInfoMsg.h"
 #include "Messages/MsgSystem.h"
+#include "NetworkManager.h"
 #include <QMutexLocker>
 #include <QSysInfo>
+#include <QtQml>
 
-Connection::Connection(int nSocketDesciptor,ServerInfoMsg::MyStatus status,QObject *parent) :
-    QTcpSocket(parent),mnBlockSize(0),mpPeerViewInfo(NULL),mStatus(status)
+
+Connection::Connection(int sockId, QObject *parent) :
+    QTcpSocket(parent)
+  , mBlockSize(0)
+  , _peerViewInfo(0)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QObject::connect(this, SIGNAL(readyRead()), this, SLOT(dataReadyToRead()));
 
-    if(setSocketDescriptor(nSocketDesciptor)){
-        sendClientViewInfo();
+    if (sockId > 0 ) {
+        if(setSocketDescriptor(sockId)){
+            sendClientViewInfo();
+        }
+    }
+    else {
+        QObject::connect(this, SIGNAL(connected()),this,SLOT(sendClientViewInfo()));
     }
 }
-
-Connection::Connection(ServerInfoMsg::MyStatus status,QObject *parent):
-        QTcpSocket(parent),mnBlockSize(0),mpPeerViewInfo(NULL),mStatus(status)
-{
-    QObject::connect(this, SIGNAL(readyRead()), this, SLOT(dataReadyToRead()));
-    QObject::connect(this, SIGNAL(connected()),this,SLOT(sendClientViewInfo()));
-}
-
-ServerInfoMsg::MyStatus Connection::status()
-{
-    return mStatus;
-}
-
-void Connection::setStatus(ServerInfoMsg::MyStatus status)
-{
-    if(mStatus != status){
-        mStatus = status;
-        emit statusChanged(this);
-    }
-}
-
 
 
 void Connection::sendClientViewInfo()
 {
-    PeerViewInfoMsg pvi(QSysInfo::machineHostName());
+    PeerViewInfoMsg pvi(QSysInfo::machineHostName(), NetworkManager::me()->status());
     sendMessage(&pvi);
 }
+
 
 bool Connection::sendMessage(Message *pMsg)
 {
@@ -56,24 +47,23 @@ bool Connection::sendMessage(Message *pMsg)
 
         return this->write(block) == block.size();
     }
-
     return false;
 }
+
 
 void Connection::dataReadyToRead()
 {
     QMutexLocker locker(&mMutex);
-
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_4_6);
 
-    while(bytesAvailable() >= (int)sizeof(quint16)){
+    while(bytesAvailable() >= (int)sizeof(quint16)) {
 
-        if (mnBlockSize == 0){
-            in >> mnBlockSize;
+        if (mBlockSize == 0) {
+            in >> mBlockSize;
         }
 
-        if (bytesAvailable() < mnBlockSize){
+        if (bytesAvailable() < mBlockSize){
             return;
         }
 
@@ -81,33 +71,24 @@ void Connection::dataReadyToRead()
 
         if(pMsg){            
             if(pMsg->typeId() == PeerViewInfoMsg::TypeID){
-                setPeerViewInfo(dynamic_cast<PeerViewInfoMsg*>(pMsg));
+                PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(pMsg);
+                if(pvi != NULL){
+                    if(_peerViewInfo){
+                        delete _peerViewInfo;
+                        _peerViewInfo = NULL;
+                    }
+
+                    peerViewInfo(pvi);
+                    emit readyForUse();
+                }
             }
             else{
                 emit newMessageArrived(this,pMsg);
             }
 
-            mnBlockSize = 0;
+            mBlockSize = 0;
         }
     }
 }
 
-void Connection::setPeerViewInfo(PeerViewInfoMsg *pPeerViewInfo)
-{
-    if(mpPeerViewInfo != pPeerViewInfo && pPeerViewInfo != NULL){
-        if(mpPeerViewInfo){
-            delete mpPeerViewInfo;
-            mpPeerViewInfo = NULL;
-        }
-        else{
-            mpPeerViewInfo = pPeerViewInfo;
-            emit readyForUse();
-        }
-
-        mpPeerViewInfo = pPeerViewInfo;
-        emit peerViewInfoChanged();
-    }
-}
-
-PeerViewInfoMsg *Connection::peerViewInfo()const{return mpPeerViewInfo;}
 

@@ -2,35 +2,27 @@
 
 int PeerViewInfoMsg::TypeID = 1;//qMetaTypeId<PeerViewInfoMsg>();
 
-PeerViewInfoMsg::PeerViewInfoMsg()
+
+PeerViewInfoMsg::PeerViewInfoMsg(const QString& name, PeerStatus status, QObject* p)
+    : Message(p)
+    , _name(name)
+    , _status(status)
 {
 }
-
-PeerViewInfoMsg::PeerViewInfoMsg(QString name):mName(name)
-{
-}
-
-PeerViewInfoMsg::~PeerViewInfoMsg()
-{
-}
-
-void PeerViewInfoMsg::setName(const QString name)
-{
-    mName = name;
-}
-
-QString PeerViewInfoMsg::name()const{return mName;}
-
 
 void PeerViewInfoMsg::write(QDataStream &dataBuffer)
 {
     dataBuffer << TypeID;
-    dataBuffer << mName;
+    dataBuffer << _name;
+    dataBuffer << (int)_status;
 }
 
 void PeerViewInfoMsg::read(QDataStream &dataBuffer)
 {
-    dataBuffer >> mName;
+    dataBuffer >> _name;
+    int tmp;
+    dataBuffer >> tmp;
+    _status = (PeerStatus)tmp;
 }
 
 int PeerViewInfoMsg::typeId() { return PeerViewInfoMsg::TypeID;}

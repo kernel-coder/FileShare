@@ -1,15 +1,14 @@
-#ifndef MESSAGE_H
-#define MESSAGE_H
+#pragma once
 
-#include <QObject>
+#include "JObject.h"
 #include <QMetaType>
 #include <QDataStream>
 
-class Message: public QObject
+class Message: public JObject
 {
     Q_OBJECT
 public:
-    Message();
+    Message(QObject* p = 0);
     virtual ~Message();
 
     virtual void read(QDataStream &dataBuffer) = 0;
@@ -17,4 +16,3 @@ public:
     virtual int typeId() = 0;
 };
 
-#endif // MESSAGE_H

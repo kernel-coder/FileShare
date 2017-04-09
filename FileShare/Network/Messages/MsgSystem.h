@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QDataStream>
-#include "ServerInfoMsg.h"
+#include "PeerViewInfoMsg.h"
 class Message;
 class QDataStream;
 
@@ -13,7 +13,7 @@ Q_OBJECT
 public:
     explicit MsgSystem(QObject *parent = 0);
     static Message *readAndContruct(QDataStream &pStream);
-    static  QString readableStatus(ServerInfoMsg::MyStatus status);
+    static  QString readableStatus(PeerViewInfoMsg::PeerStatus status);
 
 signals:
 

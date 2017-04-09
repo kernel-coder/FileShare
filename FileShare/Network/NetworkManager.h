@@ -1,13 +1,13 @@
 #ifndef NETWORKMANAGER_H
 #define NETWORKMANAGER_H
 
-#include <QObject>
+#include "JObject.h"
 #include <QAbstractSocket>
 #include <QHash>
 #include <QHostAddress>
 #include <QMap>
 #include "Server.h"
-#include "Messages/ServerInfoMsg.h"
+#include "Messages/PeerViewInfoMsg.h"
 
 class Connection;
 class PeerManager;
@@ -19,16 +19,19 @@ class GameCanceledMsg;
 class LineAddedMsg;
 class DotController;
 
+
 class NetworkManager : public QObject
 {
 Q_OBJECT
-public:
     explicit NetworkManager(QObject *parent = 0);
+public:    
+    static NetworkManager* me();
     ~NetworkManager();
+
+    MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
 
     bool sendMessage(Connection *pConn, Message *pMsg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort = -1);
-    ServerInfoMsg::MyStatus status();
     void setPlayingWith(Connection *pPeer);
 
 signals:
@@ -54,18 +57,13 @@ private slots:
 private:
     void removeConnection(Connection *pConnection);
     void disconnectSignal(Connection *pConnection);
-    void setStatus(ServerInfoMsg::MyStatus status);
 
     PeerManager *mpPeerManager;
     Server mServer;
     QMultiHash<QHostAddress, Connection *> mPeers;
     typedef QMap<Connection*,ChatMsg*> ChatMsgMap;
     ChatMsgMap mChatMsgsWhilePlaying;
-    ServerInfoMsg::MyStatus mStatus;
     Connection *mpPlayingWith;
-
-    friend class DotController;
-
 };
 
 #endif // NETWORKMANAGER_H

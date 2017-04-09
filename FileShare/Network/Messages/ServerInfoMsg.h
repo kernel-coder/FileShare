@@ -8,15 +8,9 @@ class ServerInfoMsg : public Message
 {
     Q_OBJECT
 public:
-    enum MyStatus {Busy,Free};
-    
-    ServerInfoMsg();
-    ServerInfoMsg(const int nPort, MyStatus status);
+    ServerInfoMsg(int nPort = 0, QObject* p =0);
         
-    void setPort(const int nPort);
-    int port()const;
-    void setStatus(MyStatus status);
-    MyStatus status();
+    MetaPropertyPublicSet_Ex(int, port)
 
     virtual void read(QDataStream &dataBuffer);
     virtual void write(QDataStream &dataBuffer);
@@ -25,9 +19,6 @@ public:
     static int TypeID;
 
 private:
-    int mnPort;
-    MyStatus mStatus;
-
 };
 
 #endif // SERVERINFO_H

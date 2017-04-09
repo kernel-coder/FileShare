@@ -1,5 +1,4 @@
-#ifndef PEERVIEWINFOMSG_H
-#define PEERVIEWINFOMSG_H
+#pragma once
 
 #include "Message.h"
 #include <QColor>
@@ -8,12 +7,11 @@ class PeerViewInfoMsg : public Message
 {
     Q_OBJECT
 public:
-    PeerViewInfoMsg();
-    PeerViewInfoMsg(QString name);
-    ~PeerViewInfoMsg();
+    enum PeerStatus {Busy,Free};
+    PeerViewInfoMsg(const QString& name = "", PeerStatus status = Free, QObject* p = 0);
 
-    void setName(const QString name);
-    QString name()const;
+    MetaPropertyPublicSet_Ex(QString, name)
+    MetaPropertyPublicSet_Ex(PeerStatus, status)
 
     virtual void read(QDataStream &dataBuffer);
     virtual void write(QDataStream &dataBuffer);
@@ -21,9 +19,4 @@ public:
 
 public:
     static int TypeID ;
-
-private:
-    QString mName;
 };
-
-#endif // PEERVIEWINFOMSG_H

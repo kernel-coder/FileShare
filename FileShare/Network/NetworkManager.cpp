@@ -9,11 +9,26 @@
 #include "Messages/LineAddedMsg.h"
 #include "StatusViewer.h"
 #include "Messages/PeerViewInfoMsg.h"
+#include <QCoreApplication>
+#include <QSettings>
+
+NetworkManager* NetworkManager::me()
+{
+    static NetworkManager* _nm = 0;
+    if (_nm == 0) {
+        _nm = new NetworkManager(qApp);
+    }
+    return _nm;
+}
+
 
 NetworkManager::NetworkManager(QObject *parent) :
-        QObject(parent),mStatus(ServerInfoMsg::Free)
+        QObject(parent)
 {
-    mpPeerManager = new PeerManager(this,this);
+    QSettings s;
+    _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();
+
+    mpPeerManager = new PeerManager(this, this);
     mpPeerManager->setServerPort(mServer.serverPort());
     mpPeerManager->startBroadcasting();
 
@@ -23,15 +38,6 @@ NetworkManager::NetworkManager(QObject *parent) :
     //connect(GameSettings::me(),SIGNAL(playerColorChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)));
 }
 
-ServerInfoMsg::MyStatus NetworkManager::status()
-{
-    return mStatus;
-}
-
-void NetworkManager::setStatus(ServerInfoMsg::MyStatus status)
-{
-    mStatus = status;
-}
 
 NetworkManager::~NetworkManager()
 {
@@ -100,8 +106,9 @@ void NetworkManager::readyForUse()
 
     mPeers.insert(pConnection->peerAddress(), pConnection);
     emit newParticipant(pConnection);
-    StatusViewer::me()->showTip(pConnection->peerViewInfo()->name() + tr("has just come in the network"), LONG_DURATION);
+    StatusViewer::me()->showTip(pConnection->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
 }
+
 
 void NetworkManager::disconnectSignal(Connection *pConnection)
 {
@@ -140,7 +147,7 @@ void NetworkManager::removeConnection(Connection *pConnection)
 void NetworkManager::newMessageArrived(Connection *pConn, Message *pMsg)
 {
     if(/*GameSettings::me()->setting(Game::BlockOthersWhileNetPlay).value<bool>() && */
-       pConn != mpPlayingWith && status() == ServerInfoMsg::Busy){
+       pConn != mpPlayingWith && status() == PeerViewInfoMsg::Busy){
         ChatMsg *pMsg = new ChatMsg(tr("Soryy, I am busy now. I will chat with you later."));
         pConn->sendMessage(pMsg);
 
@@ -170,6 +177,7 @@ void NetworkManager::newMessageArrived(Connection *pConn, Message *pMsg)
     emit newMsgCame();
 }
 
+
 void NetworkManager::closeAllSocks()
 {
     QList<Connection*> socks = mPeers.values();
@@ -196,5 +204,5 @@ void NetworkManager::setPlayingWith(Connection *pPeer)
 
     mChatMsgsWhilePlaying.clear();
     mpPlayingWith = pPeer;
-    setStatus(pPeer != NULL ? ServerInfoMsg::Busy : ServerInfoMsg::Free);
+    status(pPeer != NULL ? PeerViewInfoMsg::Busy : PeerViewInfoMsg::Free);
 }
