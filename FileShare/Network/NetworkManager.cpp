@@ -83,6 +83,42 @@ bool NetworkManager::sendMessage(Connection *pConn, Message *pMsg)
     return false;
 }
 
+void NetworkManager::addPendingPeers(const QHostAddress &senderIp, Connection *conn)
+{
+    mPendingPeers.insert(senderIp, conn);
+}
+
+void NetworkManager::removePendingPeers(Connection *conn)
+{
+    foreach (Connection *pConnection, mPendingPeers.values()){
+        if (conn == pConnection){
+            mPendingPeers.remove(conn->peerAddress());
+            break;
+        }
+    }
+}
+
+Connection *NetworkManager::hasPendingConnection(const QHostAddress &senderIp, int nSenderPort)
+{
+    if (nSenderPort == -1){
+        return mPendingPeers.value(senderIp,NULL);
+    }
+
+    if (!mPendingPeers.contains(senderIp)){
+        return NULL;
+    }
+
+    QList<Connection *> pConnections = mPendingPeers.values(senderIp);
+
+    foreach (Connection *pConnection, pConnections){
+        if (pConnection->peerPort() == nSenderPort){
+            return pConnection;
+        }
+    }
+
+    return NULL;
+}
+
 Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int nSenderPort)
 {
     if (nSenderPort == -1){
@@ -115,7 +151,7 @@ void NetworkManager::readyForUse()
 {
     Connection *pConnection = qobject_cast<Connection *>(sender());
 
-    if (!pConnection || (NULL != hasConnection(pConnection->peerAddress(),pConnection->peerPort()))){
+    if (!pConnection || (NULL != hasConnection(pConnection->peerAddress(), pConnection->peerPort()))){
         return;
     }
 

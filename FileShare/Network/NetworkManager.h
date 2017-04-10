@@ -36,6 +36,11 @@ public:
 
     bool sendMessage(Connection *pConn, Message *pMsg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort = -1);
+
+    void addPendingPeers(const QHostAddress &senderIp, Connection* conn);
+    void removePendingPeers(Connection* conn);
+    Connection *hasPendingConnection(const QHostAddress &senderIp, int nSenderPort = -1);
+
     void setPlayingWith(Connection *pPeer);
 
 signals:
@@ -55,7 +60,7 @@ private slots:
     void connectionError(QAbstractSocket::SocketError socketError);
     void disconnected();
     void readyForUse();
-    void newMessageArrived(Connection *pConn,Message *pMsg);
+    void newMessageArrived(Connection *pConn, Message *pMsg);
     void closeAllSocks();
     void checkPCPlayerInfoChanged();
 
@@ -66,6 +71,7 @@ private:
     PeerManager *mpPeerManager;
     Server mServer;
     QMultiHash<QHostAddress, Connection *> mPeers;
+    QMultiHash<QHostAddress, Connection *> mPendingPeers;
     typedef QMap<Connection*,ChatMsg*> ChatMsgMap;
     ChatMsgMap mChatMsgsWhilePlaying;
     Connection *mpPlayingWith;

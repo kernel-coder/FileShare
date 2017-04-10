@@ -8,6 +8,7 @@
 #include "QsLogDest.h"
 #include "CustomLogger.h"
 #include <QDir>
+#include <QtQml>
 
 
 void registersQmlComponents()

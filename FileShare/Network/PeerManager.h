@@ -26,8 +26,9 @@ public:
 signals:
     void newPeer(Connection *pConnection);
 
-public slots:
-    void connected();
+private slots:
+    void onPeerConnected();
+    void onPeerConnectingError(QAbstractSocket::SocketError socketError);
 
 private slots:
     void sendBroadcastDatagram();

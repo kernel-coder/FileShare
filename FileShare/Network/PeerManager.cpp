@@ -24,6 +24,7 @@ PeerManager::PeerManager(NetworkManager *pNetManager, QObject *parent) :
 
     mBroadcastTimer.setInterval(BroadcastInterval);
     connect(&mBroadcastTimer, SIGNAL(timeout()),this, SLOT(sendBroadcastDatagram()));
+    sendBroadcastDatagram();
 }
 
 void PeerManager::setServerPort(int nPort)
@@ -117,7 +118,7 @@ void PeerManager::readBroadcastDatagram()
             continue;
         }
 
-        ServerInfoMsg *pSIMsg = dynamic_cast<ServerInfoMsg*>(pMsg);         
+        ServerInfoMsg *pSIMsg = qobject_cast<ServerInfoMsg*>(pMsg);
 
         if(!pSIMsg || pSIMsg->port() <= 0 || pSIMsg->port() == mnServerPort){
             continue;
@@ -125,21 +126,37 @@ void PeerManager::readBroadcastDatagram()
 
         qDebug() << "sender b id: " << senderIp.toString() << pSIMsg->port();
 
-        Connection *conn = mpNetManager->hasConnection(senderIp);
-        if (conn == NULL){
-            conn = new Connection(0, this);
-            connect(conn, SIGNAL(connected()), SLOT(connected()));
-            conn->connectToHost(senderIp, pSIMsg->port());
+        if (mpNetManager->hasPendingConnection(senderIp, pSIMsg->port()) == NULL) {
+            Connection *conn = mpNetManager->hasConnection(senderIp);
+            if (conn == NULL){
+                conn = new Connection(0, this);
+                connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
+                connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
+                conn->connectToHost(senderIp, pSIMsg->port());
+            }
         }
     }
 }
 
 
-void PeerManager::connected()
+void PeerManager::onPeerConnected()
 {
     Connection *conn = qobject_cast<Connection*>(sender());
     if(conn) {
+        conn->disconnect(this);
+        mpNetManager->removePendingPeers(conn);
         emit newPeer(conn);
+    }
+}
+
+void PeerManager::onPeerConnectingError(QAbstractSocket::SocketError socketError)
+{
+    Connection *conn = qobject_cast<Connection*>(sender());
+    if(conn) {
+        qDebug() << "Peer conneciton error " <<  conn->errorString();
+        conn->disconnect(this);
+        mpNetManager->removePendingPeers(conn);
+        conn->deleteLater();
     }
 }
 
