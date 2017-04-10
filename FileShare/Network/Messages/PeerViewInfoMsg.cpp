@@ -1,7 +1,5 @@
 #include "PeerViewInfoMsg.h"
 
-int PeerViewInfoMsg::TypeID = 1;//qMetaTypeId<PeerViewInfoMsg>();
-
 
 PeerViewInfoMsg::PeerViewInfoMsg(const QString& name, PeerStatus status, QObject* p)
     : Message(p)

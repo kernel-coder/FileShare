@@ -1,7 +1,5 @@
 #include "ServerInfoMsg.h"
 
-int ServerInfoMsg::TypeID = 0;
-
 ServerInfoMsg::ServerInfoMsg(int nPort, QObject* p)
     : Message(p)
     , _port(nPort)

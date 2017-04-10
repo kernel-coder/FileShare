@@ -22,7 +22,7 @@ Window {
             anchors.centerIn: parent
             spacing: 10
             LabelEx {
-                text: NetMgr.username + ":"
+                text: "I'm " + NetMgr.username + " on port " + NetMgr.port + ", "
             }
             LabelEx {
                 text: NetMgr.status == PeerViewInfoMsg.Free ? "Availale" : "Busy"
@@ -43,25 +43,26 @@ Window {
         color: "#333333"
         Rectangle {
             color: "#222222"
-            anchors.leftMargin: 5
             anchors.left: parent.left;
             anchors.top: parent.top;
             anchors.bottom: parent.bottom
             width: parent.width * .3
             ListView {
+                spacing: 5
+                anchors.margins: 5
+                anchors.fill: parent
                 model: peersModel
                 delegate:  Component {
-                    Item {
-                        height: 30
-                        Row {
-                            spacing: 10
-                            LabelEx {
-                                text: name
-                            }
-                            LabelEx {
-                                text: status == PeerViewInfoMsg.Free ? "Availale" : "Busy"
-                            }
-                        }
+                    BorderedButton {
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        checkable: true;
+                        isRadioMode: true
+                        borderWidth: 0
+                        radius: 0
+                        colorNormal: "#333333"
+                        impHeight: 30
+                        text: name + ": " + (status == PeerViewInfoMsg.Free ? "Availale" : "Busy")
                     }
                 }
             }
@@ -71,6 +72,10 @@ Window {
 
     Connections {
         target: NetMgr
-        onNewParticipant: peersModel.append({name: connection.peerViewInfo.name})
+        onNewParticipant: {
+            peersModel.append({ name: connection.peerViewInfo.name,
+                                status: connection.peerViewInfo.status
+                              })
+        }
     }
 }

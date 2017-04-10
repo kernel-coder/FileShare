@@ -40,10 +40,10 @@ bool Connection::sendMessage(Message *pMsg)
         QByteArray block;
         QDataStream stream(&block, QIODevice::WriteOnly);
         stream.setVersion(QDataStream::Qt_4_6);
-        stream << (quint16)0;
+        stream << (quint64)0;
         pMsg->write(stream);
         stream.device()->seek(0);
-        stream << (quint16)(block.size() - sizeof(quint16));
+        stream << (quint64)(block.size() - sizeof(quint64));
 
         return this->write(block) == block.size();
     }
@@ -57,7 +57,7 @@ void Connection::dataReadyToRead()
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_4_6);
 
-    while(bytesAvailable() >= (int)sizeof(quint16)) {
+    while(bytesAvailable() >= (int)sizeof(quint64)) {
 
         if (mBlockSize == 0) {
             in >> mBlockSize;
@@ -77,7 +77,6 @@ void Connection::dataReadyToRead()
                         delete _peerViewInfo;
                         _peerViewInfo = NULL;
                     }
-
                     peerViewInfo(pvi);
                     emit readyForUse();
                 }

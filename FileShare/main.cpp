@@ -9,6 +9,7 @@
 #include "CustomLogger.h"
 #include <QDir>
 
+
 void registersQmlComponents()
 {
     qmlRegisterType<Connection>("com.kcl.fileshare", 1, 0, "Connection");
@@ -51,9 +52,6 @@ int main(int argc, char *argv[])
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
-    QsLogging::DestinationPtr debugDestination(
-       QsLogging::DestinationFactory::MakeDebugOutputDestination() );
-    logger.addDestination(debugDestination.get());
 
     const QString sLogPath = app.applicationDirPath() + "/log-fs.txt";
     QsLogging::DestinationPtr fileDestination(

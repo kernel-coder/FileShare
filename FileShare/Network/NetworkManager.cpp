@@ -27,11 +27,14 @@ NetworkManager::NetworkManager(QObject *parent) :
         QObject(parent)
 {
     QSettings s;
-    _username = s.value("username", QSysInfo::machineHostName()).toString();
+    _username = s.value("username", QHostInfo::localHostName()).toString();
     _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();
 
+    QHostInfo::lookupHost(_username, this, SLOT(onLocalHostLookupDone(QHostInfo)));
+
     mpPeerManager = new PeerManager(this, this);
-    mpPeerManager->setServerPort(mServer.serverPort());
+    _port = mServer.serverPort();
+    mpPeerManager->setServerPort(_port);
     mpPeerManager->startBroadcasting();
 
     connect(mpPeerManager, SIGNAL(newPeer(Connection*)),SLOT(newConnection(Connection*)));
@@ -44,6 +47,18 @@ NetworkManager::NetworkManager(QObject *parent) :
 NetworkManager::~NetworkManager()
 {
     closeAllSocks();
+}
+
+
+void NetworkManager::onLocalHostLookupDone(const QHostInfo &host)
+{
+    foreach (QHostAddress ha, host.addresses()) {
+        if (ha.isNull() || ha.isLoopback() || ha.isMulticast() ||
+                ha.protocol() != QAbstractSocket::IPv4Protocol) {
+            continue;
+        }
+        qDebug() << "loup " << ha.toString();
+    }
 }
 
 void NetworkManager::checkPCPlayerInfoChanged(/*Game::Player player*/)
@@ -191,6 +206,7 @@ void NetworkManager::closeAllSocks()
         }
     }
 }
+
 
 void NetworkManager::setPlayingWith(Connection *pPeer)
 {

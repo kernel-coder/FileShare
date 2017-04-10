@@ -1,12 +1,23 @@
 #include "MsgSystem.h"
 #include "Message.h"
-#include "ChatMsg.h"
+#include "ServerInfoMsg.h"
 #include "PeerViewInfoMsg.h"
+#include "ShareRequestMsg.h"
+#include "ShareResponseMsg.h"
+
+#include "ChatMsg.h"
 #include "PlayRequestMsg.h"
 #include "PlayRequestResultMsg.h"
 #include "GameCanceledMsg.h"
 #include "LineAddedMsg.h"
-#include "ServerInfoMsg.h"
+
+
+static int _msgIdCounter = 0;
+int ServerInfoMsg::TypeID = _msgIdCounter++;
+int PeerViewInfoMsg::TypeID = _msgIdCounter++;
+int ShareRequestMsg::TypeID = _msgIdCounter++;
+int ShareResponseMsg::TypeID = _msgIdCounter++;
+
 
 MsgSystem::MsgSystem(QObject *parent) :
     QObject(parent)

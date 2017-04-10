@@ -6,7 +6,8 @@ ImageButton {
     id: btn
 
     property color borderColor: "#656565"
-    property int borderWidth: 1
+    property real borderWidth: 1
+    property real radius: 5
     property real impWidth: 64
     property real impHeight: 36
     property color colorDisabled: "transparent"
@@ -20,9 +21,9 @@ ImageButton {
         background: Rectangle {
             implicitWidth: impWidth
             implicitHeight: impHeight;
-            border.width: 1
+            border.width: borderWidth
             border.color: control.borderColor
-            radius: 5
+            radius: radius
             color : enabled ? (control.down ? control.colorPressed : (control.hovered ? control.colorHovered : control.colorNormal)) : control.colorDisabled
             Row {
                 spacing: 7; anchors.centerIn: parent

@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QHostAddress>
 #include <QMap>
+#include <QHostInfo>
 #include "Server.h"
 #include "Messages/PeerViewInfoMsg.h"
 
@@ -29,6 +30,8 @@ public:
     ~NetworkManager();
 
     MetaPropertyPublicSet_Ex(QString, username)
+    MetaPropertyPublicSet_Ex(QString, ip)
+    MetaPropertyPublicSet_Ex(int, port)
     MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
 
     bool sendMessage(Connection *pConn, Message *pMsg);
@@ -47,6 +50,7 @@ signals:
     void newMsgCame();
 
 private slots:
+    void onLocalHostLookupDone(const QHostInfo &host);
     void newConnection(Connection *connection);
     void connectionError(QAbstractSocket::SocketError socketError);
     void disconnected();

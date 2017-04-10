@@ -32,7 +32,7 @@ private:
     void setPeerViewInfo(PeerViewInfoMsg *pPeerViewInfo);
 
 private:
-    quint16 mBlockSize;
+    quint64 mBlockSize;
     QMutex mMutex;
 };
 
