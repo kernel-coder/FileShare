@@ -13,6 +13,9 @@
 #include <QSettings>
 #include <QSettings>
 
+#define IP_PORT_PAIR(ip, port) QString("%1:%2").arg(ip).arg(port)
+
+
 NetworkManager* NetworkManager::me()
 {
     static NetworkManager* _nm = 0;
@@ -83,61 +86,30 @@ bool NetworkManager::sendMessage(Connection *pConn, Message *pMsg)
     return false;
 }
 
-void NetworkManager::addPendingPeers(const QHostAddress &senderIp, Connection *conn)
+void NetworkManager::addPendingPeers(const QHostAddress &senderIp, int port, Connection *conn)
 {
-    mPendingPeers.insert(senderIp, conn);
+    QString key = IP_PORT_PAIR(senderIp.toIPv4Address(), port);
+    if (!mPendingPeers.contains(key)) {
+        mPendingPeers.insert(key, conn);
+    }
 }
 
 void NetworkManager::removePendingPeers(Connection *conn)
 {
-    foreach (Connection *pConnection, mPendingPeers.values()){
-        if (conn == pConnection){
-            mPendingPeers.remove(conn->peerAddress());
-            break;
-        }
+    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
+    if (mPendingPeers.contains(key)) {
+        mPendingPeers.remove(key);
     }
 }
 
-Connection *NetworkManager::hasPendingConnection(const QHostAddress &senderIp, int nSenderPort)
+Connection *NetworkManager::hasPendingConnection(const QHostAddress &senderIp, int port)
 {
-    if (nSenderPort == -1){
-        return mPendingPeers.value(senderIp, NULL);
-    }
-
-    if (!mPendingPeers.contains(senderIp)){
-        return NULL;
-    }
-
-    QList<Connection *> pConnections = mPendingPeers.values(senderIp);
-
-    foreach (Connection *pConnection, pConnections){
-        if (pConnection->peerPort() == nSenderPort){
-            return pConnection;
-        }
-    }
-
-    return NULL;
+    return mPendingPeers.value(IP_PORT_PAIR(senderIp.toIPv4Address(), port), NULL);
 }
 
-Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int nSenderPort)
+Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port)
 {
-    if (nSenderPort == -1){
-        return mPeers.value(senderIp, NULL);
-    }
-
-    if (!mPeers.contains(senderIp)){
-        return NULL;
-    }
-
-    QList<Connection *> pConnections = mPeers.values(senderIp);
-
-    foreach (Connection *pConnection, pConnections){
-        if (pConnection->peerPort() == nSenderPort){
-            return pConnection;
-        }
-    }
-
-    return NULL;
+    return mPeers.value(IP_PORT_PAIR(senderIp.toIPv4Address(), port), NULL);
 }
 
 void NetworkManager::newConnection(Connection *pConnection)
@@ -149,26 +121,24 @@ void NetworkManager::newConnection(Connection *pConnection)
 
 void NetworkManager::readyForUse()
 {
-    Connection *pConnection = qobject_cast<Connection *>(sender());
+    Connection *conn = qobject_cast<Connection *>(sender());
+    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
 
-    if (!pConnection || (NULL != hasConnection(pConnection->peerAddress(), pConnection->peerPort()))){
-        return;
-    }
-
-    connect(pConnection, SIGNAL(newMessageArrived(Connection*,Message*)),this,SLOT(newMessageArrived(Connection*,Message*)));
-
-    mPeers.insert(pConnection->peerAddress(), pConnection);
-    emit newParticipant(pConnection);
-    StatusViewer::me()->showTip(pConnection->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
+    if (!mPeers.contains(key)){
+        mPeers.insert(key, conn);
+        connect(conn, SIGNAL(newMessageArrived(Connection*,Message*)), SLOT(newMessageArrived(Connection*,Message*)));
+        emit newParticipant(conn);
+        StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
+    }  
 }
 
 
-void NetworkManager::disconnectSignal(Connection *pConnection)
+void NetworkManager::disconnectSignal(Connection *conn)
 {
-    disconnect(pConnection, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
-    disconnect(pConnection, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    disconnect(pConnection, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
-    disconnect(pConnection, SIGNAL(newMessageArrived(Connection*,Message*)),this,SLOT(newMessageArrived(Connection*,Message*)));
+    disconnect(conn, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
+    disconnect(conn, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    disconnect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
+    disconnect(conn, SIGNAL(newMessageArrived(Connection*,Message*)),this,SLOT(newMessageArrived(Connection*,Message*)));
 }
 
 void NetworkManager::disconnected()
@@ -185,16 +155,16 @@ void NetworkManager::connectionError(QAbstractSocket::SocketError /* socketError
     }
 }
 
-void NetworkManager::removeConnection(Connection *pConnection)
+void NetworkManager::removeConnection(Connection *conn)
 {
-    if (mPeers.contains(pConnection->peerAddress())){
-        mPeers.remove(pConnection->peerAddress());
-        emit participantLeft(pConnection);
+    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
+    if (mPeers.contains(key)){
+        mPeers.remove(key);
+        emit participantLeft(conn);
     }
 
-    pConnection->deleteLater();
-
-    StatusViewer::me()->showTip(pConnection->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
+    conn->deleteLater();
+    StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
 }
 
 void NetworkManager::newMessageArrived(Connection *pConn, Message *pMsg)
@@ -241,22 +211,4 @@ void NetworkManager::closeAllSocks()
             pConn->close();
         }
     }
-}
-
-
-void NetworkManager::setPlayingWith(Connection *pPeer)
-{
-    if(pPeer == NULL && mpPlayingWith){
-        QMapIterator<Connection*,ChatMsg*> iter(mChatMsgsWhilePlaying);
-        while(iter.hasNext()){
-            if(mPeers.contains(pPeer->peerAddress())){
-                emit chatMsgCame(iter.key(),iter.value());
-            }
-            iter.next();
-        }        
-    }
-
-    mChatMsgsWhilePlaying.clear();
-    mpPlayingWith = pPeer;
-    status(pPeer != NULL ? PeerViewInfoMsg::Busy : PeerViewInfoMsg::Free);
 }

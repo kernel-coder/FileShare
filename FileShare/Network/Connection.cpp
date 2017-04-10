@@ -14,7 +14,7 @@ Connection::Connection(int sockId, QObject *parent) :
   , _peerViewInfo(0)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-    QObject::connect(this, SIGNAL(readyRead()), this, SLOT(dataReadyToRead()));
+    connect(this, SIGNAL(readyRead()), SLOT(dataReadyToRead()));
 
     if (sockId > 0 ) {
         if(setSocketDescriptor(sockId)){
@@ -22,7 +22,7 @@ Connection::Connection(int sockId, QObject *parent) :
         }
     }
     else {
-        QObject::connect(this, SIGNAL(connected()),this,SLOT(sendClientViewInfo()));
+        connect(this, SIGNAL(connected()), SLOT(sendClientViewInfo()));
     }
 }
 

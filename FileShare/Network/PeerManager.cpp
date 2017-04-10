@@ -123,18 +123,19 @@ void PeerManager::readBroadcastDatagram()
         if(!pSIMsg || pSIMsg->port() <= 0 || pSIMsg->port() == mnServerPort){
             continue;
         }
+        int port = pSIMsg->port();
 
-        qDebug() << "peer id: " << senderIp.toString() << pSIMsg->port();
+        qDebug() << "peer id: " << senderIp.toString() << port;
 
-        if (mpNetManager->hasPendingConnection(senderIp, pSIMsg->port()) == NULL) {
-            Connection *conn = mpNetManager->hasConnection(senderIp, pSIMsg->port());
+        if (mpNetManager->hasPendingConnection(senderIp, port) == NULL) {
+            Connection *conn = mpNetManager->hasConnection(senderIp, port);
             if (conn == NULL){
                 conn = new Connection(0, this);
-                mpNetManager->addPendingPeers(senderIp, conn);
-                qDebug() << "connecting to peer: " << senderIp.toString() << pSIMsg->port();
+                mpNetManager->addPendingPeers(senderIp, port, conn);
+                qDebug() << "connecting to peer: " << senderIp.toString() << port;
                 connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
                 connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
-                conn->connectToHost(senderIp, pSIMsg->port());
+                conn->connectToHost(senderIp, port);
             }
         }
     }

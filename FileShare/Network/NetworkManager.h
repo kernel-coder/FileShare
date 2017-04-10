@@ -37,11 +37,9 @@ public:
     bool sendMessage(Connection *pConn, Message *pMsg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort);
 
-    void addPendingPeers(const QHostAddress &senderIp, Connection* conn);
+    void addPendingPeers(const QHostAddress &senderIp, int port, Connection* conn);
     void removePendingPeers(Connection* conn);
     Connection *hasPendingConnection(const QHostAddress &senderIp, int nSenderPort);
-
-    void setPlayingWith(Connection *pPeer);
 
 signals:
     void newParticipant(Connection *connection);
@@ -70,8 +68,8 @@ private:
 
     PeerManager *mpPeerManager;
     Server mServer;
-    QHash<QHostAddress, Connection *> mPeers;
-    QHash<QHostAddress, Connection *> mPendingPeers;
+    QHash<QString, Connection *> mPeers;
+    QHash<QString, Connection *> mPendingPeers;
     typedef QMap<Connection*,ChatMsg*> ChatMsgMap;
     ChatMsgMap mChatMsgsWhilePlaying;
     Connection *mpPlayingWith;
