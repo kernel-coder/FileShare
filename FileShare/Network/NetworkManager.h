@@ -35,11 +35,11 @@ public:
     MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
 
     bool sendMessage(Connection *pConn, Message *pMsg);
-    Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort = -1);
+    Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort);
 
     void addPendingPeers(const QHostAddress &senderIp, Connection* conn);
     void removePendingPeers(Connection* conn);
-    Connection *hasPendingConnection(const QHostAddress &senderIp, int nSenderPort = -1);
+    Connection *hasPendingConnection(const QHostAddress &senderIp, int nSenderPort);
 
     void setPlayingWith(Connection *pPeer);
 
@@ -70,8 +70,8 @@ private:
 
     PeerManager *mpPeerManager;
     Server mServer;
-    QMultiHash<QHostAddress, Connection *> mPeers;
-    QMultiHash<QHostAddress, Connection *> mPendingPeers;
+    QHash<QHostAddress, Connection *> mPeers;
+    QHash<QHostAddress, Connection *> mPendingPeers;
     typedef QMap<Connection*,ChatMsg*> ChatMsgMap;
     ChatMsgMap mChatMsgsWhilePlaying;
     Connection *mpPlayingWith;

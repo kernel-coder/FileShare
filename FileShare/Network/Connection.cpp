@@ -74,11 +74,13 @@ void Connection::dataReadyToRead()
                 PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(pMsg);
                 if(pvi != NULL){
                     if(_peerViewInfo){
-                        delete _peerViewInfo;
-                        _peerViewInfo = NULL;
+                        _peerViewInfo->name(pvi->name());
+                        _peerViewInfo->status(pvi->status());
                     }
-                    peerViewInfo(pvi);
-                    emit readyForUse();
+                    else {
+                        peerViewInfo(pvi);
+                        emit readyForUse();
+                    }
                 }
             }
             else{

@@ -127,11 +127,11 @@ void PeerManager::readBroadcastDatagram()
         qDebug() << "peer id: " << senderIp.toString() << pSIMsg->port();
 
         if (mpNetManager->hasPendingConnection(senderIp, pSIMsg->port()) == NULL) {
-            Connection *conn = mpNetManager->hasConnection(senderIp);
+            Connection *conn = mpNetManager->hasConnection(senderIp, pSIMsg->port());
             if (conn == NULL){
                 conn = new Connection(0, this);
-                qDebug() << "connecting to peer: " << senderIp.toString() << pSIMsg->port();
                 mpNetManager->addPendingPeers(senderIp, conn);
+                qDebug() << "connecting to peer: " << senderIp.toString() << pSIMsg->port();
                 connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
                 connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
                 conn->connectToHost(senderIp, pSIMsg->port());

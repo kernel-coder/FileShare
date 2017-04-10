@@ -101,7 +101,7 @@ void NetworkManager::removePendingPeers(Connection *conn)
 Connection *NetworkManager::hasPendingConnection(const QHostAddress &senderIp, int nSenderPort)
 {
     if (nSenderPort == -1){
-        return mPendingPeers.value(senderIp,NULL);
+        return mPendingPeers.value(senderIp, NULL);
     }
 
     if (!mPendingPeers.contains(senderIp)){
@@ -122,7 +122,7 @@ Connection *NetworkManager::hasPendingConnection(const QHostAddress &senderIp, i
 Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int nSenderPort)
 {
     if (nSenderPort == -1){
-        return mPeers.value(senderIp,NULL);
+        return mPeers.value(senderIp, NULL);
     }
 
     if (!mPeers.contains(senderIp)){
