@@ -124,12 +124,14 @@ void PeerManager::readBroadcastDatagram()
             continue;
         }
 
-        qDebug() << "sender b id: " << senderIp.toString() << pSIMsg->port();
+        qDebug() << "peer id: " << senderIp.toString() << pSIMsg->port();
 
         if (mpNetManager->hasPendingConnection(senderIp, pSIMsg->port()) == NULL) {
             Connection *conn = mpNetManager->hasConnection(senderIp);
             if (conn == NULL){
                 conn = new Connection(0, this);
+                qDebug() << "connecting to peer: " << senderIp.toString() << pSIMsg->port();
+                mpNetManager->addPendingPeers(senderIp, conn);
                 connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
                 connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
                 conn->connectToHost(senderIp, pSIMsg->port());
@@ -143,6 +145,7 @@ void PeerManager::onPeerConnected()
 {
     Connection *conn = qobject_cast<Connection*>(sender());
     if(conn) {
+        qDebug() << "Peer conneciton success " <<  conn->peerAddress().toString();
         conn->disconnect(this);
         mpNetManager->removePendingPeers(conn);
         emit newPeer(conn);
