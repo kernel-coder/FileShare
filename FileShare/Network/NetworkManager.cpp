@@ -40,8 +40,8 @@ NetworkManager::NetworkManager(QObject *parent) :
     mpPeerManager->setServerPort(_port);
     mpPeerManager->startBroadcasting();
 
-    connect(mpPeerManager, SIGNAL(newPeer(Connection*)),SLOT(newConnection(Connection*)));
-    connect(&mServer, SIGNAL(newPeer(Connection*)),SLOT(newConnection(Connection*)));
+    connect(mpPeerManager, SIGNAL(newPeer(Connection*)), SLOT(newConnection(Connection*)));
+    connect(&mServer, SIGNAL(newPeer(Connection*)), SLOT(newConnection(Connection*)));
     //connect(GameSettings::me(),SIGNAL(playerNameChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)));
     //connect(GameSettings::me(),SIGNAL(playerColorChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)))
 }
@@ -98,7 +98,11 @@ void NetworkManager::removePendingPeers(Connection *conn)
 {
     QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
     if (mPendingPeers.contains(key)) {
+        qDebug() << "removed pending peer " << key;
         mPendingPeers.remove(key);
+    }
+    else {
+        qDebug() << "no pending peer found with key " << key;
     }
 }
 
@@ -112,11 +116,9 @@ Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port
     return mPeers.value(IP_PORT_PAIR(senderIp.toIPv4Address(), port), NULL);
 }
 
-void NetworkManager::newConnection(Connection *pConnection)
+void NetworkManager::newConnection(Connection *conn)
 {
-    connect(pConnection, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
-    connect(pConnection, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(pConnection, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
+    connect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
 }
 
 void NetworkManager::readyForUse()
@@ -126,6 +128,9 @@ void NetworkManager::readyForUse()
 
     if (!mPeers.contains(key)){
         mPeers.insert(key, conn);
+        connect(conn, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
+        connect(conn, SIGNAL(disconnected()), this, SLOT(disconnected()));
+
         connect(conn, SIGNAL(newMessageArrived(Connection*,Message*)), SLOT(newMessageArrived(Connection*,Message*)));
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);

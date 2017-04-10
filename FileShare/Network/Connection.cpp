@@ -6,6 +6,7 @@
 #include <QMutexLocker>
 #include <QSysInfo>
 #include <QtQml>
+#include <QTimer>
 
 
 Connection::Connection(int sockId, QObject *parent) :
@@ -17,12 +18,18 @@ Connection::Connection(int sockId, QObject *parent) :
     connect(this, SIGNAL(readyRead()), SLOT(dataReadyToRead()));
 
     if (sockId > 0 ) {
-        if(setSocketDescriptor(sockId)){
-            sendClientViewInfo();
+        if(setSocketDescriptor(sockId)) {
+            QTimer::singleShot(1000, [=](){
+               sendClientViewInfo();
+            });
         }
     }
     else {
-        connect(this, SIGNAL(connected()), SLOT(sendClientViewInfo()));
+        connect(this, &QTcpSocket::connected, [=]() {
+            QTimer::singleShot(1000, [=](){
+               sendClientViewInfo();
+            });
+        });
     }
 }
 
