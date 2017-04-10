@@ -53,6 +53,9 @@ int main(int argc, char *argv[])
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);
+    QsLogging::DestinationPtr debugDestination(
+           QsLogging::DestinationFactory::MakeDebugOutputDestination() );
+        logger.addDestination(debugDestination.get());
 
     const QString sLogPath = app.applicationDirPath() + "/log-fs.txt";
     QsLogging::DestinationPtr fileDestination(
