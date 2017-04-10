@@ -33,8 +33,6 @@ NetworkManager::NetworkManager(QObject *parent) :
     _username = s.value("username", QHostInfo::localHostName()).toString();
     _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();
 
-    QHostInfo::lookupHost(_username, this, SLOT(onLocalHostLookupDone(QHostInfo)));
-
     mpPeerManager = new PeerManager(this, this);
     _port = mServer.serverPort();
     mpPeerManager->setServerPort(_port);
@@ -53,28 +51,15 @@ NetworkManager::~NetworkManager()
 }
 
 
-void NetworkManager::onLocalHostLookupDone(const QHostInfo &host)
+void NetworkManager::checkPCPlayerInfoChanged()
 {
-    foreach (QHostAddress ha, host.addresses()) {
-        if (ha.isNull() || ha.isLoopback() || ha.isMulticast() ||
-                ha.protocol() != QAbstractSocket::IPv4Protocol) {
-            continue;
+    QList<Connection*> socks = mPeers.values();
+
+    foreach(Connection* pConn,socks){
+        if(pConn){
+            pConn->sendClientViewInfo();
         }
-        qDebug() << "loup " << ha.toString();
     }
-}
-
-void NetworkManager::checkPCPlayerInfoChanged(/*Game::Player player*/)
-{
-    //if(player == Game::Player1){
-        QList<Connection*> socks = mPeers.values();
-
-        foreach(Connection* pConn,socks){
-            if(pConn){
-                pConn->sendClientViewInfo();
-            }
-        }
-    //}
 }
 
 bool NetworkManager::sendMessage(Connection *pConn, Message *pMsg)
@@ -96,13 +81,14 @@ void NetworkManager::addPendingPeers(const QHostAddress &senderIp, int port, Con
 
 void NetworkManager::removePendingPeers(Connection *conn)
 {
-    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
-    if (mPendingPeers.contains(key)) {
-        qDebug() << "removed pending peer " << key;
-        mPendingPeers.remove(key);
-    }
-    else {
-        qDebug() << "no pending peer found with key " << key;
+    QHashIterator<QString, Connection*> iter(mPendingPeers);
+    while (iter.hasNext()) {
+        iter.next();
+        if (iter.value() == conn) {
+            mPendingPeers.remove(iter.key());
+            qDebug() << "removed pending peer " << iter.key();
+            break;
+        }
     }
 }
 
@@ -118,19 +104,25 @@ Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port
 
 void NetworkManager::newConnection(Connection *conn)
 {
-    connect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
+    Connection* existingConn = hasConnection(conn->peerAddress(), conn->peerPort());
+    if (existingConn == NULL) {
+        connect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
+    }
+    else {
+        delete conn;
+    }
 }
 
 void NetworkManager::readyForUse()
 {
     Connection *conn = qobject_cast<Connection *>(sender());
     QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
+    qDebug() << "new party conneccted " << key;
 
-    if (!mPeers.contains(key)){
+    if (!mPeers.contains(key)) {
         mPeers.insert(key, conn);
         connect(conn, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
-        connect(conn, SIGNAL(disconnected()), this, SLOT(disconnected()));
-
+        connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
         connect(conn, SIGNAL(newMessageArrived(Connection*,Message*)), SLOT(newMessageArrived(Connection*,Message*)));
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
@@ -141,15 +133,16 @@ void NetworkManager::readyForUse()
 void NetworkManager::disconnectSignal(Connection *conn)
 {
     disconnect(conn, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
-    disconnect(conn, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    disconnect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
     disconnect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
     disconnect(conn, SIGNAL(newMessageArrived(Connection*,Message*)),this,SLOT(newMessageArrived(Connection*,Message*)));
 }
 
-void NetworkManager::disconnected()
+void NetworkManager::onDisconnected()
 {
-    if (Connection *pConnection = qobject_cast<Connection *>(sender())){
-        removeConnection(pConnection);
+    if (Connection *conn = qobject_cast<Connection *>(sender())){
+        participantLeft(conn);
+        removeConnection(conn);
     }
 }
 
@@ -162,15 +155,20 @@ void NetworkManager::connectionError(QAbstractSocket::SocketError /* socketError
 
 void NetworkManager::removeConnection(Connection *conn)
 {
-    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
-    if (mPeers.contains(key)){
-        mPeers.remove(key);
-        emit participantLeft(conn);
+    QHashIterator<QString, Connection*> iter(mPeers);
+    while (iter.hasNext()) {
+        iter.next();
+        if (iter.value() == conn) {
+            mPeers.remove(iter.key());
+            qDebug() << "removed connection " << iter.key();
+            break;
+        }
     }
 
-    conn->deleteLater();
     StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
+    conn->deleteLater();
 }
+
 
 void NetworkManager::newMessageArrived(Connection *pConn, Message *pMsg)
 {

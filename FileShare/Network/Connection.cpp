@@ -83,10 +83,12 @@ void Connection::dataReadyToRead()
                     if(_peerViewInfo){
                         _peerViewInfo->name(pvi->name());
                         _peerViewInfo->status(pvi->status());
+                        pvi->deleteLater();
                     }
                     else {
                         peerViewInfo(pvi);
                         emit readyForUse();
+                        qDebug() << " readyForUse fired";
                     }
                 }
             }

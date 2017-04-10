@@ -43,7 +43,7 @@ public:
 
 signals:
     void newParticipant(Connection *connection);
-    void participantLeft(Connection *pConn);
+    void participantLeft(Connection *connection);
     void chatMsgCame(Connection *pFrom,ChatMsg *pMsg);
     void playRequestCame(Connection *pFrom,PlayRequestMsg *pMsg);
     void playRequestResultCame(Connection *pFrom,PlayRequestResultMsg *pMsg);
@@ -53,10 +53,9 @@ signals:
     void newMsgCame();
 
 private slots:
-    void onLocalHostLookupDone(const QHostInfo &host);
     void newConnection(Connection *connection);
     void connectionError(QAbstractSocket::SocketError socketError);
-    void disconnected();
+    void onDisconnected();
     void readyForUse();
     void newMessageArrived(Connection *pConn, Message *pMsg);
     void closeAllSocks();
@@ -68,8 +67,8 @@ private:
 
     PeerManager *mpPeerManager;
     Server mServer;
-    QHash<QString, Connection *> mPeers;
-    QHash<QString, Connection *> mPendingPeers;
+    QHash<QString, Connection*> mPeers;
+    QHash<QString, Connection*> mPendingPeers;
     typedef QMap<Connection*,ChatMsg*> ChatMsgMap;
     ChatMsgMap mChatMsgsWhilePlaying;
     Connection *mpPlayingWith;

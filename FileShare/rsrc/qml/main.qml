@@ -73,9 +73,18 @@ Window {
     Connections {
         target: NetMgr
         onNewParticipant: {
-            peersModel.append({ name: connection.peerViewInfo.name,
+            peersModel.append({ connObj :  connection, name: connection.peerViewInfo.name,
                                 status: connection.peerViewInfo.status
                               })
+        }
+        onParticipantLeft: {
+            for (var i = 0; i < peersModel.count; i++) {
+                var obj = peersModel.get(i);
+                if (obj.connObj == connection) {
+                    peersModel.remove(i, 1);
+                    break;
+                }
+            }
         }
     }
 }
