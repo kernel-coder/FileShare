@@ -27,6 +27,13 @@ PeerManager::PeerManager(NetworkManager *pNetManager, QObject *parent) :
     sendBroadcastDatagram();
 }
 
+
+PeerManager::~PeerManager()
+{
+    mBroadcastSocket.close();
+}
+
+
 void PeerManager::setServerPort(int nPort)
 {
     mnServerPort = nPort;

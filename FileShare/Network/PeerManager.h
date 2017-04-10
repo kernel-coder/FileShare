@@ -18,6 +18,7 @@ class PeerManager : public QObject
 Q_OBJECT
 public:
     PeerManager(NetworkManager *pNetManager, QObject *parent = 0);
+    ~PeerManager();
     void setServerPort(int nPort);
     QByteArray userName() const;
     void startBroadcasting();

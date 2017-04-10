@@ -104,19 +104,13 @@ Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port
 
 void NetworkManager::newConnection(Connection *conn)
 {
-    Connection* existingConn = hasConnection(conn->peerAddress(), conn->peerPort());
-    if (existingConn == NULL) {
-        connect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
-    }
-    else {
-        delete conn;
-    }
+    connect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
 }
 
 void NetworkManager::readyForUse()
 {
     Connection *conn = qobject_cast<Connection *>(sender());
-    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerPort());
+    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerViewInfo()->port());
     qDebug() << "new party conneccted " << key;
 
     if (!mPeers.contains(key)) {
@@ -126,7 +120,10 @@ void NetworkManager::readyForUse()
         connect(conn, SIGNAL(newMessageArrived(Connection*,Message*)), SLOT(newMessageArrived(Connection*,Message*)));
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
-    }  
+    }
+    else {
+        removeConnection(conn);
+    }
 }
 
 
@@ -160,12 +157,12 @@ void NetworkManager::removeConnection(Connection *conn)
         iter.next();
         if (iter.value() == conn) {
             mPeers.remove(iter.key());
+            StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
             qDebug() << "removed connection " << iter.key();
             break;
         }
     }
 
-    StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
     conn->deleteLater();
 }
 
