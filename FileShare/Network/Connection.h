@@ -14,7 +14,8 @@ class TcpSocket : public QTcpSocket
 {
     Q_OBJECT
 public:
-    TcpSocket(int sockId = 0, QObject * p = nullptr);
+    TcpSocket(QObject * p = nullptr);
+    void setupSocket(int sockId = 0);
 
 signals:
     void newMessageCome(Message *msg);

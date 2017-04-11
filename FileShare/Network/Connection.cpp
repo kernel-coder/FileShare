@@ -10,7 +10,11 @@
 #include <QThread>
 
 
-TcpSocket::TcpSocket(int sockId, QObject * p) : QTcpSocket(p), mnBlockSize(0)
+TcpSocket::TcpSocket(QObject * p) : QTcpSocket(p), mnBlockSize(0)
+{
+}
+
+void TcpSocket::setupSocket(int sockId)
 {
     connect(this, SIGNAL(readyRead()), SLOT(dataReadyToRead()));
 
@@ -79,12 +83,11 @@ Connection::Connection(int sockId, QObject *parent)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);        
     QThread* thread = new QThread(this);
-    Connection* conn = new Connection();
-    conn->moveToThread(thread);
-    connect(conn, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
+    mSocket = new TcpSocket();
+    mSocket->moveToThread(thread);
+    connect(mSocket, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), mSocket, SLOT(deleteLater()));
     thread->start();
-
-    mSocket = new TcpSocket(sockId, this);
 
     connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
     connect(mSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));

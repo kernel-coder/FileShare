@@ -20,7 +20,6 @@ SOURCES += main.cpp \
     Utils.cpp \
     FileTransferManager.cpp
 
-
 HEADERS += \
     StatusViewer.h \
     Utils.h \
