@@ -62,9 +62,7 @@ bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 void PeerManager::sendBroadcastDatagram()
 {
     QMutexLocker locker(&mMutex);
-
     QByteArray datagram = serverInfo();
-
     bool bValidBroadcastAddresses = true;
 
     foreach (QHostAddress address, mBroadcastAddresses){

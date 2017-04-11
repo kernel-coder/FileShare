@@ -11,6 +11,7 @@
 #include "GameCanceledMsg.h"
 #include "LineAddedMsg.h"
 #include "FileTransferMsg.h"
+#include "FilePartTransferMsg.h"
 
 
 static int _msgIdCounter = 0;
@@ -19,7 +20,9 @@ int PeerViewInfoMsg::TypeID = _msgIdCounter++;
 int ShareRequestMsg::TypeID = _msgIdCounter++;
 int ShareResponseMsg::TypeID = _msgIdCounter++;
 int FileTransferMsg::TypeID = _msgIdCounter++;
-
+int FileTransferAckMsg::TypeID = _msgIdCounter++;
+int FilePartTransferMsg::TypeID = _msgIdCounter++;
+int FilePartTransferAckMsg::TypeID = _msgIdCounter++;
 
 MsgSystem::MsgSystem(QObject *parent) :
     QObject(parent)
@@ -30,32 +33,41 @@ MsgSystem::MsgSystem(QObject *parent) :
 Message * MsgSystem::readAndContruct(QDataStream &stream)
 {
     Message *pMsg = NULL;
-    int nTypeId;
+    int msgTypeId;
 
-    stream >> nTypeId;
+    stream >> msgTypeId;
 
-    if(nTypeId == ServerInfoMsg::TypeID){
+    if(msgTypeId == ServerInfoMsg::TypeID){
         pMsg = new ServerInfoMsg();
     }
-    else if(nTypeId == PeerViewInfoMsg::TypeID){
+    else if(msgTypeId == PeerViewInfoMsg::TypeID){
         pMsg = new PeerViewInfoMsg();
     }    
-    else if(nTypeId == ShareRequestMsg::TypeID){
+    else if(msgTypeId == ShareRequestMsg::TypeID){
         pMsg = new ShareRequestMsg();
     }
-    else if(nTypeId == ShareResponseMsg::TypeID){
+    else if(msgTypeId == ShareResponseMsg::TypeID){
         pMsg = new ShareResponseMsg();
     }
-    else if(nTypeId == FileTransferMsg::TypeID){
+    else if(msgTypeId == FileTransferMsg::TypeID){
         pMsg = new FileTransferMsg();
     }
-    else if(nTypeId == ChatMsg::TypeID){
+    else if(msgTypeId == FileTransferAckMsg::TypeID){
+        pMsg = new FileTransferAckMsg();
+    }
+    else if(msgTypeId == FilePartTransferMsg::TypeID){
+        pMsg = new FilePartTransferMsg();
+    }
+    else if(msgTypeId == FilePartTransferAckMsg::TypeID){
+        pMsg = new FilePartTransferAckMsg();
+    }
+    else if(msgTypeId == ChatMsg::TypeID){
         pMsg = new ChatMsg();
     }
-    else if(nTypeId == GameCanceledMsg::TypeID){
+    else if(msgTypeId == GameCanceledMsg::TypeID){
         pMsg = new GameCanceledMsg();
     }
-    else if(nTypeId == LineAddedMsg::TypeID){
+    else if(msgTypeId == LineAddedMsg::TypeID){
         pMsg = new LineAddedMsg();
     }
 

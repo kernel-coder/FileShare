@@ -61,6 +61,8 @@ int main(int argc, char *argv[])
     qInstallMessageHandler(customMessageHandler);
 
     QGuiApplication app(argc, argv);
+    app.setOrganizationName("KCL");
+    app.setApplicationName("QFileShare");
 
     QsLogging::Logger& logger = QsLogging::Logger::instance();
     logger.setLoggingLevel(QsLogging::TraceLevel);

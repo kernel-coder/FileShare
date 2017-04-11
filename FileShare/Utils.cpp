@@ -41,7 +41,7 @@ QString Utils::dataDirCommon(const QString& file)
     path = QString("%1/%2/%3/").arg(path).arg(qApp->organizationName()).arg(qApp->applicationName());
     makePath(path);
     if (!file.isEmpty()) {
-        path  = path + file;
+        path  = path + file;      
     }
     return path;
 }

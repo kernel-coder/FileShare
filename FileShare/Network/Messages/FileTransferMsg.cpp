@@ -5,8 +5,9 @@
 #include <QDebug>
 
 
-FileTransferMsg::FileTransferMsg(const QString& filename, QObject* p)
+FileTransferMsg::FileTransferMsg(const QString& uuid, const QString& filename, QObject* p)
     : Message(p)
+    , _uuid(uuid)
     , _filename(filename)
 {
 
@@ -16,40 +17,31 @@ FileTransferMsg::FileTransferMsg(const QString& filename, QObject* p)
 void FileTransferMsg::write(QDataStream &buf)
 {
     buf << typeId();
-    buf << QFileInfo(_filename).fileName();
-    qDebug() << "sending file " << _filename;
-    QFile file(_filename);
-    if (file.open(QFile::ReadOnly)) {
-        qDebug() << "sending data ";
-        QByteArray ba = file.readAll();
-        buf << ba.length();
-        buf.writeRawData(ba.data(), ba.length());
-        file.close();
-    }
-    else {
-        buf << ((qint64)0);
-    }
+    buf << _uuid;
+    buf << _basePath;
+    buf << _filename;
+    buf << _size;
+    buf << _seqCount;
 }
 
 
 void FileTransferMsg::read(QDataStream &buf)
 {
-    QString filename;
-    int length  =0;
-    buf >> filename;
-    buf >> length;
-    QByteArray ba;
-    ba.resize(length);
-    buf.readRawData(ba.data(), length);
-    _filename = Utils::me()->dataDirCommon(filename);
-    QFile file(_filename);
-    if (file.open(QFile::WriteOnly)) {
-        file.write(ba);
-        file.close();
-    }
-    qDebug() << "File recieved at " << _filename;
+    buf >> _uuid;
+    buf >> _basePath;
+    buf >> _filename;
+    buf >> _size;
+    buf >> _seqCount;
 }
 
 
 int FileTransferMsg::typeId() { return FileTransferMsg::TypeID;}
 
+
+FileTransferAckMsg::FileTransferAckMsg(const QString& uuid, const QString& filename, QObject* p)
+    : FileTransferMsg(uuid, filename)
+{
+}
+
+
+int FileTransferAckMsg::typeId() { return FileTransferMsg::TypeID;}

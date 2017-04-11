@@ -19,7 +19,8 @@ HEADERS += \
     $$PWD/Messages/ServerInfoMsg.h \
     $$PWD/Messages/ShareRequestMsg.h \
     $$PWD/Messages/ShareResponseMsg.h \
-    $$PWD/Messages/FileTransferMsg.h
+    $$PWD/Messages/FileTransferMsg.h \
+    $$PWD/Messages/FilePartTransferMsg.h
 
 SOURCES += \
     #$$PWD/ChatWnd.cpp \
@@ -39,4 +40,5 @@ SOURCES += \
     $$PWD/Messages/ServerInfoMsg.cpp \
     $$PWD/Messages/ShareRequestMsg.cpp \
     $$PWD/Messages/ShareResponseMsg.cpp \
-    $$PWD/Messages/FileTransferMsg.cpp
+    $$PWD/Messages/FileTransferMsg.cpp \
+    $$PWD/Messages/FilePartTransferMsg.cpp

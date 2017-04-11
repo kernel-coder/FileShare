@@ -30,13 +30,14 @@ Connection::Connection(int sockId, QObject *parent)
 
 void Connection::sendClientViewInfo()
 {
-    PeerViewInfoMsg pvi(NetMgr->username(), NetMgr->port(), NetMgr->status());
-    sendMessage(&pvi);
+    PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
+    sendMessage(pvi);
 }
 
 
 bool Connection::sendMessage(Message *msg)
 {
+    bool result = false;
     if(msg){
         QByteArray block;
         QDataStream stream(&block, QIODevice::WriteOnly);
@@ -45,10 +46,10 @@ bool Connection::sendMessage(Message *msg)
         msg->write(stream);
         stream.device()->seek(0);
         stream << (quint64)(block.size() - sizeof(quint64));
-
-        return this->write(block) == block.size();
+        result = this->write(block) == block.size();
+        msg->deleteLater();
     }
-    return false;
+    return result;
 }
 
 
