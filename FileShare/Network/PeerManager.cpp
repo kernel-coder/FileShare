@@ -175,7 +175,7 @@ void PeerManager::updateAddresses()
                 QHostAddress broadcastAddress = entry.broadcast();
                 if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost && !broadcastAddress.isLoopback()
                         && !mBroadcastAddresses.contains(broadcastAddress)) {
-                    qDebug() << "BD address found " << broadcastAddress.toString() << " /// " << entry.ip().toString();
+                    //qDebug() << "BD address found " << broadcastAddress.toString() << " /// " << entry.ip().toString();
                     mBroadcastAddresses << broadcastAddress;
                     mIPAddresses << entry.ip();
                 }

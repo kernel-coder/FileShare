@@ -75,12 +75,13 @@ void Connection::dataReadyToRead()
         }
 
         Message *msg = MsgSystem::readAndContruct(in);
+        mBlockSize = 0;
 
         if(msg){
-            if(msg->typeId() == PeerViewInfoMsg::TypeID){
+            if(msg->typeId() == PeerViewInfoMsg::TypeID) {
                 PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(msg);
-                if(pvi != NULL){
-                    if(_peerViewInfo){
+                if(pvi != NULL) {
+                    if(_peerViewInfo) {
                         _peerViewInfo->name(pvi->name());
                         _peerViewInfo->status(pvi->status());
                         pvi->deleteLater();
@@ -94,9 +95,7 @@ void Connection::dataReadyToRead()
             }
             else{
                 emit newMessageArrived(this, msg);
-            }
-
-            mBlockSize = 0;
+            }            
         }
     }
 }

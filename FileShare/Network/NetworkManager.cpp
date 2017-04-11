@@ -126,7 +126,7 @@ void NetworkManager::onReadyForUse()
         mPeers.insert(key, conn);
         connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
         connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-        connect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMessageArrived(Connection*, Message*)));
+        connect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), this, SLOT(onNewMessageArrived(Connection*, Message*)));
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
     }
