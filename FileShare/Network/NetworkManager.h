@@ -63,10 +63,8 @@ private slots:
     void onNewMessageArrived(Connection *conn, Message *msg);
     void closeAllSocks();
 
-
 private:
     void removeConnection(Connection *conn);
-    void disconnectSignal(Connection *conn);
 
     PeerManager *mpPeerManager;
     Server mServer;

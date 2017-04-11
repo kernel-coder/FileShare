@@ -19,7 +19,7 @@ public:
 signals:
     void readyForUse();
     void peerViewInfoChanged();
-    void newMessageArrived(Connection *pFrom,Message *pMsg);
+    void newMessageArrived(Connection *sender, Message *msg);
     void fireSendMessage(Message* msg);
 
 public slots:

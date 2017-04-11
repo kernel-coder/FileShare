@@ -136,15 +136,6 @@ void NetworkManager::onReadyForUse()
 }
 
 
-void NetworkManager::disconnectSignal(Connection *conn)
-{
-    disconnect(conn, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
-    disconnect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-    disconnect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
-    disconnect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), this, SLOT(onNewMessageArrived(Connection*, Message*)));
-}
-
-
 void NetworkManager::onDisconnected()
 {
     if (Connection *conn = qobject_cast<Connection *>(sender())){
@@ -190,10 +181,10 @@ void NetworkManager::closeAllSocks()
 {
     QList<Connection*> socks = mPeers.values();
 
-    foreach(Connection* conn,socks){
+    foreach(Connection* conn, socks){
         if(conn){
-            disconnectSignal(conn);
             conn->close();
+            conn->deleteLater();
         }
     }
 }

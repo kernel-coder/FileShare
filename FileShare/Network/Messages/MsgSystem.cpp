@@ -12,6 +12,7 @@
 #include "LineAddedMsg.h"
 #include "FileTransferMsg.h"
 #include "FilePartTransferMsg.h"
+#include <QDebug>
 
 
 static int _msgIdCounter = 0;
@@ -32,50 +33,42 @@ MsgSystem::MsgSystem(QObject *parent) :
 
 Message * MsgSystem::readAndContruct(QDataStream &stream)
 {
-    Message *pMsg = NULL;
+    Message *msg = NULL;
     int msgTypeId;
 
-    stream >> msgTypeId;
+    stream >> msgTypeId;    
 
     if(msgTypeId == ServerInfoMsg::TypeID){
-        pMsg = new ServerInfoMsg();
+        msg = new ServerInfoMsg();
     }
     else if(msgTypeId == PeerViewInfoMsg::TypeID){
-        pMsg = new PeerViewInfoMsg();
+        msg = new PeerViewInfoMsg();
     }    
     else if(msgTypeId == ShareRequestMsg::TypeID){
-        pMsg = new ShareRequestMsg();
+        msg = new ShareRequestMsg();
     }
     else if(msgTypeId == ShareResponseMsg::TypeID){
-        pMsg = new ShareResponseMsg();
+        msg = new ShareResponseMsg();
     }
     else if(msgTypeId == FileTransferMsg::TypeID){
-        pMsg = new FileTransferMsg();
+        msg = new FileTransferMsg();
     }
     else if(msgTypeId == FileTransferAckMsg::TypeID){
-        pMsg = new FileTransferAckMsg();
+        msg = new FileTransferAckMsg();
     }
     else if(msgTypeId == FilePartTransferMsg::TypeID){
-        pMsg = new FilePartTransferMsg();
+        msg = new FilePartTransferMsg();
     }
     else if(msgTypeId == FilePartTransferAckMsg::TypeID){
-        pMsg = new FilePartTransferAckMsg();
-    }
-    else if(msgTypeId == ChatMsg::TypeID){
-        pMsg = new ChatMsg();
-    }
-    else if(msgTypeId == GameCanceledMsg::TypeID){
-        pMsg = new GameCanceledMsg();
-    }
-    else if(msgTypeId == LineAddedMsg::TypeID){
-        pMsg = new LineAddedMsg();
+        msg = new FilePartTransferAckMsg();
     }
 
-    if(pMsg){
-        pMsg->read(stream);
+    if(msg){
+        msg->read(stream);
     }
 
-    return pMsg;
+    qDebug() << QString("Message Received: %1, %2").arg(msgTypeId).arg(msg->metaObject()->className());
+    return msg;
 }
 
 
