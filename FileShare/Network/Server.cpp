@@ -19,8 +19,8 @@ Server::~Server()
 void Server::incomingConnection(int sockId)
 {
     Connection *conn = Connection::createConnection(this);
-    addPendingConnection(conn);
     conn->setupSocket(sockId);
+    addPendingConnection(conn);
     if (NetMgr->hasPendingConnection(conn->peerAddress(), conn->peerPort()) == NULL
             && NetMgr->hasConnection(conn->peerAddress(), conn->peerPort()) == NULL) {
         NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
