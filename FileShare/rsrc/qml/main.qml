@@ -142,7 +142,7 @@ Window {
                     var conn = peerListView.currentConnection();
                     if (conn) {
                         drag.accept(Qt.CopyAction);
-                        var files = "Want to share with " + conn.name + "?\n";
+                        var files = "Want to share with " + conn.peerViewInfo.name + "?\n";
                         for (var i = 0; i < drag.urls.length; i++) {
                             files += (Utils.urlToFile(drag.urls[i]) + "\n")
                         }

@@ -39,8 +39,8 @@ void FileSenderHandler::startSending()
 void FileSenderHandler::parseFile(const QFileInfo &fi)
 {
     if (fi.isDir()) {
-        QDir dir = fi.absoluteDir();
-        QFileInfoList fis = dir.entryInfoList(QDir::AllDirs | QDir::NoDot | QDir::NoDotDot);
+        QDir dir(fi.absoluteFilePath());
+        QFileInfoList fis = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
         foreach (QFileInfo fi, fis) {
             parseFile(fi);
         }
@@ -57,7 +57,7 @@ void FileSenderHandler::sendRootFile()
     if (mCurrentRootFileIndex < mRootFiles.length()) {
         QFileInfo fi(mRootFiles.at(mCurrentRootFileIndex));
         parseFile(fi);
-        mCurrentBasePath = fi.isDir() ? fi.absoluteDir().dirName() : "";
+        mCurrentBasePath = fi.isDir() ? QDir(fi.absoluteFilePath()).dirName() : "";
         mCurrentFileIndex = 0;
         sendFile();
     }
@@ -202,7 +202,8 @@ void FileTransferManager::shareFilesTo(Connection *conn, const QList<QUrl> &urls
     handler->moveToThread(thread);
     connect(handler, SIGNAL(finished()), handler, SLOT(deleteLater()));
     connect(handler, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    QMetaObject::invokeMethod(handler, SLOT(startSending()));
+    thread->start();
+    QMetaObject::invokeMethod(handler, "startSending");
 }
 
 
@@ -215,6 +216,7 @@ void FileTransferManager::onNewMsgCame(Connection *sender, Message *msg)
         handler->moveToThread(thread);
         connect(handler, SIGNAL(finished()), handler, SLOT(deleteLater()));
         connect(handler, SIGNAL(finished()), thread, SLOT(deleteLater()));
-        QMetaObject::invokeMethod(handler, SLOT(startReceiving()));
+        thread->start();
+        QMetaObject::invokeMethod(handler, "startReceiving");
     }
 }
