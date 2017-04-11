@@ -89,6 +89,12 @@ Window {
                 anchors.margins: 5
                 anchors.fill: parent
                 model: peersModel
+                function currentConnection() {
+                    if (currentIndex >= 0) {
+                        return peersModel.get(currentIndex).connObj
+                    }
+                }
+
                 delegate:  Component {
                     BorderedButton {
                         anchors.left: parent.left
@@ -133,19 +139,27 @@ Window {
                 id: dragArea
                 anchors.fill: parent
                 onEntered: {
-                    drag.accept(Qt.CopyAction); console.log(drag.action);
-                    var files = "Wants to share?\n";
-                    for (var i = 0; i < drag.urls.length; i++) {
-                        files += (Utils.urlToFile(drag.urls[i]) + "\n")
-                    }
-                    lblDropInfo.text = files;
-                }
-                onDropped: {
-                    drop.accept(Qt.CopyAction); console.log(drop.urls)
-                    if (peerListView.currentIndex >= 0) {
-                        FileMgr.shareFilesTo(peersModel.get(peerListView.currentIndex).connObj, drop.urls)
+                    var conn = peerListView.currentConnection();
+                    if (conn) {
+                        drag.accept(Qt.CopyAction);
+                        var files = "Want to share with " + conn.name + "?\n";
+                        for (var i = 0; i < drag.urls.length; i++) {
+                            files += (Utils.urlToFile(drag.urls[i]) + "\n")
+                        }
+                        lblDropInfo.text = files;
                     }
                     else {
+                        drag.accepted = false
+                    }
+                }
+                onDropped: {
+                    drop.accept(Qt.CopyAction);
+                    var conn = peerListView.currentConnection()
+                    if (conn) {
+                        FileMgr.shareFilesTo(conn, drop.urls)
+                    }
+                    else {
+                        drop.accepted = false
                     }
                 }
             }
