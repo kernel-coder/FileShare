@@ -1,6 +1,7 @@
 #include "Server.h"
 #include "Connection.h"
 #include <QDebug>
+#include "NetworkManager.h"
 
 Server::Server(QObject *parent) :
     QTcpServer(parent)
@@ -17,7 +18,18 @@ Server::~Server()
 
 void Server::incomingConnection(int sockId)
 {
-    Connection *pConnection = new Connection(sockId, this);
-    qDebug() << " incomingConnection::newPeer fired";
-    emit newPeer(pConnection);
+    Connection *conn = Connection::createConnection(this);
+    addPendingConnection(conn);
+    conn->setupSocket(sockId);
+    if (NetMgr->hasPendingConnection(conn->peerAddress(), conn->peerPort()) == NULL
+            && NetMgr->hasConnection(conn->peerAddress(), conn->peerPort()) == NULL) {
+        NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
+        qDebug() << " incomingConnection::newPeer firing...";
+        emit newPeer(conn);
+    }
+    else {
+        conn->close();
+        conn->deleteLater();
+        qDebug() << " incomingConnection::newPeer existing connecting... closing";
+    }
 }

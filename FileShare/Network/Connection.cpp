@@ -7,14 +7,32 @@
 #include <QSysInfo>
 #include <QtQml>
 #include <QTimer>
+#include <QThread>
 
 
-Connection::Connection(int sockId, QObject *parent)
+Connection* Connection::createConnection(QObject *parent)
+{
+    QThread* thread = new QThread(parent);
+    Connection* conn = new Connection();
+    conn->moveToThread(thread);
+    connect(conn, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
+    thread->start();
+    return conn;
+}
+
+
+
+Connection::Connection(QObject *parent)
     : QTcpSocket(parent)
     , mBlockSize(0)
     , _peerViewInfo(0)
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);    
+}
+
+
+void Connection::setupSocket(int sockId)
+{
     connect(this, SIGNAL(readyRead()), SLOT(dataReadyToRead()));
 
     if (sockId > 0 ) {

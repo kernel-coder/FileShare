@@ -13,7 +13,9 @@ class Connection : public QTcpSocket
 {
 Q_OBJECT
 public:
-    Connection(int sockId = 0, QObject *parent = 0);    
+    Connection(QObject *parent = 0);
+    static Connection* createConnection(QObject* parent);
+    void setupSocket(int sockId = 0);
     MetaPropertyPrivateSet_Ex(PeerViewInfoMsg* , peerViewInfo)
 
 signals:

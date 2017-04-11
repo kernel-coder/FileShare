@@ -113,7 +113,6 @@ Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port
 void NetworkManager::newConnection(Connection *conn)
 {
     connect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
-    connect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), this, SLOT(onNewMessageArrived(Connection*, Message*)));
 }
 
 
@@ -127,7 +126,8 @@ void NetworkManager::onReadyForUse()
         qDebug() << "new connection found " << key;
         mPeers.insert(key, conn);
         connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
-        connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));        
+        connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+        connect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), this, SLOT(onNewMessageArrived(Connection*, Message*)));
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
     }
@@ -174,7 +174,6 @@ void NetworkManager::removeConnection(Connection *conn)
 void NetworkManager::onNewMessageArrived(Connection *conn, Message *msg)
 {
     emit newMsgCame(conn, msg);
-    emit newMsgCame();
 }
 
 
