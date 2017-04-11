@@ -19,17 +19,11 @@ Connection::Connection(int sockId, QObject *parent)
 
     if (sockId > 0 ) {
         if(setSocketDescriptor(sockId)) {
-            QTimer::singleShot(500, [=](){
-               sendClientViewInfo();
-            });
+            sendClientViewInfo();
         }
     }
     else {
-        connect(this, &QTcpSocket::connected, [=]() {
-            QTimer::singleShot(1000, [=](){
-               sendClientViewInfo();
-            });
-        });
+        connect(this, SIGNAL(connected()), SLOT(sendClientViewInfo()));
     }
 }
 
