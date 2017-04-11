@@ -45,6 +45,7 @@ bool Connection::sendMessage(Message *msg)
 void Connection::sendMessage_Private(Message *msg)
 {
     if(msg){
+        qDebug() << QString("Message Sending: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
         QByteArray block;
         QDataStream stream(&block, QIODevice::WriteOnly);
         stream.setVersion(QDataStream::Qt_4_6);
@@ -52,7 +53,7 @@ void Connection::sendMessage_Private(Message *msg)
         msg->write(stream);
         stream.device()->seek(0);
         stream << (quint64)(block.size() - sizeof(quint64));
-        this->write(block) == block.size();
+        this->write(block);
         msg->deleteLater();
     }
 }
@@ -77,6 +78,8 @@ void Connection::dataReadyToRead()
         Message *msg = MsgSystem::readAndContruct(in);
         mBlockSize = 0;
 
+        qDebug() << QString("Message Received: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
+
         if(msg){
             if(msg->typeId() == PeerViewInfoMsg::TypeID) {
                 PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(msg);
@@ -88,8 +91,8 @@ void Connection::dataReadyToRead()
                     }
                     else {
                         peerViewInfo(pvi);
-                        emit readyForUse();
-                        qDebug() << " readyForUse fired";
+                        qDebug() << "Firing readyForuse fired";
+                        emit readyForUse();                        
                     }
                 }
             }

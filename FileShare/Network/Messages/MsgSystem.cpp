@@ -67,9 +67,6 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
         msg->read(stream);
     }
 
-    if (msgTypeId != ServerInfoMsg::TypeID) {
-        qDebug() << QString("Message Received: %1, %2").arg(msgTypeId).arg(msg->metaObject()->className());
-    }
     return msg;
 }
 

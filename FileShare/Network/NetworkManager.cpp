@@ -119,11 +119,11 @@ void NetworkManager::newConnection(Connection *conn)
 void NetworkManager::onReadyForUse()
 {
     Connection *conn = qobject_cast<Connection *>(sender());
-    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerViewInfo()->port());
-    qDebug() << "new party conneccted " << key;
+    QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerViewInfo()->port());    
     removePendingPeers(conn);
 
     if (!mPeers.contains(key)) {
+        qDebug() << "new connection found " << key;
         mPeers.insert(key, conn);
         connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
         connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
