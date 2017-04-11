@@ -18,7 +18,8 @@ HEADERS += \
     $$PWD/Messages/PlayRequestResultMsg.h \
     $$PWD/Messages/ServerInfoMsg.h \
     $$PWD/Messages/ShareRequestMsg.h \
-    $$PWD/Messages/ShareResponseMsg.h
+    $$PWD/Messages/ShareResponseMsg.h \
+    $$PWD/Messages/FileTransferMsg.h
 
 SOURCES += \
     #$$PWD/ChatWnd.cpp \
@@ -37,4 +38,5 @@ SOURCES += \
     $$PWD/Messages/PlayRequestResultMsg.cpp \
     $$PWD/Messages/ServerInfoMsg.cpp \
     $$PWD/Messages/ShareRequestMsg.cpp \
-    $$PWD/Messages/ShareResponseMsg.cpp
+    $$PWD/Messages/ShareResponseMsg.cpp \
+    $$PWD/Messages/FileTransferMsg.cpp

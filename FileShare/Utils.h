@@ -6,12 +6,15 @@
 class Utils : public QObject
 {
     Q_OBJECT
-public:
     explicit Utils(QObject *parent = 0);
-
+public:
+    static Utils* me();
+    Q_INVOKABLE bool makePath(const QString& path);
+    Q_INVOKABLE QString dataDirCommon(const QString& file = QString(""));
     Q_INVOKABLE QString fileRelativeAppPath(const QString& file);
     Q_INVOKABLE QUrl urlRelativeAppPath(const QString& file);
     Q_INVOKABLE QString urlToFile(const QUrl& url);
+    Q_INVOKABLE QStringList urlsToFiles(const QList<QUrl>& url);
 
 };
 

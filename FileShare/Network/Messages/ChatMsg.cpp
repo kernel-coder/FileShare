@@ -26,16 +26,16 @@ QString ChatMsg::string()const
     return mMsg;
 }
 
-void ChatMsg::write(QDataStream &dataBuffer)
+void ChatMsg::write(QDataStream &buf)
 {
-    dataBuffer << TypeID;
-    dataBuffer << mMsg;
+    buf << TypeID;
+    buf << mMsg;
 }
 
 
-void ChatMsg::read(QDataStream &dataBuffer)
+void ChatMsg::read(QDataStream &buf)
 {
-    dataBuffer >> mMsg;
+    buf >> mMsg;
 }
 
 int ChatMsg::typeId(){return ChatMsg::TypeID;}

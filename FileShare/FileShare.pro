@@ -2,14 +2,6 @@ TEMPLATE = app
 
 QT += qml quick
 CONFIG += c++11
-
-SOURCES += main.cpp \
-    StatusViewer.cpp \
-    Utils.cpp \
-    FileTransferManager.cpp
-
-RESOURCES += qml.qrc
-
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
@@ -19,6 +11,15 @@ include(deployment.pri)
 include ($$PWD/QsLog/QsLog.pri)
 include ($$PWD/QtJson/QtJson.pri)
 include ($$PWD/Network/Network.pri)
+
+RESOURCES += qml.qrc
+
+
+SOURCES += main.cpp \
+    StatusViewer.cpp \
+    Utils.cpp \
+    FileTransferManager.cpp
+
 
 HEADERS += \
     StatusViewer.h \

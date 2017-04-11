@@ -24,7 +24,7 @@ static QObject* utilsProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    return new Utils(qApp);
+    return Utils::me();
 }
 
 
@@ -33,7 +33,7 @@ static QObject* netMgrProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    return NetworkManager::me();
+    return NetMgr;
 }
 
 
@@ -42,7 +42,7 @@ static QObject* fileMgrProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    return FileTransferManager::me();
+    return FileMgr;
 }
 
 

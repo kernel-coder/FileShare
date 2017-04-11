@@ -16,7 +16,7 @@ public:
     MetaPropertyPublicSet_Ex(int, port)
     MetaPropertyPublicSet_Ex(PeerStatus, status)
 
-    virtual void read(QDataStream &dataBuffer);
-    virtual void write(QDataStream &dataBuffer);
+    virtual void read(QDataStream &buf);
+    virtual void write(QDataStream &buf);
     virtual int typeId();
 };

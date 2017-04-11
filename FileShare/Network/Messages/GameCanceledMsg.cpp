@@ -27,16 +27,16 @@ QString GameCanceledMsg::string()const
     return mMsg;
 }
 
-void GameCanceledMsg::write(QDataStream &dataBuffer)
+void GameCanceledMsg::write(QDataStream &buf)
 {
-    dataBuffer << TypeID;
-    dataBuffer << mMsg;
+    buf << TypeID;
+    buf << mMsg;
 }
 
 
-void GameCanceledMsg::read(QDataStream &dataBuffer)
+void GameCanceledMsg::read(QDataStream &buf)
 {
-    dataBuffer >> mMsg;
+    buf >> mMsg;
 }
 
 int GameCanceledMsg::typeId(){return GameCanceledMsg::TypeID;}

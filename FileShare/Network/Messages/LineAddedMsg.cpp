@@ -46,22 +46,22 @@ void LineAddedMsg::setDot2Column(const uint nColumn)
 uint LineAddedMsg::dot2Column()const{return mnDot2Column;}
 
 
-void LineAddedMsg::write(QDataStream &dataBuffer)
+void LineAddedMsg::write(QDataStream &buf)
 {
-    dataBuffer << typeId();
-    dataBuffer << mnDot1Row;
-    dataBuffer << mnDot1Column;
-    dataBuffer << mnDot2Row;
-    dataBuffer << mnDot2Column;
+    buf << typeId();
+    buf << mnDot1Row;
+    buf << mnDot1Column;
+    buf << mnDot2Row;
+    buf << mnDot2Column;
 }
 
 
-void LineAddedMsg::read(QDataStream &dataBuffer)
+void LineAddedMsg::read(QDataStream &buf)
 {
-    dataBuffer >> mnDot1Row;
-    dataBuffer >> mnDot1Column;
-    dataBuffer >> mnDot2Row;
-    dataBuffer >> mnDot2Column;
+    buf >> mnDot1Row;
+    buf >> mnDot1Column;
+    buf >> mnDot2Row;
+    buf >> mnDot2Column;
 }
 
 int LineAddedMsg::typeId()

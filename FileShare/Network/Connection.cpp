@@ -36,7 +36,7 @@ Connection::Connection(int sockId, QObject *parent)
 
 void Connection::sendClientViewInfo()
 {
-    PeerViewInfoMsg pvi(NetworkManager::me()->username(), NetworkManager::me()->port(), NetworkManager::me()->status());
+    PeerViewInfoMsg pvi(NetMgr->username(), NetMgr->port(), NetMgr->status());
     sendMessage(&pvi);
 }
 

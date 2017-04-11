@@ -11,8 +11,8 @@ public:
     Message(QObject* p = 0);
     virtual ~Message();
 
-    virtual void read(QDataStream &dataBuffer) = 0;
-    virtual void write(QDataStream &dataBuffer) = 0;
+    virtual void read(QDataStream &buf) = 0;
+    virtual void write(QDataStream &buf) = 0;
     virtual int typeId() = 0;
 };
 

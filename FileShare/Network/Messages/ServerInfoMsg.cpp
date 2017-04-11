@@ -8,16 +8,16 @@ ServerInfoMsg::ServerInfoMsg(int nPort, QObject* p)
 }
 
 
-void ServerInfoMsg::write(QDataStream &dataBuffer)
+void ServerInfoMsg::write(QDataStream &buf)
 {
-    dataBuffer << typeId();
-    dataBuffer << _port;
+    buf << typeId();
+    buf << _port;
 }
 
 
-void ServerInfoMsg::read(QDataStream &dataBuffer)
+void ServerInfoMsg::read(QDataStream &buf)
 {
-    dataBuffer >> _port;
+    buf >> _port;
 }
 
 int ServerInfoMsg::typeId() { return ServerInfoMsg::TypeID;}

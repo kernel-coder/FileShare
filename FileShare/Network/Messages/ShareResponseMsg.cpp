@@ -1,23 +1,27 @@
 #include "ShareResponseMsg.h"
 
-ShareResponseMsg::ShareResponseMsg(const QString& name, QObject* p)
+ShareResponseMsg::ShareResponseMsg(int requestId, bool accepted, QObject* p)
     : Message(p)
-    , _name(name)
+    , _requestId(requestId)
+    , _accepted(accepted)
 {
 
 }
 
 
-void ShareResponseMsg::write(QDataStream &dataBuffer)
+void ShareResponseMsg::write(QDataStream &buf)
 {
-    dataBuffer << typeId();
-    dataBuffer << _name;
+    buf << typeId();
+    buf << _requestId;
+    buf << _accepted;
 }
 
 
-void ShareResponseMsg::read(QDataStream &dataBuffer)
+void ShareResponseMsg::read(QDataStream &buf)
 {
-    dataBuffer >> _name;
+    buf >> _requestId;
+    buf >> _accepted;
 }
+
 
 int ShareResponseMsg::typeId() { return ShareResponseMsg::TypeID;}

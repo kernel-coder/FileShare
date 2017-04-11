@@ -35,19 +35,19 @@ QString PlayRequestMsg::string()const
     return mRequestMsg;
 }
 
-void PlayRequestMsg::write(QDataStream &dataBuffer)
+void PlayRequestMsg::write(QDataStream &buf)
 {
-    dataBuffer << TypeID;
-    dataBuffer << mnDotsInRow;
-    dataBuffer << mnDotsInColumn;
-    dataBuffer << mRequestMsg;
+    buf << TypeID;
+    buf << mnDotsInRow;
+    buf << mnDotsInColumn;
+    buf << mRequestMsg;
 }
 
-void PlayRequestMsg::read(QDataStream &dataBuffer)
+void PlayRequestMsg::read(QDataStream &buf)
 {
-    dataBuffer >> mnDotsInRow;
-    dataBuffer >> mnDotsInColumn;
-    dataBuffer >> mRequestMsg;
+    buf >> mnDotsInRow;
+    buf >> mnDotsInColumn;
+    buf >> mRequestMsg;
 }
 
 int PlayRequestMsg::typeId() { return PlayRequestMsg::TypeID;}

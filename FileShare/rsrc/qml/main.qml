@@ -98,7 +98,7 @@ Window {
                         radius: 0
                         colorNormal: "#333333"
                         impHeight: 30
-                        text: name + ": " + (status == PeerViewInfoMsg.Free ? "Availale" : "Busy")
+                        text: connObj.peerViewInfo.name + ": " + (connObj.peerViewInfo.status == PeerViewInfoMsg.Free ? "Availale" : "Busy")
                     }
                 }
             }
@@ -150,9 +150,7 @@ Window {
     Connections {
         target: NetMgr
         onNewParticipant: {
-            peersModel.append({ connObj :  connection, name: connection.peerViewInfo.name,
-                                status: connection.peerViewInfo.status
-                              })
+            peersModel.append({connObj :  connection})
         }
         onParticipantLeft: {
             for (var i = 0; i < peersModel.count; i++) {

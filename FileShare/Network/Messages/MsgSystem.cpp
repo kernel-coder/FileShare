@@ -10,6 +10,7 @@
 #include "PlayRequestResultMsg.h"
 #include "GameCanceledMsg.h"
 #include "LineAddedMsg.h"
+#include "FileTransferMsg.h"
 
 
 static int _msgIdCounter = 0;
@@ -17,6 +18,7 @@ int ServerInfoMsg::TypeID = _msgIdCounter++;
 int PeerViewInfoMsg::TypeID = _msgIdCounter++;
 int ShareRequestMsg::TypeID = _msgIdCounter++;
 int ShareResponseMsg::TypeID = _msgIdCounter++;
+int FileTransferMsg::TypeID = _msgIdCounter++;
 
 
 MsgSystem::MsgSystem(QObject *parent) :

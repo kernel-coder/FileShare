@@ -29,9 +29,6 @@ private slots:
     void dataReadyToRead();
 
 private:
-    void setPeerViewInfo(PeerViewInfoMsg *pPeerViewInfo);
-
-private:
     quint64 mBlockSize;
     QMutex mMutex;
 };

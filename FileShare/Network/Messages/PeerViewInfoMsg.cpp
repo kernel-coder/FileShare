@@ -10,21 +10,21 @@ PeerViewInfoMsg::PeerViewInfoMsg(const QString& name, int port,PeerStatus status
 }
 
 
-void PeerViewInfoMsg::write(QDataStream &dataBuffer)
+void PeerViewInfoMsg::write(QDataStream &buf)
 {
-    dataBuffer << TypeID;
-    dataBuffer << _name;
-    dataBuffer << _port;
-    dataBuffer << (int)_status;
+    buf << TypeID;
+    buf << _name;
+    buf << _port;
+    buf << (int)_status;
 }
 
 
-void PeerViewInfoMsg::read(QDataStream &dataBuffer)
+void PeerViewInfoMsg::read(QDataStream &buf)
 {
-    dataBuffer >> _name;
-    dataBuffer >> _port;
+    buf >> _name;
+    buf >> _port;
     int tmp;
-    dataBuffer >> tmp;
+    buf >> tmp;
     _status = (PeerStatus)tmp;
 }
 

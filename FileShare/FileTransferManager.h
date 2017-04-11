@@ -3,9 +3,12 @@
 #include "JObject.h"
 #include <QUrl>
 
-#define FTM FileTransferManager()::me()
+#define FileMgr FileTransferManager::me()
 
 class Connection;
+class Message;
+
+struct FileTransferManagerPri;
 
 class FileTransferManager : public JObject
 {
@@ -14,7 +17,12 @@ class FileTransferManager : public JObject
 public:
     static FileTransferManager* me();
 
-
 public slots:
     void shareFilesTo(Connection* conn, const QList<QUrl> &urls);
+
+private slots:
+    void onNewMsgCame(Connection *sender, Message *msg);
+
+private:
+    FileTransferManagerPri* d;
 };

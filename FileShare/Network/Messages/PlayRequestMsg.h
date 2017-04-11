@@ -17,8 +17,8 @@ public:
     void setString(const QString strData);
     QString string()const;
 
-    virtual void read(QDataStream &dataBuffer);
-    virtual void write(QDataStream &dataBuffer);
+    virtual void read(QDataStream &buf);
+    virtual void write(QDataStream &buf);
     virtual int typeId();
 
 public:

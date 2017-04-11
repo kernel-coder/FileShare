@@ -50,23 +50,23 @@ void PlayRequestResultMsg::setDotsInColumn(const int nDotsInColumn)
 
 int PlayRequestResultMsg::dotsInColumn()const{return mnDotsInColumn;}
 
-void PlayRequestResultMsg::write(QDataStream &dataBuffer)
+void PlayRequestResultMsg::write(QDataStream &buf)
 {
-    dataBuffer << TypeID;
-    dataBuffer << int(mStatus);
-    dataBuffer << mStatusMsg;
-    dataBuffer << mnDotsInRow;
-    dataBuffer << mnDotsInColumn;
+    buf << TypeID;
+    buf << int(mStatus);
+    buf << mStatusMsg;
+    buf << mnDotsInRow;
+    buf << mnDotsInColumn;
 }
 
-void PlayRequestResultMsg::read(QDataStream &dataBuffer)
+void PlayRequestResultMsg::read(QDataStream &buf)
 {
     int nStatus;
-    dataBuffer >> nStatus;
+    buf >> nStatus;
     mStatus = PlayRequestResultMsg::Status(nStatus);
-    dataBuffer >> mStatusMsg;
-    dataBuffer >> mnDotsInRow;
-    dataBuffer >> mnDotsInColumn;
+    buf >> mStatusMsg;
+    buf >> mnDotsInRow;
+    buf >> mnDotsInColumn;
 }
 
 int PlayRequestResultMsg::typeId()

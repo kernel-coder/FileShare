@@ -17,7 +17,7 @@ Server::~Server()
 
 void Server::incomingConnection(int sockId)
 {
-    Connection *pConnection = new Connection(sockId);
+    Connection *pConnection = new Connection(sockId, this);
     qDebug() << " incomingConnection::newPeer fired";
     emit newPeer(pConnection);
 }

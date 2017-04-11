@@ -10,6 +10,8 @@
 #include "Server.h"
 #include "Messages/PeerViewInfoMsg.h"
 
+#define NetMgr NetworkManager::me()
+
 class Connection;
 class PeerManager;
 class Message;
@@ -18,8 +20,6 @@ class PlayRequestMsg;
 class PlayRequestResultMsg;
 class GameCanceledMsg;
 class LineAddedMsg;
-
-
 
 class NetworkManager : public QObject
 {
@@ -44,10 +44,10 @@ public:
 signals:
     void newParticipant(Connection *connection);
     void participantLeft(Connection *connection);
-    void chatMsgCame(Connection *sender,ChatMsg *msg);
-    void playRequestCame(Connection *sender,PlayRequestMsg *msg);
-    void playRequestResultCame(Connection *sender,PlayRequestResultMsg *msg);
-    void gameCanceledMsgCame(Connection *sender,GameCanceledMsg *msg);
+    void chatMsgCame(Connection *sender, ChatMsg *msg);
+    void playRequestCame(Connection *sender, PlayRequestMsg *msg);
+    void playRequestResultCame(Connection *sender, PlayRequestResultMsg *msg);
+    void gameCanceledMsgCame(Connection *sender, GameCanceledMsg *msg);
     void lineAddedMsgCame(Connection *sender, LineAddedMsg *msg);
     void newMsgCame(Connection *sender, Message *msg);
     void newMsgCame();
