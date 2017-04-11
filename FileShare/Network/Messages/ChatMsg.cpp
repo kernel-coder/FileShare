@@ -1,6 +1,6 @@
 #include "ChatMsg.h"
 
-int ChatMsg::TypeID = 2;//qMetaTypeId<ChatMsg>();
+int ChatMsg::TypeID = -1;//qMetaTypeId<ChatMsg>();
 
 ChatMsg::ChatMsg()
 {

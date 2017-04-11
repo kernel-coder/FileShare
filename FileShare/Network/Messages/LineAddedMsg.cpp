@@ -1,6 +1,6 @@
 #include "LineAddedMsg.h"
 
-int LineAddedMsg::TypeID = 6;
+int LineAddedMsg::TypeID =  -1;
 
 LineAddedMsg::LineAddedMsg()
 {

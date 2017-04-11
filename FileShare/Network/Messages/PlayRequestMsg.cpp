@@ -1,6 +1,6 @@
 #include "PlayRequestMsg.h"
 
-int PlayRequestMsg::TypeID = 3;
+int PlayRequestMsg::TypeID = -1;
 
 PlayRequestMsg::PlayRequestMsg():mnDotsInRow(2),mnDotsInColumn(2)
 {

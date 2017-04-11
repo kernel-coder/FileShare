@@ -1,6 +1,6 @@
 #include "PlayRequestResultMsg.h"
 
-int PlayRequestResultMsg::TypeID = 4;
+int PlayRequestResultMsg::TypeID = -1;
 
 PlayRequestResultMsg::PlayRequestResultMsg():mStatus(PlayRequestResultMsg::Rejected)
 {

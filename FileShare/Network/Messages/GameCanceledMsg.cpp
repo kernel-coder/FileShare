@@ -1,7 +1,7 @@
 #include "GameCanceledMsg.h"
 
 
-int GameCanceledMsg::TypeID = 5;//qMetaTypeId<GameCanceledMsg>();
+int GameCanceledMsg::TypeID = -1;//qMetaTypeId<GameCanceledMsg>();
 
 GameCanceledMsg::GameCanceledMsg()
 {

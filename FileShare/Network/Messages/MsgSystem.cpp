@@ -40,11 +40,11 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
     else if(nTypeId == PeerViewInfoMsg::TypeID){
         pMsg = new PeerViewInfoMsg();
     }    
-    else if(nTypeId == PlayRequestMsg::TypeID){
-        pMsg = new PlayRequestMsg();
+    else if(nTypeId == ShareRequestMsg::TypeID){
+        pMsg = new ShareRequestMsg();
     }
-    else if(nTypeId == PlayRequestResultMsg::TypeID){
-        pMsg = new PlayRequestResultMsg();
+    else if(nTypeId == ShareResponseMsg::TypeID){
+        pMsg = new ShareResponseMsg();
     }
     else if(nTypeId == FileTransferMsg::TypeID){
         pMsg = new FileTransferMsg();
