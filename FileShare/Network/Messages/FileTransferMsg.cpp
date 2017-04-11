@@ -17,8 +17,10 @@ void FileTransferMsg::write(QDataStream &buf)
 {
     buf << typeId();
     buf << QFileInfo(_filename).fileName();
+    qDebug() << "sending file " << _filename;
     QFile file(_filename);
     if (file.open(QFile::ReadOnly)) {
+        qDebug() << "sending data ";
         QByteArray ba = file.readAll();
         buf << ba.length();
         buf.writeRawData(ba.data(), ba.length());

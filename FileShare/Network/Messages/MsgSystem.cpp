@@ -39,15 +39,18 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
     }
     else if(nTypeId == PeerViewInfoMsg::TypeID){
         pMsg = new PeerViewInfoMsg();
-    }
-    else if(nTypeId == ChatMsg::TypeID){
-        pMsg = new ChatMsg();
-    }
+    }    
     else if(nTypeId == PlayRequestMsg::TypeID){
         pMsg = new PlayRequestMsg();
     }
     else if(nTypeId == PlayRequestResultMsg::TypeID){
         pMsg = new PlayRequestResultMsg();
+    }
+    else if(nTypeId == FileTransferMsg::TypeID){
+        pMsg = new FileTransferMsg();
+    }
+    else if(nTypeId == ChatMsg::TypeID){
+        pMsg = new ChatMsg();
     }
     else if(nTypeId == GameCanceledMsg::TypeID){
         pMsg = new GameCanceledMsg();
