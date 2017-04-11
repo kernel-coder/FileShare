@@ -121,6 +121,7 @@ void NetworkManager::onReadyForUse()
     Connection *conn = qobject_cast<Connection *>(sender());
     QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerViewInfo()->port());
     qDebug() << "new party conneccted " << key;
+    removePendingPeers(conn);
 
     if (!mPeers.contains(key)) {
         mPeers.insert(key, conn);

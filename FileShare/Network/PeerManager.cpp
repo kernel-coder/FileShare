@@ -147,7 +147,6 @@ void PeerManager::onPeerConnected()
     if(conn) {
         qDebug() << "Peer conneciton success " <<  conn->peerAddress().toString();
         conn->disconnect(this);
-        mpNetManager->removePendingPeers(conn);
         emit newPeer(conn);
     }
 }
