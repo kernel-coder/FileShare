@@ -1,13 +1,15 @@
 #pragma once
+
 #include "Message.h"
+#include <QStringList>
 
 class ShareRequestMsg : public Message
 {
 public:
     static int TypeID ;
 
-    ShareRequestMsg(const QString& name = "", QObject* p = 0);
-    MetaPropertyPublicSet_Ex(QString, name)
+    ShareRequestMsg(const QStringList& files = QStringList(), QObject* p = 0);
+    MetaPropertyPublicSet_Ex(QStringList, files)
 
     virtual void read(QDataStream &dataBuffer);
     virtual void write(QDataStream &dataBuffer);

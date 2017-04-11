@@ -13,17 +13,18 @@
 static const qint32 BroadcastInterval = 10000;
 static const unsigned BroadcastPort = 45000;
 
-PeerManager::PeerManager(NetworkManager *pNetManager, QObject *parent) :
-    QObject(parent),mpNetManager(pNetManager)
+PeerManager::PeerManager(NetworkManager *netMgr, QObject *parent) 
+: QObject(parent)
+, mpNetManager(netMgr)
 {
     updateAddresses();
     mnServerPort = 0;
 
     mBroadcastSocket.bind(QHostAddress::Any, BroadcastPort, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
-    connect(&mBroadcastSocket, SIGNAL(readyRead()),this, SLOT(readBroadcastDatagram()));
+    connect(&mBroadcastSocket, SIGNAL(readyRead()), SLOT(readBroadcastDatagram()));
 
     mBroadcastTimer.setInterval(BroadcastInterval);
-    connect(&mBroadcastTimer, SIGNAL(timeout()),this, SLOT(sendBroadcastDatagram()));
+    connect(&mBroadcastTimer, SIGNAL(timeout()), SLOT(sendBroadcastDatagram()));
     sendBroadcastDatagram();
 }
 
@@ -34,9 +35,9 @@ PeerManager::~PeerManager()
 }
 
 
-void PeerManager::setServerPort(int nPort)
+void PeerManager::setServerPort(int port)
 {
-    mnServerPort = nPort;
+    mnServerPort = port;
 }
 
 
@@ -119,30 +120,23 @@ void PeerManager::readBroadcastDatagram()
 
         QDataStream stream(datagram);
 
-        Message *pMsg = MsgSystem::readAndContruct(stream);
+        ServerInfoMsg *msg = qobject_cast<ServerInfoMsg*>(MsgSystem::readAndContruct(stream));
 
-        if(!pMsg || (pMsg->typeId() != ServerInfoMsg::TypeID)) {
+        if (!msg || (msg->typeId() != ServerInfoMsg::TypeID) || msg->port() <= 0 || msg->port() == mnServerPort) {
             continue;
         }
 
-        ServerInfoMsg *pSIMsg = qobject_cast<ServerInfoMsg*>(pMsg);
+        qDebug() << "peer id: " << senderIp.toString() << msg->port();
 
-        if(!pSIMsg || pSIMsg->port() <= 0 || pSIMsg->port() == mnServerPort){
-            continue;
-        }
-        int port = pSIMsg->port();
-
-        qDebug() << "peer id: " << senderIp.toString() << port;
-
-        if (mpNetManager->hasPendingConnection(senderIp, port) == NULL) {
-            Connection *conn = mpNetManager->hasConnection(senderIp, port);
+        if (mpNetManager->hasPendingConnection(senderIp, msg->port()) == NULL) {
+            Connection *conn = mpNetManager->hasConnection(senderIp, msg->port());
             if (conn == NULL){
-                conn = new Connection(0, this);
-                mpNetManager->addPendingPeers(senderIp, port, conn);
-                qDebug() << "connecting to peer: " << senderIp.toString() << port;
+                conn = new Connection(0);
+                mpNetManager->addPendingPeers(senderIp, msg->port(), conn);
+                qDebug() << "connecting to peer: " << senderIp.toString() << msg->port();
                 connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
                 connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
-                conn->connectToHost(senderIp, port);
+                conn->connectToHost(senderIp, msg->port());
             }
         }
     }

@@ -17,3 +17,12 @@ QUrl Utils::urlRelativeAppPath(const QString &file)
 {
     return QUrl::fromLocalFile(QString("%1/%2").arg(qApp->applicationDirPath().replace('\\', '/')).arg(file));
 }
+
+
+QString Utils::urlToFile(const QUrl &url)
+{
+    if (url.isLocalFile()) {
+        return url.toLocalFile();
+    }
+    return "invalid local url";
+}

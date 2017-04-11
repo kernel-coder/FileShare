@@ -9,12 +9,22 @@
 #include "CustomLogger.h"
 #include <QDir>
 #include <QtQml>
+#include "FileTransferManager.h"
 
 
 void registersQmlComponents()
 {
     qmlRegisterType<Connection>("com.kcl.fileshare", 1, 0, "Connection");
     qmlRegisterType<PeerViewInfoMsg>("com.kcl.fileshare", 1, 0, "PeerViewInfoMsg");
+}
+
+
+static QObject* utilsProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return new Utils(qApp);
 }
 
 
@@ -26,27 +36,28 @@ static QObject* netMgrProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
     return NetworkManager::me();
 }
 
-static QObject* utilsProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+
+static QObject* fileMgrProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    return new Utils(qApp);
+    return FileTransferManager::me();
 }
 
 
 void registersSingletonObjects()
 {
-    qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "NetMgr", netMgrProvider);
     qmlRegisterSingletonType<Utils>("com.kcl.fileshare", 1, 0, "Utils", utilsProvider);
+    qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "NetMgr", netMgrProvider);
+    qmlRegisterSingletonType<FileTransferManager>("com.kcl.fileshare", 1, 0, "FileMgr", fileMgrProvider);
 }
-
 
 
 int main(int argc, char *argv[])
 {
     atexit(appCleanup);
-    qRegisterMetaType<QMap<QString,QByteArray>>("QMap<QString,QByteArray>");
+    qRegisterMetaType<QMap<QString, QByteArray>>("QMap<QString,QByteArray>");
     qInstallMessageHandler(customMessageHandler);
 
     QGuiApplication app(argc, argv);

@@ -18,7 +18,7 @@ class PlayRequestMsg;
 class PlayRequestResultMsg;
 class GameCanceledMsg;
 class LineAddedMsg;
-class DotController;
+
 
 
 class NetworkManager : public QObject
@@ -34,7 +34,7 @@ public:
     MetaPropertyPublicSet_Ex(int, port)
     MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
 
-    bool sendMessage(Connection *pConn, Message *pMsg);
+    bool sendMessage(Connection *conn, Message *msg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort);
 
     void addPendingPeers(const QHostAddress &senderIp, int port, Connection* conn);
@@ -44,26 +44,29 @@ public:
 signals:
     void newParticipant(Connection *connection);
     void participantLeft(Connection *connection);
-    void chatMsgCame(Connection *pFrom,ChatMsg *pMsg);
-    void playRequestCame(Connection *pFrom,PlayRequestMsg *pMsg);
-    void playRequestResultCame(Connection *pFrom,PlayRequestResultMsg *pMsg);
-    void gameCanceledMsgCame(Connection *pFrom,GameCanceledMsg *pMsg);
-    void lineAddedMsgCame(Connection *pFrom, LineAddedMsg *pMsg);
-    void newMsgCame(Connection *pFrom, Message *pMsg);
+    void chatMsgCame(Connection *sender,ChatMsg *msg);
+    void playRequestCame(Connection *sender,PlayRequestMsg *msg);
+    void playRequestResultCame(Connection *sender,PlayRequestResultMsg *msg);
+    void gameCanceledMsgCame(Connection *sender,GameCanceledMsg *msg);
+    void lineAddedMsgCame(Connection *sender, LineAddedMsg *msg);
+    void newMsgCame(Connection *sender, Message *msg);
     void newMsgCame();
+
+public slots:
+    void broadcastUserInfoChanged();
 
 private slots:
     void newConnection(Connection *connection);
     void connectionError(QAbstractSocket::SocketError socketError);
     void onDisconnected();
     void readyForUse();
-    void newMessageArrived(Connection *pConn, Message *pMsg);
+    void newMessageArrived(Connection *conn, Message *msg);
     void closeAllSocks();
-    void checkPCPlayerInfoChanged();
+
 
 private:
-    void removeConnection(Connection *pConnection);
-    void disconnectSignal(Connection *pConnection);
+    void removeConnection(Connection *conn);
+    void disconnectSignal(Connection *conn);
 
     PeerManager *mpPeerManager;
     Server mServer;

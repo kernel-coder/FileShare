@@ -22,8 +22,42 @@ Window {
             anchors.centerIn: parent
             spacing: 10
             LabelEx {
-                text: "I'm " + NetMgr.username + " on port " + NetMgr.port + ", "
+                text: "I'm "
             }
+            LabelEx {
+                color: "#0072C5"
+                font.bold: true
+                text: NetMgr.username
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                verticalAlignment: Qt.AlignVCenter
+
+                MouseArea {
+                    anchors.fill: parent
+                    onDoubleClicked: {
+                        txtUsername.text = NetMgr.username
+                        txtUsername.visible = true
+                    }
+                }
+                TextField {
+                    id: txtUsername
+                    visible: false
+                    anchors.fill: parent
+                    horizontalAlignment: Qt.AlignHCenter
+                    verticalAlignment: Qt.AlignVCenter
+                    onAccepted:  {
+                        if (text.trim().length > 0) {
+                            NetMgr.username = text.trim()
+                            NetMgr.broadcastUserInfoChanged()
+                        }
+                    }
+                    onEditingFinished: visible = false
+                }
+            }
+            LabelEx {
+                text: " on port " + NetMgr.port + ", "
+            }
+
             LabelEx {
                 text: NetMgr.status == PeerViewInfoMsg.Free ? "Availale" : "Busy"
             }
@@ -32,6 +66,7 @@ Window {
                 checked: NetMgr.status == PeerViewInfoMsg.Free
                 onClicked: {
                     NetMgr.status = checked ? PeerViewInfoMsg.Free : PeerViewInfoMsg.Busy
+                    NetMgr.broadcastUserInfoChanged()
                 }
             }
         }
@@ -42,6 +77,7 @@ Window {
         anchors.top: titlebar.bottom; anchors.bottom: parent.bottom
         color: "#333333"
         Rectangle {
+            id: rectPeers
             color: "#222222"
             anchors.left: parent.left;
             anchors.top: parent.top;
@@ -66,7 +102,48 @@ Window {
                     }
                 }
             }
+        }
+        Rectangle {
+            id: dropRect
+            color: "transparent"
+            anchors.left: rectPeers.right
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            LabelEx {
+                id: lblDropInfo
+                font.pixelSize: 10
+                visible: dragArea.containsDrag
+                anchors.fill: parent
+                horizontalAlignment: Qt.AlignHCenter
+                verticalAlignment: Qt.AlignVCenter
+            }
 
+            states: [
+                  State {
+                      when: dragArea.containsDrag
+                      PropertyChanges {
+                          target: dropRect
+                          color: "grey"
+                      }
+                  }
+              ]
+            DropArea {
+                id: dragArea
+                anchors.fill: parent
+                onEntered: {
+                    drag.accept(Qt.CopyAction); console.log(drag.action);
+                    var files = "Wants to share?\n";
+                    for (var i = 0; i < drag.urls.length; i++) {
+                        files += (Utils.urlToFile(drag.urls[i]) + "\n")
+                    }
+                    lblDropInfo.text = files;
+                }
+                onDropped: {
+                    drop.accept(Qt.CopyAction); console.log(drop.urls)
+                    FileMgr.shareFilesTo(null, drop.urls)
+                }
+            }
         }
     }
 

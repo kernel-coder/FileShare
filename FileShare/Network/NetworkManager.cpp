@@ -40,8 +40,6 @@ NetworkManager::NetworkManager(QObject *parent) :
 
     connect(mpPeerManager, SIGNAL(newPeer(Connection*)), SLOT(newConnection(Connection*)));
     connect(&mServer, SIGNAL(newPeer(Connection*)), SLOT(newConnection(Connection*)));
-    //connect(GameSettings::me(),SIGNAL(playerNameChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)));
-    //connect(GameSettings::me(),SIGNAL(playerColorChanged(Game::Player)),SLOT(checkPCPlayerInfoChanged(Game::Player)))
 }
 
 
@@ -51,25 +49,31 @@ NetworkManager::~NetworkManager()
 }
 
 
-void NetworkManager::checkPCPlayerInfoChanged()
+void NetworkManager::broadcastUserInfoChanged()
 {
+    QSettings s;
+    s.setValue("username", _username);
+    s.setValue("userstatus", (int)_status);
+
     QList<Connection*> socks = mPeers.values();
 
-    foreach(Connection* pConn,socks){
-        if(pConn){
-            pConn->sendClientViewInfo();
+    foreach(Connection* conn,socks) {
+        if(conn) {
+            conn->sendClientViewInfo();
         }
     }
 }
 
-bool NetworkManager::sendMessage(Connection *pConn, Message *pMsg)
+
+bool NetworkManager::sendMessage(Connection *conn, Message *msg)
 {
-    if(pConn){
-        return pConn->sendMessage(pMsg);
+    if(conn) {
+        return conn->sendMessage(msg);
     }
 
     return false;
 }
+
 
 void NetworkManager::addPendingPeers(const QHostAddress &senderIp, int port, Connection *conn)
 {
@@ -78,6 +82,7 @@ void NetworkManager::addPendingPeers(const QHostAddress &senderIp, int port, Con
         mPendingPeers.insert(key, conn);
     }
 }
+
 
 void NetworkManager::removePendingPeers(Connection *conn)
 {
@@ -92,20 +97,24 @@ void NetworkManager::removePendingPeers(Connection *conn)
     }
 }
 
+
 Connection *NetworkManager::hasPendingConnection(const QHostAddress &senderIp, int port)
 {
     return mPendingPeers.value(IP_PORT_PAIR(senderIp.toIPv4Address(), port), NULL);
 }
+
 
 Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port)
 {
     return mPeers.value(IP_PORT_PAIR(senderIp.toIPv4Address(), port), NULL);
 }
 
+
 void NetworkManager::newConnection(Connection *conn)
 {
     connect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
 }
+
 
 void NetworkManager::readyForUse()
 {
@@ -135,6 +144,7 @@ void NetworkManager::disconnectSignal(Connection *conn)
     disconnect(conn, SIGNAL(newMessageArrived(Connection*,Message*)),this,SLOT(newMessageArrived(Connection*,Message*)));
 }
 
+
 void NetworkManager::onDisconnected()
 {
     if (Connection *conn = qobject_cast<Connection *>(sender())){
@@ -143,12 +153,14 @@ void NetworkManager::onDisconnected()
     }
 }
 
+
 void NetworkManager::connectionError(QAbstractSocket::SocketError /* socketError */)
 {
-    if (Connection *pConnection = qobject_cast<Connection *>(sender())){
-        removeConnection(pConnection);
+    if (Connection *conn = qobject_cast<Connection *>(sender())){
+        removeConnection(conn);
     }
 }
+
 
 void NetworkManager::removeConnection(Connection *conn)
 {
@@ -167,36 +179,36 @@ void NetworkManager::removeConnection(Connection *conn)
 }
 
 
-void NetworkManager::newMessageArrived(Connection *pConn, Message *pMsg)
+void NetworkManager::newMessageArrived(Connection *conn, Message *msg)
 {
     if(/*GameSettings::me()->setting(Game::BlockOthersWhileNetPlay).value<bool>() && */
-       pConn != mpPlayingWith && status() == PeerViewInfoMsg::Busy){
-        ChatMsg *pMsg = new ChatMsg(tr("Soryy, I am busy now. I will chat with you later."));
-        pConn->sendMessage(pMsg);
+       conn != mpPlayingWith && status() == PeerViewInfoMsg::Busy){
+        ChatMsg *msg = new ChatMsg(tr("Soryy, I am busy now. I will chat with you later."));
+        conn->sendMessage(msg);
 
-        if(pMsg->typeId() == ChatMsg::TypeID){
-            mChatMsgsWhilePlaying[pConn] = dynamic_cast<ChatMsg*>(pMsg);
+        if(msg->typeId() == ChatMsg::TypeID){
+            mChatMsgsWhilePlaying[conn] = dynamic_cast<ChatMsg*>(msg);
         }
         return;
     }
 
-    if(pMsg->typeId() == ChatMsg::TypeID){
-        emit chatMsgCame(pConn,dynamic_cast<ChatMsg*>(pMsg));
+    if(msg->typeId() == ChatMsg::TypeID){
+        emit chatMsgCame(conn,dynamic_cast<ChatMsg*>(msg));
     }
-    else if(pMsg->typeId() == PlayRequestMsg::TypeID){
-        emit playRequestCame(pConn,dynamic_cast<PlayRequestMsg*>(pMsg));
+    else if(msg->typeId() == PlayRequestMsg::TypeID){
+        emit playRequestCame(conn,dynamic_cast<PlayRequestMsg*>(msg));
     }
-    else if(pMsg->typeId() == PlayRequestResultMsg::TypeID){
-        emit playRequestResultCame(pConn,dynamic_cast<PlayRequestResultMsg*>(pMsg));
+    else if(msg->typeId() == PlayRequestResultMsg::TypeID){
+        emit playRequestResultCame(conn,dynamic_cast<PlayRequestResultMsg*>(msg));
     }
-    else if(pMsg->typeId() == GameCanceledMsg::TypeID){
-        emit gameCanceledMsgCame(pConn,dynamic_cast<GameCanceledMsg*>(pMsg));
+    else if(msg->typeId() == GameCanceledMsg::TypeID){
+        emit gameCanceledMsgCame(conn,dynamic_cast<GameCanceledMsg*>(msg));
     }
-    else if(pMsg->typeId() == LineAddedMsg::TypeID){
-        emit lineAddedMsgCame(pConn,dynamic_cast<LineAddedMsg*>(pMsg));
+    else if(msg->typeId() == LineAddedMsg::TypeID){
+        emit lineAddedMsgCame(conn,dynamic_cast<LineAddedMsg*>(msg));
     }
 
-    emit newMsgCame(pConn, pMsg);
+    emit newMsgCame(conn, msg);
     emit newMsgCame();
 }
 
@@ -205,10 +217,10 @@ void NetworkManager::closeAllSocks()
 {
     QList<Connection*> socks = mPeers.values();
 
-    foreach(Connection* pConn,socks){
-        if(pConn){
-            disconnectSignal(pConn);
-            pConn->close();
+    foreach(Connection* conn,socks){
+        if(conn){
+            disconnectSignal(conn);
+            conn->close();
         }
     }
 }

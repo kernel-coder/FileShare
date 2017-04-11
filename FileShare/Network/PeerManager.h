@@ -17,7 +17,7 @@ class PeerManager : public QObject
 {
 Q_OBJECT
 public:
-    PeerManager(NetworkManager *pNetManager, QObject *parent = 0);
+    PeerManager(NetworkManager *netMgr, QObject *parent = 0);
     ~PeerManager();
     void setServerPort(int nPort);
     QByteArray userName() const;
@@ -25,7 +25,7 @@ public:
     bool isLocalHostAddress(const QHostAddress &address);
 
 signals:
-    void newPeer(Connection *pConnection);
+    void newPeer(Connection *conn);
 
 private slots:
     void onPeerConnected();

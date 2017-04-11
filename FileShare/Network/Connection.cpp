@@ -9,10 +9,10 @@
 #include <QTimer>
 
 
-Connection::Connection(int sockId, QObject *parent) :
-    QTcpSocket(parent)
-  , mBlockSize(0)
-  , _peerViewInfo(0)
+Connection::Connection(int sockId, QObject *parent)
+    : QTcpSocket(parent)
+    , mBlockSize(0)
+    , _peerViewInfo(0)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     connect(this, SIGNAL(readyRead()), SLOT(dataReadyToRead()));
@@ -41,14 +41,14 @@ void Connection::sendClientViewInfo()
 }
 
 
-bool Connection::sendMessage(Message *pMsg)
+bool Connection::sendMessage(Message *msg)
 {
-    if(pMsg){
+    if(msg){
         QByteArray block;
         QDataStream stream(&block, QIODevice::WriteOnly);
         stream.setVersion(QDataStream::Qt_4_6);
         stream << (quint64)0;
-        pMsg->write(stream);
+        msg->write(stream);
         stream.device()->seek(0);
         stream << (quint64)(block.size() - sizeof(quint64));
 
@@ -74,11 +74,11 @@ void Connection::dataReadyToRead()
             return;
         }
 
-        Message *pMsg = MsgSystem::readAndContruct(in);
+        Message *msg = MsgSystem::readAndContruct(in);
 
-        if(pMsg){            
-            if(pMsg->typeId() == PeerViewInfoMsg::TypeID){
-                PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(pMsg);
+        if(msg){
+            if(msg->typeId() == PeerViewInfoMsg::TypeID){
+                PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(msg);
                 if(pvi != NULL){
                     if(_peerViewInfo){
                         _peerViewInfo->name(pvi->name());
@@ -93,7 +93,7 @@ void Connection::dataReadyToRead()
                 }
             }
             else{
-                emit newMessageArrived(this,pMsg);
+                emit newMessageArrived(this, msg);
             }
 
             mBlockSize = 0;

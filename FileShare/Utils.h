@@ -11,6 +11,7 @@ public:
 
     Q_INVOKABLE QString fileRelativeAppPath(const QString& file);
     Q_INVOKABLE QUrl urlRelativeAppPath(const QString& file);
+    Q_INVOKABLE QString urlToFile(const QUrl& url);
 
 };
 

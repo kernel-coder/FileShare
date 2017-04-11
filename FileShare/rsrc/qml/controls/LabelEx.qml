@@ -4,5 +4,5 @@ import QtQuick.Controls 1.1
 Label {
     property string tag: ""
     color: "white"
-    font.pixelSize: 20
+    font.pixelSize: 18
 }
