@@ -59,8 +59,8 @@ private slots:
     void newConnection(Connection *connection);
     void connectionError(QAbstractSocket::SocketError socketError);
     void onDisconnected();
-    void readyForUse();
-    void newMessageArrived(Connection *conn, Message *msg);
+    void onReadyForUse();
+    void onNewMessageArrived(Connection *conn, Message *msg);
     void closeAllSocks();
 
 

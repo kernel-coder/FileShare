@@ -112,11 +112,11 @@ Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port
 
 void NetworkManager::newConnection(Connection *conn)
 {
-    connect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
+    connect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
 }
 
 
-void NetworkManager::readyForUse()
+void NetworkManager::onReadyForUse()
 {
     Connection *conn = qobject_cast<Connection *>(sender());
     QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerViewInfo()->port());
@@ -124,9 +124,9 @@ void NetworkManager::readyForUse()
 
     if (!mPeers.contains(key)) {
         mPeers.insert(key, conn);
-        connect(conn, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
+        connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
         connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-        connect(conn, SIGNAL(newMessageArrived(Connection*,Message*)), SLOT(newMessageArrived(Connection*,Message*)));
+        connect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMessageArrived(Connection*, Message*)));
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
     }
@@ -140,8 +140,8 @@ void NetworkManager::disconnectSignal(Connection *conn)
 {
     disconnect(conn, SIGNAL(error(QAbstractSocket::SocketError)),this, SLOT(connectionError(QAbstractSocket::SocketError)));
     disconnect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-    disconnect(conn, SIGNAL(readyForUse()), this, SLOT(readyForUse()));
-    disconnect(conn, SIGNAL(newMessageArrived(Connection*,Message*)),this,SLOT(newMessageArrived(Connection*,Message*)));
+    disconnect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
+    disconnect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), this, SLOT(onNewMessageArrived(Connection*, Message*)));
 }
 
 
@@ -179,7 +179,7 @@ void NetworkManager::removeConnection(Connection *conn)
 }
 
 
-void NetworkManager::newMessageArrived(Connection *conn, Message *msg)
+void NetworkManager::onNewMessageArrived(Connection *conn, Message *msg)
 {
     //if(/*GameSettings::me()->setting(Game::BlockOthersWhileNetPlay).value<bool>() && */
     //   conn != mpPlayingWith && status() == PeerViewInfoMsg::Busy){
