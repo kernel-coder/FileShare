@@ -65,13 +65,11 @@ void NetworkManager::broadcastUserInfoChanged()
 }
 
 
-bool NetworkManager::sendMessage(Connection *conn, Message *msg)
+void NetworkManager::sendMessage(Connection *conn, Message *msg)
 {
     if(conn) {
-        return conn->sendMessage(msg);
+        conn->sendMessage(msg);
     }
-
-    return false;
 }
 
 

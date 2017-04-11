@@ -34,7 +34,7 @@ public:
     MetaPropertyPublicSet_Ex(int, port)
     MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
 
-    bool sendMessage(Connection *conn, Message *msg);
+    void sendMessage(Connection *conn, Message *msg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort);
 
     void addPendingPeers(const QHostAddress &senderIp, int port, Connection* conn);

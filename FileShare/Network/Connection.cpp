@@ -10,28 +10,7 @@
 #include <QThread>
 
 
-Connection* Connection::createConnection(QObject *parent)
-{
-    QThread* thread = new QThread(parent);
-    Connection* conn = new Connection();
-    conn->moveToThread(thread);
-    connect(conn, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
-    thread->start();
-    return conn;
-}
-
-
-
-Connection::Connection(QObject *parent)
-    : QTcpSocket(parent)
-    , mBlockSize(0)
-    , _peerViewInfo(0)
-{
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);    
-}
-
-
-void Connection::setupSocket(int sockId)
+TcpSocket::TcpSocket(int sockId, QObject * p) : QTcpSocket(p), mnBlockSize(0)
 {
     connect(this, SIGNAL(readyRead()), SLOT(dataReadyToRead()));
 
@@ -43,24 +22,40 @@ void Connection::setupSocket(int sockId)
     else {
         connect(this, SIGNAL(connected()), SLOT(sendClientViewInfo()));
     }
-
-    connect(this, SIGNAL(fireSendMessage(Message*)), this, SLOT(sendMessage_Private(Message*)));
 }
 
 
-void Connection::sendClientViewInfo()
+void TcpSocket::sendClientViewInfo()
 {
     PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
     sendMessage(pvi);
 }
 
-bool Connection::sendMessage(Message *msg)
+
+void TcpSocket::onDataReadReady()
 {
-    emit fireSendMessage(msg);
-    return true;
+    QMutexLocker locker(&mMutex);
+    QDataStream in(this);
+    in.setVersion(QDataStream::Qt_4_6);
+
+    while(bytesAvailable() >= (int)sizeof(quint16)){
+        if (mnBlockSize == 0){
+            in >> mnBlockSize;
+        }
+
+        if (bytesAvailable() < mnBlockSize){
+            return;
+        }
+
+        mnBlockSize = 0;
+
+        Message *msg = MsgSystem::readAndContruct(in);
+        emit newMessageCome(msg);
+    }
 }
 
-void Connection::sendMessage_Private(Message *msg)
+
+void TcpSocket::sendMessage(Message *msg)
 {
     if(msg){
         qDebug() << QString("Message Sending: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
@@ -77,46 +72,67 @@ void Connection::sendMessage_Private(Message *msg)
 }
 
 
-void Connection::dataReadyToRead()
+
+Connection::Connection(int sockId, QObject *parent)
+    : QObject(parent)
+    , _peerViewInfo(0)
 {
-    QMutexLocker locker(&mMutex);
-    QDataStream in(this);
-    in.setVersion(QDataStream::Qt_4_6);
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);        
+    QThread* thread = new QThread(this);
+    Connection* conn = new Connection();
+    conn->moveToThread(thread);
+    connect(conn, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
+    thread->start();
 
-    while(bytesAvailable() >= (int)sizeof(quint64)) {
+    mSocket = new TcpSocket(sockId, this);
 
-        if (mBlockSize == 0) {
-            in >> mBlockSize;
-        }
+    connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
+    connect(mSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+    connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(error(QAbstractSocket::SocketError)));
+    connect(mSocket, SIGNAL(newMessageCome(Message*)), this, SLOT(onMessageReceived(Message*)));
+    connect(this, SIGNAL(fireSendMessage(Message*)), mSocket, SLOT(sendMessage(Message*)));
 
-        if (bytesAvailable() < mBlockSize){
-            return;
-        }
+    connect(this, SIGNAL(sigConnectToHost(QHostAddress,quint16)), mSocket, SLOT(slotConnectToHost(QHostAddress,quint16)));
+    connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()));
+    connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
+}
 
-        Message *msg = MsgSystem::readAndContruct(in);
-        mBlockSize = 0;
 
-        qDebug() << QString("Message Received: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
+void Connection::sendClientViewInfo()
+{
+    PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
+    emit fireSendMessage(pvi);
+}
 
-        if(msg){
-            if(msg->typeId() == PeerViewInfoMsg::TypeID) {
-                PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(msg);
-                if(pvi != NULL) {
-                    if(_peerViewInfo) {
-                        _peerViewInfo->name(pvi->name());
-                        _peerViewInfo->status(pvi->status());
-                        pvi->deleteLater();
-                    }
-                    else {
-                        peerViewInfo(pvi);
-                        qDebug() << "Firing readyForuse fired";
-                        emit readyForUse();                        
-                    }
+
+void Connection::sendMessage(Message *msg)
+{
+    emit fireSendMessage(msg);
+}
+
+
+void Connection::onMessageReceived(Message* msg)
+{
+    qDebug() << QString("Message Received: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
+
+    if(msg){
+        if(msg->typeId() == PeerViewInfoMsg::TypeID) {
+            PeerViewInfoMsg* pvi = qobject_cast<PeerViewInfoMsg*>(msg);
+            if(pvi != NULL) {
+                if(_peerViewInfo) {
+                    _peerViewInfo->name(pvi->name());
+                    _peerViewInfo->status(pvi->status());
+                    pvi->deleteLater();
+                }
+                else {
+                    peerViewInfo(pvi);
+                    qDebug() << "Firing readyForuse fired";
+                    emit readyForUse();
                 }
             }
-            else{
-                emit newMessageArrived(this, msg);
-            }            
+        }
+        else{
+            emit newMessageArrived(this, msg);
         }
     }
 }
