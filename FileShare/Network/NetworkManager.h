@@ -50,7 +50,7 @@ signals:
     void gameCanceledMsgCame(Connection *sender, GameCanceledMsg *msg);
     void lineAddedMsgCame(Connection *sender, LineAddedMsg *msg);
     void newMsgCame(Connection *sender, Message *msg);
-    void newMsgCame();
+    void newMsgCame();    
 
 public slots:
     void broadcastUserInfoChanged();

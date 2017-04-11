@@ -25,6 +25,8 @@ Connection::Connection(int sockId, QObject *parent)
     else {
         connect(this, SIGNAL(connected()), SLOT(sendClientViewInfo()));
     }
+
+    connect(this, SIGNAL(fireSendMessage(Message*)), this, SLOT(sendMessage_Private(Message*)));
 }
 
 
@@ -34,10 +36,14 @@ void Connection::sendClientViewInfo()
     sendMessage(pvi);
 }
 
-
 bool Connection::sendMessage(Message *msg)
 {
-    bool result = false;
+    emit fireSendMessage(msg);
+    return true;
+}
+
+void Connection::sendMessage_Private(Message *msg)
+{
     if(msg){
         QByteArray block;
         QDataStream stream(&block, QIODevice::WriteOnly);
@@ -46,10 +52,9 @@ bool Connection::sendMessage(Message *msg)
         msg->write(stream);
         stream.device()->seek(0);
         stream << (quint64)(block.size() - sizeof(quint64));
-        result = this->write(block) == block.size();
+        this->write(block) == block.size();
         msg->deleteLater();
     }
-    return result;
 }
 
 
