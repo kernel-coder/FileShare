@@ -124,7 +124,7 @@ void PeerManager::readBroadcastDatagram()
             continue;
         }
 
-        qDebug() << "peer id: " << senderIp.toString() << msg->port();
+        //qDebug() << "peer id: " << senderIp.toString() << msg->port();
 
         if (mpNetManager->hasPendingConnection(senderIp, msg->port()) == NULL) {
             Connection *conn = mpNetManager->hasConnection(senderIp, msg->port());

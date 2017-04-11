@@ -181,33 +181,6 @@ void NetworkManager::removeConnection(Connection *conn)
 
 void NetworkManager::onNewMessageArrived(Connection *conn, Message *msg)
 {
-    //if(/*GameSettings::me()->setting(Game::BlockOthersWhileNetPlay).value<bool>() && */
-    //   conn != mpPlayingWith && status() == PeerViewInfoMsg::Busy){
-    //    ChatMsg *msg = new ChatMsg(tr("Soryy, I am busy now. I will chat with you later."));
-    //    conn->sendMessage(msg);
-
-    //    if(msg->typeId() == ChatMsg::TypeID){
-    //        mChatMsgsWhilePlaying[conn] = dynamic_cast<ChatMsg*>(msg);
-    //    }
-    //    return;
-    //}
-
-    //if(msg->typeId() == ChatMsg::TypeID){
-    //    emit chatMsgCame(conn,dynamic_cast<ChatMsg*>(msg));
-    //}
-    //else if(msg->typeId() == PlayRequestMsg::TypeID){
-    //    emit playRequestCame(conn,dynamic_cast<PlayRequestMsg*>(msg));
-    //}
-    //else if(msg->typeId() == PlayRequestResultMsg::TypeID){
-    //    emit playRequestResultCame(conn,dynamic_cast<PlayRequestResultMsg*>(msg));
-    //}
-    //else if(msg->typeId() == GameCanceledMsg::TypeID){
-    //    emit gameCanceledMsgCame(conn,dynamic_cast<GameCanceledMsg*>(msg));
-    //}
-    //else if(msg->typeId() == LineAddedMsg::TypeID){
-    //    emit lineAddedMsgCame(conn,dynamic_cast<LineAddedMsg*>(msg));
-    //}
-
     emit newMsgCame(conn, msg);
     emit newMsgCame();
 }
