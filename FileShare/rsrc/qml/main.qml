@@ -84,6 +84,7 @@ Window {
             anchors.bottom: parent.bottom
             width: parent.width * .3
             ListView {
+                id: peerListView
                 spacing: 5
                 anchors.margins: 5
                 anchors.fill: parent
@@ -141,7 +142,11 @@ Window {
                 }
                 onDropped: {
                     drop.accept(Qt.CopyAction); console.log(drop.urls)
-                    FileMgr.shareFilesTo(null, drop.urls)
+                    if (peerListView.currentIndex >= 0) {
+                        FileMgr.shareFilesTo(peersModel.get(peerListView.currentIndex).connObj, drop.urls)
+                    }
+                    else {
+                    }
                 }
             }
         }

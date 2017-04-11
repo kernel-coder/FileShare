@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include <QFileInfo>
 #include <QFile>
+#include <QDebug>
 
 
 FileTransferMsg::FileTransferMsg(const QString& filename, QObject* p)
@@ -44,6 +45,7 @@ void FileTransferMsg::read(QDataStream &buf)
         file.write(ba);
         file.close();
     }
+    qDebug() << "File recieved at " << _filename;
 }
 
 
