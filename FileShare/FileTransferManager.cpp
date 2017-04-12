@@ -134,6 +134,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
             FileTransferAckMsg* ackMsg = qobject_cast<FileTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mCurrentUUID) {
                 mFile = new QFile(mAllFiles.at(mCurrentFileIndex).absoluteFilePath());
+                qDebug() << "sending file "  << mFile->fileName();
                 if (mFile->open(QFile::ReadOnly)) {
                     sendFilePart(0);
                 }
@@ -164,6 +165,7 @@ void FileReceiverHandler::handleThreadStarting()
     if (!filename.endsWith("/")) filename += "/";
     filename += mFileMsg->filename();
     mFile = new QFile(filename);
+    qDebug() << "Receving file "  << filename;
     mFile->open(QFile::WriteOnly);
     FileTransferAckMsg* msg = new FileTransferAckMsg(mFileMsg->uuid(), mFileMsg->filename());
     msg->basePath(mFileMsg->basePath());
