@@ -18,11 +18,10 @@ public:
     void setupSocket(int sockId = 0);
 
 signals:
-    void newMessageCome(Message *msg);
+    void newRawMsgArrived(const QByteArray& data);
 
-public slots:
-    void sendMessage(Message *msg);
-    void sendClientViewInfo();
+private slots:
+    void sendRawMessage(const QByteArray& data);
 
 private slots:
     void onDataReadReady();
@@ -62,7 +61,7 @@ signals:
     void disconnected();
     void error(QAbstractSocket::SocketError socketError);
 
-    void fireSendMessage(Message* msg);
+    void fireSendRawMessage(const QByteArray& data);
     void readyForUse();
     void newMessageArrived(Connection *sender, Message *msg);
 
@@ -75,7 +74,7 @@ public slots:
     void sendClientViewInfo();
 
 private slots:
-    void onMessageReceived(Message* msg);
+    void onNewRawMessageReceived(const QByteArray& data);
 
 private:
     TcpSocket* mSocket;

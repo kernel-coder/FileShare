@@ -14,25 +14,14 @@ TcpSocket::TcpSocket(QObject * p) : QTcpSocket(p), mnBlockSize(0)
 {
 }
 
+
 void TcpSocket::setupSocket(int sockId)
 {
     connect(this, SIGNAL(readyRead()), SLOT(onDataReadReady()));
 
     if (sockId > 0 ) {
-        if(setSocketDescriptor(sockId)) {
-            sendClientViewInfo();
-        }
+        setSocketDescriptor(sockId);
     }
-    else {
-        connect(this, SIGNAL(connected()), SLOT(sendClientViewInfo()));
-    }
-}
-
-
-void TcpSocket::sendClientViewInfo()
-{
-    PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
-    sendMessage(pvi);
 }
 
 
@@ -42,7 +31,7 @@ void TcpSocket::onDataReadReady()
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_4_6);
 
-    while(bytesAvailable() >= (int)sizeof(quint16)){
+    while(bytesAvailable() >= (int)sizeof(quint64)){
         if (mnBlockSize == 0){
             in >> mnBlockSize;
         }
@@ -52,27 +41,14 @@ void TcpSocket::onDataReadReady()
         }
 
         mnBlockSize = 0;
-
-        Message *msg = MsgSystem::readAndContruct(in);
-        emit newMessageCome(msg);
+        emit newRawMsgArrived(read(mnBlockSize));
     }
 }
 
 
-void TcpSocket::sendMessage(Message *msg)
+void TcpSocket::sendRawMessage(const QByteArray& data)
 {
-    if(msg){
-        qDebug() << QString("Message Sending: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
-        QByteArray block;
-        QDataStream stream(&block, QIODevice::WriteOnly);
-        stream.setVersion(QDataStream::Qt_4_6);
-        stream << (quint64)0;
-        msg->write(stream);
-        stream.device()->seek(0);
-        stream << (quint64)(block.size() - sizeof(quint64));
-        this->write(block);
-        msg->deleteLater();
-    }
+    this->write(data);
 }
 
 
@@ -88,14 +64,18 @@ Connection::Connection(int sockId, QObject *parent)
     connect(mSocket, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
     connect(thread, &QThread::started, [&]() {
         mSocket->setupSocket(sockId);
+        if (sockId > 0) {
+            QTimer::singleShot(10, this, SLOT(sendClientViewInfo()));
+        }
     });
     thread->start();
 
     connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
+    connect(mSocket, SIGNAL(connected()), this, SLOT(sendClientViewInfo()));
     connect(mSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
     connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(error(QAbstractSocket::SocketError)));
-    connect(mSocket, SIGNAL(newMessageCome(Message*)), this, SLOT(onMessageReceived(Message*)));
-    connect(this, SIGNAL(fireSendMessage(Message*)), mSocket, SLOT(sendMessage(Message*)));
+    connect(mSocket, SIGNAL(newRawMsgArrived(QByteArray)), this, SLOT(onNewRawMessageReceived(QByteArray)));
+    connect(this, SIGNAL(fireSendRawMessage(QByteArray)), mSocket, SLOT(sendRawMessage(QByteArray)));
 
     connect(this, SIGNAL(sigConnectToHost(QHostAddress,quint16)), mSocket, SLOT(slotConnectToHost(QHostAddress,quint16)));
     connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()));
@@ -114,18 +94,32 @@ Connection::~Connection()
 void Connection::sendClientViewInfo()
 {
     PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
-    emit fireSendMessage(pvi);
+    sendMessage(pvi);
 }
 
 
 void Connection::sendMessage(Message *msg)
 {
-    emit fireSendMessage(msg);
+    if(msg){
+        qDebug() << QString("Message Sending: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
+        QByteArray block;
+        QDataStream stream(&block, QIODevice::WriteOnly);
+        stream.setVersion(QDataStream::Qt_4_6);
+        stream << (quint64)0;
+        msg->write(stream);
+        stream.device()->seek(0);
+        stream << (quint64)(block.size() - sizeof(quint64));
+        msg->deleteLater();
+        emit fireSendRawMessage(block);
+    }
 }
 
 
-void Connection::onMessageReceived(Message* msg)
+void Connection::onNewRawMessageReceived(const QByteArray& data)
 {
+    QDataStream in(data);
+    in.setVersion(QDataStream::Qt_4_6);
+    Message *msg = MsgSystem::readAndContruct(in);
     qDebug() << QString("Message Received: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
 
     if(msg){
