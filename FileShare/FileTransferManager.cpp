@@ -105,8 +105,8 @@ void FileSenderHandler::sendFilePart(int seqNo)
 void FileSenderHandler::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (sender == mConnection) {
-        if (msg->typeId() == FilePartTransferAckMsg::TypeID) {
-            FilePartTransferAckMsg* ackMsg = qobject_cast<FilePartTransferAckMsg*>(msg);
+        if (msg->typeId() == FileTransferAckMsg::TypeID) {
+            FileTransferAckMsg* ackMsg = qobject_cast<FileTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mCurrentUUID) {
                 mFile = new QFile(mAllFiles.at(mCurrentFileIndex).absoluteFilePath());
                 if (mFile->open(QFile::ReadOnly)) {
