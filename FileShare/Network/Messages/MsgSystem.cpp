@@ -51,6 +51,9 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
     else if(msgTypeId == ShareResponseMsg::TypeID){
         msg = new ShareResponseMsg();
     }
+    else if (msgTypeId == FileTransferHeaderInfoMsg::TypeID){
+        msg = new FileTransferHeaderInfoMsg();
+    }
     else if(msgTypeId == FileTransferMsg::TypeID){
         msg = new FileTransferMsg();
     }

@@ -63,6 +63,7 @@ Rectangle {
                         spacing: 5
                         LabelEx {
                             anchors.horizontalCenter: parent.horizontalCenter
+                            font.pixelSize: 12
                             text: info.filePath + "( %1/%2)".arg(info.countFileProgress).arg(info.countTotalFile)
                         }
                         ProgressBarEx {
@@ -95,7 +96,7 @@ Rectangle {
             }
             onDropped: {
                 drop.accept(Qt.CopyAction);
-                var conn = view.peerViewInfo
+                var conn = view.connObj
                 if (conn) {
                     FileMgr.shareFilesTo(conn, drop.urls)
                 }
