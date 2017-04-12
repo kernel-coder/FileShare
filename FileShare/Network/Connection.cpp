@@ -22,7 +22,7 @@ void TcpSocket::onDataReadReady()
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_4_6);
 
-    while(bytesAvailable() >= (int)sizeof(quint64)){
+    while(bytesAvailable() >= (int)sizeof(qint64)){
         if (mnBlockSize == 0){
             in >> mnBlockSize;
         }
@@ -84,13 +84,12 @@ void Connection::sendMessage(Message *msg)
     if(msg){
         qDebug() << QString("Message Sending: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
         QByteArray block;
-        QDataStream stream(&block, QIODevice::WriteOnly);
+        {QDataStream stream(&block, QIODevice::WriteOnly);
         stream.setVersion(QDataStream::Qt_4_6);
-        stream << (quint64)0;
+        stream << (qint64)0;
         msg->write(stream);
         stream.device()->seek(0);
-        stream << (quint64)(block.size() - sizeof(quint64));
-        msg->deleteLater();
+        stream << (qint64)(block.size() - sizeof(qint64));}
         emit fireSendRawMessage(block);
     }
 }
