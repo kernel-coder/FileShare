@@ -99,8 +99,7 @@ void PeerManager::readBroadcastDatagram()
 
         QHostAddress senderIp;
         quint16 senderPort;
-        QByteArray datagram;
-        datagram.resize(srvrInfo.size());
+        QByteArray datagram(srvrInfo.size(), 0);
 
         if (mBroadcastSocket.readDatagram(datagram.data(), datagram.size(), &senderIp, &senderPort) == -1) {
             continue;
