@@ -25,6 +25,7 @@ FileHandler::FileHandler(Connection *conn, QObject *p)
     , mConnection(conn)
 {
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(this, SIGNAL(started()), this, SLOT(onThreadStarted()));
 }
 
 
@@ -157,7 +158,6 @@ FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferMsg *msg,
 
 void FileReceiverHandler::handleThreadStarting()
 {
-    connect(mConnection, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMsgCome(Connection*, Message*)));
     QString filename = Utils::me()->dataDirCommon(mFileMsg->basePath());
     Utils::me()->makePath(filename);
     if (!filename.endsWith("/")) filename += "/";
