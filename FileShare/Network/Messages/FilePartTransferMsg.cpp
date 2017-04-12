@@ -29,6 +29,7 @@ void FilePartTransferMsg::read(QDataStream &buf)
     buf >> length;
     QByteArray ba(length, 0);
     buf.readRawData(ba.data(), length);
+    _data = ba;
 }
 
 
