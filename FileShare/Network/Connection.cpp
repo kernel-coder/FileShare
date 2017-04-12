@@ -15,16 +15,6 @@ TcpSocket::TcpSocket(QObject * p) : QTcpSocket(p), mnBlockSize(0)
 }
 
 
-void TcpSocket::setupSocket(int sockId)
-{
-    connect(this, SIGNAL(readyRead()), SLOT(onDataReadReady()));
-
-    if (sockId > 0 ) {
-        setSocketDescriptor(sockId);
-    }
-}
-
-
 void TcpSocket::onDataReadReady()
 {
     QMutexLocker locker(&mMutex);
@@ -62,6 +52,7 @@ Connection::Connection(int sockId, QObject *parent)
     mSocket = new TcpSocket;
     mSocket->moveToThread(thread);
 
+    connect(mSocket, SIGNAL(readyRead()), mSocket, SLOT(onDataReadReady()));
     connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
     connect(mSocket, SIGNAL(connected()), this, SLOT(sendClientViewInfo()));
     connect(mSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
@@ -74,8 +65,10 @@ Connection::Connection(int sockId, QObject *parent)
     connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
 
     connect(thread, &QThread::started, [&]() {
-        qDebug() << "setting up socket";
-        mSocket->setupSocket(sockId);
+        if (sockId > 0) {
+            qDebug() << "setting up socket";
+            mSocket->setSocketDescriptor(sockId);
+        }
     });
     thread->start();
 }

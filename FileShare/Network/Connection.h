@@ -15,7 +15,6 @@ class TcpSocket : public QTcpSocket
     Q_OBJECT
 public:
     TcpSocket(QObject * p = nullptr);
-    void setupSocket(int sockId = 0);
 
 signals:
     void newRawMsgArrived(const QByteArray& data);
@@ -32,7 +31,7 @@ private slots:
 
 private:
      QMutex mMutex;
-     quint64 mnBlockSize;
+     qint64 mnBlockSize;
 };
 
 class Connection : public QObject
