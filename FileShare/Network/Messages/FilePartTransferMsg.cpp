@@ -23,10 +23,10 @@ void FilePartTransferMsg::write(QDataStream &buf)
 
 void FilePartTransferMsg::read(QDataStream &buf)
 {
-    buf << _uuid;
-    buf << _seqNo;
+    buf >> _uuid;
+    buf >> _seqNo;
     int length  =0;
-    buf << length;
+    buf >> length;
     QByteArray ba;
     ba.resize(length);
     buf.readRawData(ba.data(), length);
@@ -55,8 +55,8 @@ void FilePartTransferAckMsg::write(QDataStream &buf)
 
 void FilePartTransferAckMsg::read(QDataStream &buf)
 {
-    buf << _uuid;
-    buf << _seqNo;
+    buf >> _uuid;
+    buf >> _seqNo;
 }
 
 
