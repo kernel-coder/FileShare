@@ -20,6 +20,7 @@ int ServerInfoMsg::TypeID = _msgIdCounter++;
 int PeerViewInfoMsg::TypeID = _msgIdCounter++;
 int ShareRequestMsg::TypeID = _msgIdCounter++;
 int ShareResponseMsg::TypeID = _msgIdCounter++;
+int FileTransferHeaderInfoMsg::TypeID = _msgIdCounter++;
 int FileTransferMsg::TypeID = _msgIdCounter++;
 int FileTransferAckMsg::TypeID = _msgIdCounter++;
 int FilePartTransferMsg::TypeID = _msgIdCounter++;

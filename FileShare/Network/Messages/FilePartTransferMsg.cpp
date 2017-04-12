@@ -1,10 +1,41 @@
 #include "FilePartTransferMsg.h"
 
-FilePartTransferMsg::FilePartTransferMsg(const QString &uuid, int seqNo,
-                                         const QByteArray &data, QObject *p)
+
+FilePartTransferAckMsg::FilePartTransferAckMsg(const QString& rootUuid, const QString &uuid, int seqNo, QObject *p)
     : Message(p)
+    , _rootUuid(rootUuid)
     , _uuid(uuid)
     , _seqNo(seqNo)
+{
+
+}
+
+
+void FilePartTransferAckMsg::write(QDataStream &buf)
+{
+    buf << typeId();
+    buf << _rootUuid;
+    buf << _uuid;
+    buf << _seqNo;
+}
+
+
+void FilePartTransferAckMsg::read(QDataStream &buf)
+{
+    buf >> _rootUuid;
+    buf >> _uuid;
+    buf >> _seqNo;
+}
+
+
+int FilePartTransferAckMsg::typeId() { return FilePartTransferAckMsg::TypeID;}
+
+
+
+
+FilePartTransferMsg::FilePartTransferMsg(const QString& rootUuid, const QString &uuid, int seqNo,
+                                         const QByteArray &data, QObject *p)
+    : FilePartTransferAckMsg(rootUuid, uuid, seqNo, p)
     , _data(data)
 {
 
@@ -13,9 +44,7 @@ FilePartTransferMsg::FilePartTransferMsg(const QString &uuid, int seqNo,
 
 void FilePartTransferMsg::write(QDataStream &buf)
 {
-    buf << typeId();
-    buf << _uuid;
-    buf << _seqNo;
+    FilePartTransferAckMsg::write(buf);
     buf << _data.length();
     buf.writeRawData(_data.data(), _data.length());
 }
@@ -23,8 +52,7 @@ void FilePartTransferMsg::write(QDataStream &buf)
 
 void FilePartTransferMsg::read(QDataStream &buf)
 {
-    buf >> _uuid;
-    buf >> _seqNo;
+    FilePartTransferAckMsg::read(buf);
     int length  =0;
     buf >> length;
     QByteArray ba(length, 0);
@@ -36,29 +64,4 @@ void FilePartTransferMsg::read(QDataStream &buf)
 int FilePartTransferMsg::typeId() { return FilePartTransferMsg::TypeID;}
 
 
-FilePartTransferAckMsg::FilePartTransferAckMsg(const QString &uuid, int seqNo, QObject *p)
-    : Message(p)
-    , _uuid(uuid)
-    , _seqNo(seqNo)
-{
-
-}
-
-
-void FilePartTransferAckMsg::write(QDataStream &buf)
-{
-    buf << typeId();
-    buf << _uuid;
-    buf << _seqNo;
-}
-
-
-void FilePartTransferAckMsg::read(QDataStream &buf)
-{
-    buf >> _uuid;
-    buf >> _seqNo;
-}
-
-
-int FilePartTransferAckMsg::typeId() { return FilePartTransferAckMsg::TypeID;}
 

@@ -18,9 +18,11 @@ RESOURCES += qml.qrc
 SOURCES += main.cpp \
     StatusViewer.cpp \
     Utils.cpp \
-    FileTransferManager.cpp
+    FileTransferManager.cpp \
+    FileTransferHandlers.cpp
 
 HEADERS += \
     StatusViewer.h \
     Utils.h \
-    FileTransferManager.h
+    FileTransferManager.h \
+    FileTransferHandlers.h
