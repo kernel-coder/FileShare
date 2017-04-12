@@ -61,7 +61,7 @@ private:
 
     // a root transfer related;
     QString mCurrentUUID;
-    QString mCurrentBasePath;
+    int mIndexOfBasePath;
 
     // a file transfer related
     int mTotalSeqCount;

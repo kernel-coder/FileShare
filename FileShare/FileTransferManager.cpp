@@ -51,6 +51,7 @@ FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files,
     , mCurrentRootFileIndex(0)
     , mCurrentFileIndex(0)
     , mFile(0)
+    , mIndexOfBasePath(-1)
 {    
 }
 
@@ -81,7 +82,7 @@ void FileSenderHandler::sendRootFile()
     if (mCurrentRootFileIndex < mRootFiles.length()) {
         QFileInfo fi(mRootFiles.at(mCurrentRootFileIndex));
         parseFile(fi);
-        mCurrentBasePath = fi.isDir() ? QDir(fi.absoluteFilePath()).dirName() : "";
+        mIndexOfBasePath = fi.isDir() ? fi.absoluteFilePath().lastIndexOf(QDir(fi.absoluteFilePath()).dirName()) : -1;
         mCurrentFileIndex = 0;
         sendFile();
     }
@@ -98,7 +99,15 @@ void FileSenderHandler::sendFile()
         emit startingFile(fi.absoluteFilePath());
         mCurrentUUID = QUuid::createUuid().toString();
         FileTransferMsg* msg = new FileTransferMsg(mCurrentUUID, fi.fileName());
-        msg->basePath(mCurrentBasePath);
+        if (mIndexOfBasePath >= 0) {
+            QString filename = fi.absoluteFilePath();
+            int index = filename.lastIndexOf(QDir(filename).dirName());
+            QString basePath = filename.mid(mIndexOfBasePath, index - mIndexOfBasePath - 1);
+            msg->basePath(basePath);
+        }
+        else {
+            msg->basePath("");
+        }
         msg->size(fi.size());
         mTotalSeqCount = qCeil(((qreal)msg->size())/MSG_LEN);
         msg->seqCount(mTotalSeqCount);
