@@ -58,6 +58,8 @@ int main(int argc, char *argv[])
 {
     atexit(appCleanup);
     qRegisterMetaType<QMap<QString, QByteArray>>("QMap<QString,QByteArray>");
+    qRegisterMetaType<QHostAddress>("QHostAddress");
+    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
     qInstallMessageHandler(customMessageHandler);
 
     QGuiApplication app(argc, argv);

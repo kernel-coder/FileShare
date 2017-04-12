@@ -41,6 +41,7 @@ class Connection : public QObject
 Q_OBJECT
 public:
     Connection(int sockId = 0, QObject *parent = 0);
+    ~Connection();
     MetaPropertyPrivateSet_Ex(PeerViewInfoMsg* , peerViewInfo)
 
 public:

@@ -95,9 +95,15 @@ Connection::Connection(int sockId, QObject *parent)
     connect(mSocket, SIGNAL(newMessageCome(Message*)), this, SLOT(onMessageReceived(Message*)));
     connect(this, SIGNAL(fireSendMessage(Message*)), mSocket, SLOT(sendMessage(Message*)));
 
-    connect(this, SIGNAL(sigConnectToHost(QHostAddress,quint16)), mSocket, SLOT(slotConnectToHost(QHostAddress,quint16)), Qt::DirectConnection);
-    connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()), Qt::DirectConnection);
-    connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()), Qt::DirectConnection);
+    connect(this, SIGNAL(sigConnectToHost(QHostAddress,quint16)), mSocket, SLOT(slotConnectToHost(QHostAddress,quint16)));
+    connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()));
+    connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
+}
+
+
+Connection::~Connection()
+{
+   mSocket->deleteLater();
 }
 
 
