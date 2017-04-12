@@ -18,6 +18,9 @@ signals:
 protected:
     void incomingConnection(int sockId);
 
+private slots:
+    void onPeerConnectedInServer();
+
 };
 
 #endif // SERVER_H

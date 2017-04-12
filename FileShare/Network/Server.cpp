@@ -19,19 +19,18 @@ Server::~Server()
 void Server::incomingConnection(int sockId)
 {
     Connection *conn = new Connection(sockId, this);
-    addPendingConnection(conn->socket());
+    connect(conn, SIGNAL(connected()), this, SLOT(onPeerConnectedInServer()));
     NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
-    qDebug() << " incomingConnection::newPeer firing..." << conn->peerAddress().toString() << conn->peerPort();
-    emit newPeer(conn);
-//    if (NetMgr->hasPendingConnection(conn->peerAddress(), conn->peerPort()) == NULL
-//            && NetMgr->hasConnection(conn->peerAddress(), conn->peerPort()) == NULL) {
-//        NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
-//        qDebug() << " incomingConnection::newPeer firing...";
-//        emit newPeer(conn);
-//    }
-//    else {
-//        conn->close();
-//        conn->deleteLater();
-//        qDebug() << " incomingConnection::newPeer existing connecting... closing";
-//    }
+    addPendingConnection(conn->socket());       
+}
+
+
+void Server::onPeerConnectedInServer()
+{
+    Connection *conn = qobject_cast<Connection*>(sender());
+    if(conn) {
+        qDebug() << "Peer conneciton success from server " <<  conn->peerAddress().toString() << conn->peerPort();
+        conn->disconnect(this);
+        emit newPeer(conn);
+    }
 }
