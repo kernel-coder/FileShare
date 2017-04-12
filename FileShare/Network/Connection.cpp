@@ -16,7 +16,7 @@ TcpSocket::TcpSocket(QObject * p) : QTcpSocket(p), mnBlockSize(0)
 
 void TcpSocket::setupSocket(int sockId)
 {
-    connect(this, SIGNAL(readyRead()), SLOT(dataReadyToRead()));
+    connect(this, SIGNAL(readyRead()), SLOT(onDataReadReady()));
 
     if (sockId > 0 ) {
         if(setSocketDescriptor(sockId)) {
