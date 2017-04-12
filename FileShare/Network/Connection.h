@@ -6,6 +6,8 @@
 #include "Messages/PeerViewInfoMsg.h"
 #include "JObject.h"
 #include <QHostAddress>
+#include <QThread>
+#include <QWaitCondition>
 
 class Message;
 class NetworkManager;
@@ -34,7 +36,7 @@ private:
      qint64 mnBlockSize;
 };
 
-class Connection : public QObject
+class Connection : public QThread
 {
 Q_OBJECT
 public:
@@ -44,6 +46,7 @@ public:
 
 public:
     TcpSocket* socket() {return mSocket;}
+    void startAndWait();
 
     QHostAddress peerAddress() const {return mSocket->peerAddress();}
     quint16 peerPort() const {return mSocket->peerPort();}
@@ -75,8 +78,14 @@ public slots:
 private slots:
     void onNewRawMessageReceived(const QByteArray& data);
 
+protected:
+    void run();
+
 private:
+    int mSockId;
     TcpSocket* mSocket;
+    QMutex mMutex;
+    QWaitCondition mWaitCondition;
 };
 
 #endif // CONNECTION_H

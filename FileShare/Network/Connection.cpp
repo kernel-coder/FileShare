@@ -12,6 +12,7 @@
 
 TcpSocket::TcpSocket(QObject * p) : QTcpSocket(p), mnBlockSize(0)
 {
+    connect(this, SIGNAL(readyRead()), this, SLOT(onDataReadReady()));
 }
 
 
@@ -44,39 +45,30 @@ void TcpSocket::sendRawMessage(const QByteArray& data)
 
 
 Connection::Connection(int sockId, QObject *parent)
-    : QObject(parent)
+    : QThread(parent)
+    , mSockId(sockId)
     , _peerViewInfo(0)
+    , mSocket(0)
 {
-    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);        
-    QThread* thread = new QThread(this);
-    mSocket = new TcpSocket;
-    mSocket->moveToThread(thread);
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 
-    connect(mSocket, SIGNAL(readyRead()), mSocket, SLOT(onDataReadReady()));
-    connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
-    connect(mSocket, SIGNAL(connected()), this, SLOT(sendClientViewInfo()));
-    connect(mSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
-    connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(error(QAbstractSocket::SocketError)));
-    connect(mSocket, SIGNAL(newRawMsgArrived(QByteArray)), this, SLOT(onNewRawMessageReceived(QByteArray)));
-    connect(this, SIGNAL(fireSendRawMessage(QByteArray)), mSocket, SLOT(sendRawMessage(QByteArray)));
-
-    connect(this, SIGNAL(sigConnectToHost(QHostAddress,quint16)), mSocket, SLOT(slotConnectToHost(QHostAddress,quint16)));
-    connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()));
-    connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
-
-    connect(thread, &QThread::started, [&]() {
-        if (sockId > 0) {
-            qDebug() << "setting up socket";
-            mSocket->setSocketDescriptor(sockId);
-        }
-    });
-    thread->start();
 }
 
 
 Connection::~Connection()
 {
-   mSocket->deleteLater();
+    if (mSocket) {
+        mSocket->deleteLater();
+    }
+}
+
+
+void Connection::startAndWait()
+{
+    mMutex.lock();
+    start();
+    mWaitCondition.wait(&mMutex);
+    mMutex.unlock();
 }
 
 
@@ -131,6 +123,30 @@ void Connection::onNewRawMessageReceived(const QByteArray& data)
             emit newMessageArrived(this, msg);
         }
     }
+}
+
+
+void Connection::run()
+{
+    mSocket = new TcpSocket;
+
+    connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
+    connect(mSocket, SIGNAL(connected()), this, SLOT(sendClientViewInfo()));
+    connect(mSocket, SIGNAL(disconnected()), this, SIGNAL(disconnected()));
+    connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SIGNAL(error(QAbstractSocket::SocketError)));
+    connect(mSocket, SIGNAL(newRawMsgArrived(QByteArray)), this, SLOT(onNewRawMessageReceived(QByteArray)));
+    connect(this, SIGNAL(fireSendRawMessage(QByteArray)), mSocket, SLOT(sendRawMessage(QByteArray)));
+
+    connect(this, SIGNAL(sigConnectToHost(QHostAddress,quint16)), mSocket, SLOT(slotConnectToHost(QHostAddress,quint16)));
+    connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()));
+    connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
+    connect(this, SIGNAL(destroyed(QObject*)), mSocket, SLOT(deleteLater()));
+    mWaitCondition.wakeAll();
+    if (mSockId > 0) {
+        mSocket->setSocketDescriptor(mSockId);
+    }
+    exec();
+    mSocket->deleteLater();
 }
 
 

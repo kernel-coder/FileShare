@@ -134,6 +134,7 @@ void PeerManager::readBroadcastDatagram()
                 qDebug() << "connecting to peer: " << senderIp.toString() << msg->port();
                 connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
                 connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
+                conn->startAndWait();
                 conn->connectToHost(senderIp, msg->port());
             }
         }

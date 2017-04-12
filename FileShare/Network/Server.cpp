@@ -20,6 +20,7 @@ void Server::incomingConnection(int sockId)
 {
     Connection *conn = new Connection(sockId, this);
     connect(conn, SIGNAL(connected()), this, SLOT(onPeerConnectedInServer()));
+    conn->startAndWait();
     qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
     NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
     addPendingConnection(conn->socket());       
