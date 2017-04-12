@@ -89,7 +89,7 @@ void FileSenderHandler::sendRootFile()
         parseFile(fi);
         mIndexOfBasePath = fi.isDir() ? fi.absoluteFilePath().lastIndexOf(QDir(fi.absoluteFilePath()).dirName()) : -1;
         mCurrentFileIndex = 0;
-        FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(mRootUuid, fi.absoluteFilePath(), mAllFiles.length(), mRootTotalSize);
+        FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(mRootUuid, fi.fileName(), mAllFiles.length(), mRootTotalSize);
         emit sendingRootFile(mConnection, msg);
         emit sendMsg(msg);
         sendFile();

@@ -49,18 +49,19 @@ Rectangle {
                 anchors.left: parent.left; anchors.right: parent.right
                 height: 40
                 Item {
-                    id: imgDirection
                     anchors.fill: parent
                     anchors.margins: 5
+                    anchors.bottomMargin: 0
                     Image {
+                        id: imgDirection
                         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
                         source: info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" : "qrc:/images/rsrc/images/btn-download.png"
                     }
                     Column {
-                        anchors.left: imgDirection.right
+                        anchors.left: imgDirection.right; anchors.leftMargin: 5
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
-                        spacing: 5
+                        spacing: 3
                         LabelEx {
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 12
