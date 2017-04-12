@@ -31,8 +31,8 @@ void TcpSocket::onDataReadReady()
             return;
         }
 
-        mnBlockSize = 0;
         emit newRawMsgArrived(read(mnBlockSize));
+        mnBlockSize = 0;
     }
 }
 
