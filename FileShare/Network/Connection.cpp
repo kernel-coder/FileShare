@@ -48,7 +48,7 @@ void TcpSocket::onDataReadReady()
 
 void TcpSocket::sendRawMessage(const QByteArray& data)
 {
-    this->write(data);
+    write(data);
 }
 
 
@@ -58,17 +58,9 @@ Connection::Connection(int sockId, QObject *parent)
     , _peerViewInfo(0)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);        
-    QThread* thread = new QThread;
+    QThread* thread = new QThread(this);
     mSocket = new TcpSocket;
     mSocket->moveToThread(thread);
-    connect(mSocket, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
-    connect(thread, &QThread::started, [&]() {
-        mSocket->setupSocket(sockId);
-        if (sockId > 0) {
-            QTimer::singleShot(10, this, SLOT(sendClientViewInfo()));
-        }
-    });
-    thread->start();
 
     connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
     connect(mSocket, SIGNAL(connected()), this, SLOT(sendClientViewInfo()));
@@ -81,7 +73,10 @@ Connection::Connection(int sockId, QObject *parent)
     connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()));
     connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
 
-
+    connect(thread, &QThread::started, [&]() {
+        mSocket->setupSocket(sockId);
+    });
+    thread->start();
 }
 
 
