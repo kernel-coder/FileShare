@@ -121,6 +121,7 @@ void FileSenderHandler::sendFilePart(int seqNo)
     else {
         mFile->close();
         mFile->deleteLater();
+        mCurrentFileIndex++;
         sendFile();
     }
 }
