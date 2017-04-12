@@ -49,6 +49,7 @@ Connection::Connection(int sockId, QObject *parent)
     , mSockId(sockId)
     , _peerViewInfo(0)
     , mSocket(0)
+    , mPeerInfoSent(false)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     _id = ++cRefCounter;
@@ -114,8 +115,12 @@ void Connection::onNewRawMessageReceived(const QByteArray& data)
                     pvi->deleteLater();
                 }
                 else {
+                    if (!mPeerInfoSent) {
+                        mPeerInfoSent = true;
+                        sendClientViewInfo();
+                    }
                     peerViewInfo(pvi);
-                    qDebug() << "Firing readyForuse fired";
+                    qDebug() << "Firing readyForuse fired " << _id;
                     emit readyForUse();
                 }
             }

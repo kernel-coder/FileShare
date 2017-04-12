@@ -83,6 +83,7 @@ protected:
     void run();
 
 private:
+    bool mPeerInfoSent;
     int mSockId;
     TcpSocket* mSocket;
     QMutex mMutex;
