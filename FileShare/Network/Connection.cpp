@@ -32,7 +32,7 @@ void TcpSocket::onDataReadReady()
         }
 
         QByteArray data = read(mnBlockSize);
-        qDebug() << "sending data " << QString(data);
+        qDebug() << QString("received data of length %1, : ").arg(data.length()) << data;
         emit newRawMsgArrived(data);
         mnBlockSize = 0;
     }
@@ -41,7 +41,7 @@ void TcpSocket::onDataReadReady()
 
 void TcpSocket::sendRawMessage(const QByteArray& data)
 {
-    qDebug() << "sending data " << QString(data);
+    qDebug() << QString("sending data of length %1, : ").arg(data.length()) << data;
     write(data);
 }
 
