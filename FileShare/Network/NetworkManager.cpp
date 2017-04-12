@@ -137,14 +137,15 @@ void NetworkManager::onReadyForUse()
     QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerViewInfo()->port());    
     removePendingPeers(conn);
 
+    if (mPeers.contains(key)) {
+        removeConnection(conn);
+    }
+
     if (!mPeers.contains(key)) {
         qDebug() << "new connection found " << key;
         mPeers.insert(key, conn);        
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
-    }
-    else {
-        removeConnection(conn);
     }
 }
 
