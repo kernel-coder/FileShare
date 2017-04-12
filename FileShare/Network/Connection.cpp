@@ -82,11 +82,13 @@ Connection::Connection(int sockId, QObject *parent)
     , _peerViewInfo(0)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);        
-    QThread* thread = new QThread(this);
-    mSocket = new TcpSocket();
+    QThread* thread = new QThread;
+    mSocket = new TcpSocket;
     mSocket->moveToThread(thread);
     connect(mSocket, SIGNAL(destroyed(QObject*)), thread, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), mSocket, SLOT(deleteLater()));
+    connect(thread, &QThread::started, [&]() {
+        mSocket->setupSocket(sockId);
+    });
     thread->start();
 
     connect(mSocket, SIGNAL(connected()), this, SIGNAL(connected()));
@@ -98,6 +100,8 @@ Connection::Connection(int sockId, QObject *parent)
     connect(this, SIGNAL(sigConnectToHost(QHostAddress,quint16)), mSocket, SLOT(slotConnectToHost(QHostAddress,quint16)));
     connect(this, SIGNAL(sigDisconnectFromHost()), mSocket, SLOT(slotDisconnectFromHost()));
     connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
+
+
 }
 
 

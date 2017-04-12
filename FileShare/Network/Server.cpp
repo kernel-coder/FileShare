@@ -20,7 +20,7 @@ void Server::incomingConnection(int sockId)
 {
     Connection *conn = new Connection(sockId, this);
     addPendingConnection(conn->socket());
-    NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
+   // NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
     qDebug() << " incomingConnection::newPeer firing...";
     emit newPeer(conn);
 //    if (NetMgr->hasPendingConnection(conn->peerAddress(), conn->peerPort()) == NULL

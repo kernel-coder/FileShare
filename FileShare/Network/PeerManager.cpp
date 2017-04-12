@@ -102,7 +102,7 @@ void PeerManager::readBroadcastDatagram()
         QByteArray datagram;
         datagram.resize(srvrInfo.size());
 
-        if (mBroadcastSocket.readDatagram(datagram.data(), datagram.size(),&senderIp, &senderPort) == -1) {
+        if (mBroadcastSocket.readDatagram(datagram.data(), datagram.size(), &senderIp, &senderPort) == -1) {
             continue;
         }
 
