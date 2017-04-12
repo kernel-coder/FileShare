@@ -18,11 +18,11 @@ Server::~Server()
 
 void Server::incomingConnection(int sockId)
 {
-    Connection *conn = new Connection(sockId, this);
+    Connection *conn = NetMgr->createConnection(sockId);
     connect(conn, SIGNAL(connected()), this, SLOT(onPeerConnectedInServer()));
     conn->startAndWait();
     qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
-    NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
+    //NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
     addPendingConnection(conn->socket());       
 }
 
@@ -36,3 +36,15 @@ void Server::onPeerConnectedInServer()
         emit newPeer(conn);
     }
 }
+
+
+void Server::onPeerConnectingError(QAbstractSocket::SocketError socketError)
+{
+    Connection *conn = qobject_cast<Connection*>(sender());
+    if(conn) {
+        qDebug() << "Peer conneciton error " <<  conn->errorString();
+        conn->disconnect(this);
+        conn->deleteLater();
+    }
+}
+

@@ -129,7 +129,7 @@ void PeerManager::readBroadcastDatagram()
         if (mpNetManager->hasPendingConnection(senderIp, msg->port()) == NULL) {
             Connection *conn = mpNetManager->hasConnection(senderIp, msg->port());
             if (conn == NULL){
-                conn = new Connection(0, this);
+                conn = NetMgr->createConnection();
                 mpNetManager->addPendingPeers(senderIp, msg->port(), conn);
                 qDebug() << "connecting to peer: " << senderIp.toString() << msg->port();
                 connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));

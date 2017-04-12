@@ -108,9 +108,26 @@ Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port
 }
 
 
+Connection* NetworkManager::createConnection(int sockId)
+{
+    Connection* conn = new Connection(sockId, this);
+    connect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
+    connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
+    connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+    connect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), this, SLOT(onNewMessageArrived(Connection*, Message*)));
+    return conn;
+}
+
+
+void NetworkManager::connectionHandShakeFialed()
+{
+
+}
+
+
 void NetworkManager::newConnection(Connection *conn)
 {
-    connect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
+    //connect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
 }
 
 
@@ -122,10 +139,7 @@ void NetworkManager::onReadyForUse()
 
     if (!mPeers.contains(key)) {
         qDebug() << "new connection found " << key;
-        mPeers.insert(key, conn);
-        connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
-        connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
-        connect(conn, SIGNAL(newMessageArrived(Connection*, Message*)), this, SLOT(onNewMessageArrived(Connection*, Message*)));
+        mPeers.insert(key, conn);        
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
     }
@@ -138,8 +152,10 @@ void NetworkManager::onReadyForUse()
 void NetworkManager::onDisconnected()
 {
     if (Connection *conn = qobject_cast<Connection *>(sender())){
-        participantLeft(conn);
-        removeConnection(conn);
+        if (mPeers.values().contains(conn)) {
+            participantLeft(conn);
+            removeConnection(conn);
+        }
     }
 }
 
@@ -147,7 +163,9 @@ void NetworkManager::onDisconnected()
 void NetworkManager::connectionError(QAbstractSocket::SocketError /* socketError */)
 {
     if (Connection *conn = qobject_cast<Connection *>(sender())){
-        removeConnection(conn);
+        if (mPeers.values().contains(conn)) {
+            removeConnection(conn);
+        }
     }
 }
 
@@ -171,7 +189,9 @@ void NetworkManager::removeConnection(Connection *conn)
 
 void NetworkManager::onNewMessageArrived(Connection *conn, Message *msg)
 {
-    emit newMsgCame(conn, msg);
+    if (mPeers.values().contains(conn)) {
+        emit newMsgCame(conn, msg);
+    }
 }
 
 

@@ -20,6 +20,7 @@ protected:
 
 private slots:
     void onPeerConnectedInServer();
+    void onPeerConnectingError(QAbstractSocket::SocketError socketError);
 
 };
 

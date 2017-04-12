@@ -29,6 +29,9 @@ public:
     static NetworkManager* me();
     ~NetworkManager();
 
+    Connection* createConnection(int sockId = 0);
+    void connectionHandShakeFialed();
+
     MetaPropertyPublicSet_Ex(QString, username)
     MetaPropertyPublicSet_Ex(QString, ip)
     MetaPropertyPublicSet_Ex(int, port)
