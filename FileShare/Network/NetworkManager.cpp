@@ -49,6 +49,11 @@ NetworkManager::~NetworkManager()
 }
 
 
+void NetworkManager::connectManual(const QString &host, int port)
+{
+    mpPeerManager->connectManual(QHostAddress(host), port);
+}
+
 void NetworkManager::broadcastUserInfoChanged()
 {
     QSettings s;

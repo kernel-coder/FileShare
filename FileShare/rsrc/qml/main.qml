@@ -1,5 +1,6 @@
 import QtQuick 2.5
 import QtQuick.Window 2.2
+import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 import "controls"
 import com.kcl.fileshare 1.0
@@ -25,7 +26,7 @@ Window {
                 text: "I'm "
             }
             LabelEx {
-                color: "#0072C5"
+                color: "#00ff00"
                 font.bold: true
                 text: NetMgr.username
                 anchors.top: parent.top
@@ -109,76 +110,114 @@ Window {
                     }
                 }
             }
+
+            Rectangle {
+                id: rectManual
+                visible: false
+                color: "gray"
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
+                height: gridManualConnect.height + 20
+                GridLayout {
+                    id: gridManualConnect
+                    anchors.centerIn: parent
+                    anchors.margins: 5
+                    rows: 3
+                    columns: 2
+                    rowSpacing: 10
+                    columnSpacing: 5
+                    LabelEx {text: "host:"}
+                    TextField {id: tfIp; horizontalAlignment: Qt.AlignHCenter; verticalAlignment: Qt.AlignVCenter}
+                    LabelEx {text: "port:"}
+                    TextField {id: tfPort; horizontalAlignment: Qt.AlignHCenter; verticalAlignment: Qt.AlignVCenter}
+                    BorderedButton {
+                        Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                        text: "cancel"
+                        impWidth: 80; impHeight: 30
+                        onClicked2: {rectManual.visible = false; btnAddManual.visible = true }
+
+                    }
+                    BorderedButton {
+                        Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
+                        text: "connect"
+                        impWidth: 80; impHeight: 30;
+                        onClicked2: {
+                            rectManual.visible = false
+                            btnAddManual.visible = true
+                            NetMgr.connectManual(tfIp.text.trim(), parseInt(tfPort.text.trim()))
+                        }
+                    }
+                }
+            }
+
+            BorderedButton {
+                id: btnAddManual
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.bottom; anchors.bottomMargin: 2
+                impWidth: 30
+                impHeight: 30
+                radius: 15; borderWidth: 2
+                text: "+"
+                onClicked2: {
+                    btnAddManual.visible = false
+                    rectManual.visible = true
+                }
+            }
         }
+
         Rectangle {
-            id: dropRect
-            color: "transparent"
             anchors.left: rectPeers.right
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.bottom: parent.bottom
+            visible: peerListView.currentIndex < 0
+            color: "#000000"
             LabelEx {
-                id: lblDropInfo
-                font.pixelSize: 10
-                visible: dragArea.containsDrag
                 anchors.fill: parent
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter
+                color: "#ff0000"
+                text: "Seems no machines available around"
             }
+        }
 
-            states: [
-                  State {
-                      when: dragArea.containsDrag
-                      PropertyChanges {
-                          target: dropRect
-                          color: "grey"
-                      }
-                  }
-              ]
-            DropArea {
-                id: dragArea
-                anchors.fill: parent
-                onEntered: {
-                    var conn = peerListView.currentConnection();
-                    if (conn) {
-                        drag.accept(Qt.CopyAction);
-                        var files = "Want to share with " + conn.peerViewInfo.name + "?\n";
-                        for (var i = 0; i < drag.urls.length; i++) {
-                            files += (Utils.urlToFile(drag.urls[i]) + "\n")
-                        }
-                        lblDropInfo.text = files;
-                    }
-                    else {
-                        drag.accepted = false
-                    }
-                }
-                onDropped: {
-                    drop.accept(Qt.CopyAction);
-                    var conn = peerListView.currentConnection()
-                    if (conn) {
-                        FileMgr.shareFilesTo(conn, drop.urls)
-                    }
-                    else {
-                        drop.accepted = false
-                    }
-                }
-            }
+
+        ContainerView {
+            id: container
+            color: "transparent"
+            currentIndex: peerListView.currentIndex
+            visible: peerListView.currentIndex >=  0
+            anchors.left: rectPeers.right
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
         }
     }
 
     Connections {
         target: NetMgr
         onNewParticipant: {
-            peersModel.append({connObj :  connection})
+            container.addView(compUserView.createObject(container, {connection: connection}))
+            peersModel.append({connObj :  connection})                        
         }
+
         onParticipantLeft: {
             for (var i = 0; i < peersModel.count; i++) {
                 var obj = peersModel.get(i);
                 if (obj.connObj == connection) {
-                    peersModel.remove(i, 1);
+                    container.removeAt(i)
+                    peersModel.remove(i, 1);                    
                     break;
                 }
             }
+        }
+    }
+
+    Component {
+        id: compUserView
+        UserTransferView {
+            anchors.fill: parent
         }
     }
 }

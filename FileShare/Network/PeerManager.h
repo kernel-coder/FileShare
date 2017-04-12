@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QMutex>
 #include <QHash>
+#include <QHostAddress>
 
 class NetworkManager;
 class Connection;
@@ -26,6 +27,9 @@ public:
 
 signals:
     void newPeer(Connection *conn);
+
+public slots:
+    void connectManual(const QHostAddress& host, int port);
 
 private slots:
     void onPeerConnected();

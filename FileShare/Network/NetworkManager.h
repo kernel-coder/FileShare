@@ -50,6 +50,7 @@ signals:
     void newMsgCome(Connection *sender, Message *msg);
 
 public slots:
+    void connectManual(const QString& host, int port);
     void broadcastUserInfoChanged();
 
 private slots:

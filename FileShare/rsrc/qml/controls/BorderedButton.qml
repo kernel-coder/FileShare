@@ -5,7 +5,7 @@ import QtQuick.Controls.Styles 1.1
 ImageButton {
     id: btn
 
-    property color borderColor: "#656565"
+    property color borderColor: "white"
     property real borderWidth: 1
     property real radius: 5
     property real impWidth: 64
@@ -15,6 +15,7 @@ ImageButton {
     property color colorHovered: "#0072C5"
     property color colorPressed: "#D03A41"
     property int verticalOffset: 0
+    property real margins: 5
 
 
     style: ButtonStyle {
@@ -23,10 +24,11 @@ ImageButton {
             implicitHeight: impHeight;
             border.width: borderWidth
             border.color: control.borderColor
-            radius: radius
+            radius: control.radius
             color : enabled ? (control.down ? control.colorPressed : (control.hovered ? control.colorHovered : control.colorNormal)) : control.colorDisabled
             Row {
                 spacing: 7; anchors.centerIn: parent
+                anchors.margins: control.margins
                 ImageEx {
                     id:img;
                     source : enabled ? (control.down ? control.imgPressed : (control.hovered ? control.imgHover : control.imgNormal)) : control.imgDisabled

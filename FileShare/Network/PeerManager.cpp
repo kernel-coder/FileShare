@@ -123,19 +123,23 @@ void PeerManager::readBroadcastDatagram()
             continue;
         }
 
-        //qDebug() << "peer id: " << senderIp.toString() << msg->port();
+        connectManual(senderIp, msg->port());
+    }
+}
 
-        if (mpNetManager->hasPendingConnection(senderIp, msg->port()) == NULL) {
-            Connection *conn = mpNetManager->hasConnection(senderIp, msg->port());
-            if (conn == NULL){
-                conn = NetMgr->createConnection();
-                mpNetManager->addPendingPeers(senderIp, msg->port(), conn);
-                qDebug() << "connecting to peer: " << senderIp.toString() << msg->port();
-                connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
-                connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
-                conn->startAndWait();
-                conn->connectToHost(senderIp, msg->port());
-            }
+
+void PeerManager::connectManual(const QHostAddress &host, int port)
+{
+    if (mpNetManager->hasPendingConnection(host, port) == NULL) {
+        Connection *conn = mpNetManager->hasConnection(host, port);
+        if (conn == NULL){
+            conn = NetMgr->createConnection();
+            mpNetManager->addPendingPeers(host, port, conn);
+            qDebug() << "connecting to peer: " << host.toString() << port;
+            connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
+            connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
+            conn->startAndWait();
+            conn->connectToHost(host, port);
         }
     }
 }
