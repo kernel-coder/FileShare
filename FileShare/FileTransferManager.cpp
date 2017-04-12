@@ -19,9 +19,33 @@
 
 #define MSG_LEN (1*1024*1024)
 
-FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files, QObject *p)
-    : JObject(p)
+
+FileHandler::FileHandler(Connection *conn, QObject *p)
+    : QThread(p)
     , mConnection(conn)
+{
+    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
+}
+
+
+void FileHandler::onThreadStarted()
+{
+    connect(mConnection, SIGNAL(newMessageArrived(Connection*,Message*)), this, SLOT(onMessageComeFrom(Connection*,Message*)));
+    connect(this, SIGNAL(sendMsg(Message*)), mConnection, SLOT(sendMessage(Message*)));
+    handleThreadStarting();
+}
+
+
+void FileHandler::onMessageComeFrom(Connection *conn, Message *msg)
+{
+    if (conn == mConnection) {
+        handleMessageComingFrom(conn, msg);
+    }
+}
+
+
+FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files, QObject *p)
+    : FileHandler(conn, p)
     , mRootFiles(files)
     , mCurrentRootFileIndex(0)
     , mCurrentFileIndex(0)
@@ -29,9 +53,8 @@ FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files,
 {    
 }
 
-void FileSenderHandler::startSending()
+void FileSenderHandler::handleThreadStarting()
 {
-    connect(mConnection, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMsgCome(Connection*, Message*)));
     sendRootFile();
 }
 
@@ -62,7 +85,7 @@ void FileSenderHandler::sendRootFile()
         sendFile();
     }
     else {
-        emit finished();
+        exit();
     }
 }
 
@@ -78,7 +101,7 @@ void FileSenderHandler::sendFile()
         msg->size(fi.size());
         mTotalSeqCount = qCeil(((qreal)msg->size())/MSG_LEN);
         msg->seqCount(mTotalSeqCount);
-        NetMgr->sendMessage(mConnection, msg);        
+        emit sendMsg(msg);
     }
     else {
         mCurrentRootFileIndex++;
@@ -92,7 +115,7 @@ void FileSenderHandler::sendFilePart(int seqNo)
     if (seqNo < mTotalSeqCount) {
         QByteArray data = mFile->read(MSG_LEN);
         FilePartTransferMsg* msg = new FilePartTransferMsg(mCurrentUUID, seqNo, data);
-        NetMgr->sendMessage(mConnection, msg);
+        emit sendMsg(msg);
     }
     else {
         mFile->close();
@@ -102,7 +125,7 @@ void FileSenderHandler::sendFilePart(int seqNo)
 }
 
 
-void FileSenderHandler::onNewMsgCome(Connection *sender, Message *msg)
+void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg)
 {
     if (sender == mConnection) {
         if (msg->typeId() == FileTransferAckMsg::TypeID) {
@@ -125,15 +148,14 @@ void FileSenderHandler::onNewMsgCome(Connection *sender, Message *msg)
 
 
 FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferMsg *msg, QObject *p)
-    : JObject(p)
-    , mConnection(conn)
+    : FileHandler(conn, p)
     , mFileMsg(msg)
     , mFile(0)
 {
 }
 
 
-void FileReceiverHandler::startReceiving()
+void FileReceiverHandler::handleThreadStarting()
 {
     connect(mConnection, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMsgCome(Connection*, Message*)));
     QString filename = Utils::me()->dataDirCommon(mFileMsg->basePath());
@@ -146,23 +168,24 @@ void FileReceiverHandler::startReceiving()
     msg->basePath(mFileMsg->basePath());
     msg->size(mFileMsg->size());
     msg->seqCount(mFileMsg->seqCount());
-    NetMgr->sendMessage(mConnection, msg);
+    emit sendMsg(msg);
 }
 
 
-void FileReceiverHandler::onNewMsgCome(Connection *sender, Message *msg)
+void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *msg)
 {
     if (mConnection == sender) {
         if (msg->typeId() == FilePartTransferMsg::TypeID) {
             FilePartTransferMsg* fptm = qobject_cast<FilePartTransferMsg*>(msg);
            if (fptm->uuid() == mFileMsg->uuid()) {
                mFile->write(fptm->data());
+               FilePartTransferAckMsg* ackMsg = new FilePartTransferAckMsg(fptm->uuid(), fptm->seqNo());
+               emit sendMsg(ackMsg);
                if (fptm->seqNo() + 1 == mFileMsg->seqCount()) {
                    mFile->close();
                    mFile->deleteLater();
-               }
-               FilePartTransferAckMsg* ackMsg = new FilePartTransferAckMsg(fptm->uuid(), fptm->seqNo());
-               NetMgr->sendMessage(mConnection, ackMsg);
+                   exit();
+               }               
            }
         }
     }
@@ -198,12 +221,7 @@ void FileTransferManager::shareFilesTo(Connection *conn, const QList<QUrl> &urls
     qDebug() << urls.first().toString();
     QStringList files = Utils::me()->urlsToFiles(urls);
     FileSenderHandler* handler = new FileSenderHandler(conn, files);
-    QThread* thread = new QThread(this);
-    handler->moveToThread(thread);
-    connect(handler, SIGNAL(finished()), handler, SLOT(deleteLater()));
-    connect(handler, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-    QMetaObject::invokeMethod(handler, "startSending");
+    handler->start();
 }
 
 
@@ -211,11 +229,6 @@ void FileTransferManager::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (msg->typeId() == FileTransferMsg::TypeID) {
         FileReceiverHandler* handler = new FileReceiverHandler(sender, qobject_cast<FileTransferMsg*>(msg));
-        QThread* thread = new QThread(this);
-        handler->moveToThread(thread);
-        connect(handler, SIGNAL(finished()), handler, SLOT(deleteLater()));
-        connect(handler, SIGNAL(finished()), thread, SLOT(deleteLater()));
-        thread->start();
-        QMetaObject::invokeMethod(handler, "startReceiving");
+        handler->start();
     }
 }

@@ -88,7 +88,7 @@ void Connection::sendMessage(Message *msg)
     if(msg){
         qDebug() << QString("Message %1 sending to %2").arg(msg->metaObject()->className()).arg(_id);
         QByteArray block;
-        {QDataStream stream(&block, QIODevice::WriteOnly);
+        {QDataStream stream(&block, QIODevice::ReadWrite);
         stream.setVersion(QDataStream::Qt_4_6);
         stream << (qint64)0;
         msg->write(stream);

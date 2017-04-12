@@ -3,6 +3,7 @@
 #include "JObject.h"
 #include <QUrl>
 #include <QFileInfoList>
+#include <QThread>
 
 #define FileMgr FileTransferManager::me()
 
@@ -11,20 +12,41 @@ class Message;
 class FileTransferMsg;
 
 
-class FileSenderHandler : public JObject
+class FileHandler : public QThread
+{
+    Q_OBJECT
+public:
+    FileHandler(Connection* conn, QObject* p = 0);
+signals:
+    void sendMsg(Message* msg);
+
+private slots:
+    void onThreadStarted();
+    void onMessageComeFrom(Connection* conn, Message* msg);
+
+protected:
+    virtual void handleThreadStarting() = 0;
+    virtual void handleMessageComingFrom(Connection* conn, Message* msg) = 0;
+
+protected:
+    Connection* mConnection;
+};
+
+class FileSenderHandler : public FileHandler
 {
     Q_OBJECT
 public:
     FileSenderHandler(Connection* conn, const QStringList& files, QObject* p = 0);
 
+protected:
+    void handleThreadStarting();
+    void handleMessageComingFrom(Connection* conn, Message* msg);
+
 signals:
     void startingFile(const QString& file);
-    void finished();
 
 private slots:
-    void startSending();
     void sendRootFile();
-    void onNewMsgCome(Connection *sender, Message *msg);
 
 private:
     void parseFile(const QFileInfo& file);
@@ -36,7 +58,6 @@ private:
     int mCurrentRootFileIndex;
     QFileInfoList mAllFiles;
     int mCurrentFileIndex;
-    Connection* mConnection;
 
     // a root transfer related;
     QString mCurrentUUID;
@@ -47,20 +68,18 @@ private:
     QFile* mFile;
 };
 
-class FileReceiverHandler : public JObject {
+class FileReceiverHandler : public FileHandler
+{
     Q_OBJECT
 public:
     FileReceiverHandler(Connection* conn, FileTransferMsg* msg, QObject* p = 0);
 
-signals:
-    void finished();
+protected:
+    void handleThreadStarting();
+    void handleMessageComingFrom(Connection* conn, Message* msg);
 
-private slots:
-    void startReceiving();
-    void onNewMsgCome(Connection *sender, Message *msg);
 
 private:
-    Connection* mConnection;
     FileTransferMsg* mFileMsg;
     QFile* mFile;
 };
