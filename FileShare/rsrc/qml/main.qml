@@ -198,7 +198,9 @@ Window {
     Connections {
         target: NetMgr
         onNewParticipant: {
-            container.addView(compUserView.createObject(container, {connection: connection}))
+            var view = compUserView.createObject(container, {connObj: connection})
+            view.connObj = connection
+            container.addView(view)
             peersModel.append({connObj :  connection})                        
         }
 

@@ -7,7 +7,7 @@ import com.kcl.fileshare 1.0
 
 Rectangle {
     id: view
-    property var connection: null
+    property var connObj: null
     color: "transparent"
     anchors.fill: parent
 
@@ -24,13 +24,13 @@ Rectangle {
             spacing: 5
             LabelEx {
                 color: "#D03A41"
-                text: view.connection.peerViewInfo.name
+                text: view.connObj.peerViewInfo.name
             }
             LabelEx {
-                text: ", on port " + view.connection.peerViewInfo.port + ", "
+                text: ", on port " + view.connObj.peerViewInfo.port + ", "
             }
             LabelEx {
-                text: view.connection.peerViewInfo.status == PeerViewInfoMsg.Free ? "Availale" : "Busy"
+                text: view.connObj.peerViewInfo.status == PeerViewInfoMsg.Free ? "Availale" : "Busy"
             }
         }
     }
@@ -40,7 +40,6 @@ Rectangle {
         anchors.top: rectTitle.bottom; anchors.bottom: teChat.top
 
         ListView {
-            id: peerListView
             spacing: 20
             anchors.margins: 20
             anchors.fill: parent
@@ -79,9 +78,9 @@ Rectangle {
         DropArea {
             id: dragArea
             anchors.fill: parent
-            enabled: connection.status == PeerViewInfoMsg.Free
+            enabled: view.connObj.peerViewInfo.status == PeerViewInfoMsg.Free
             onEntered: {
-                var conn = view.connection
+                var conn = view.connObj
                 if (conn) {
                     drag.accept(Qt.CopyAction);
                     var files = "Want to share with " + conn.peerViewInfo.name + "?\n";
@@ -96,7 +95,7 @@ Rectangle {
             }
             onDropped: {
                 drop.accept(Qt.CopyAction);
-                var conn = view.connection
+                var conn = view.peerViewInfo
                 if (conn) {
                     FileMgr.shareFilesTo(conn, drop.urls)
                 }
@@ -123,7 +122,7 @@ Rectangle {
 
     TextArea {
         id: teChat
-        enabled: connection.status == PeerViewInfoMsg.Free
+        enabled: view.connObj.peerViewInfo.status == PeerViewInfoMsg.Free
         anchors.left: parent.left; anchors.right: parent.right
         anchors.bottom: parent.bottom; height: 50
     }
@@ -144,7 +143,7 @@ Rectangle {
         target: FileMgrUIHandler
         //void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);
         onFileTransfer: {
-            if (conn == view.connection) {
+            if (conn == view.connObj) {
                 transferHistoryModel.append({info :  uiInfo})
             }
         }
