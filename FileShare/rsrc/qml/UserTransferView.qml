@@ -11,6 +11,8 @@ Rectangle {
     color: "transparent"
     anchors.fill: parent
 
+    property var transferHistoryModel : ListModel{}
+
     Rectangle {
         id: rectTitle
         color: "#0072C5"
@@ -36,6 +38,43 @@ Rectangle {
     Item {
         anchors.left: parent.left; anchors.right: parent.right
         anchors.top: rectTitle.bottom; anchors.bottom: teChat.top
+
+        ListView {
+            id: peerListView
+            spacing: 20
+            anchors.margins: 20
+            anchors.fill: parent
+            model: transferHistoryModel
+            delegate:  Rectangle {
+                color: "#444444"
+                anchors.left: parent.left; anchors.right: parent.right
+                height: 40
+                Item {
+                    id: imgDirection
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    Image {
+                        anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
+                        source: info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" : "qrc:/images/rsrc/images/btn-download.png"
+                    }
+                    Column {
+                        anchors.left: imgDirection.right
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 5
+                        LabelEx {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: info.filePath + "( %1/%2)".arg(info.countFileProgress).arg(info.countTotalFile)
+                        }
+                        ProgressBarEx {
+                            anchors.left: parent.left; anchors.right: parent.right
+                            maximumValue: info.sizeTotalFile
+                            value: info.sizeFileProgress
+                        }
+                    }
+                }
+            }
+        }
 
         DropArea {
             id: dragArea
@@ -99,4 +138,15 @@ Rectangle {
               }
           }
       ]
+
+
+    Connections {
+        target: FileMgrUIHandler
+        //void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);
+        onFileTransfer: {
+            if (conn == view.connection) {
+                transferHistoryModel.append({info :  uiInfo})
+            }
+        }
+    }
 }

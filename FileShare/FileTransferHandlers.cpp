@@ -90,7 +90,7 @@ void FileSenderHandler::sendRootFile()
         mIndexOfBasePath = fi.isDir() ? fi.absoluteFilePath().lastIndexOf(QDir(fi.absoluteFilePath()).dirName()) : -1;
         mCurrentFileIndex = 0;
         FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(mRootUuid, fi.absoluteFilePath(), mAllFiles.length(), mRootTotalSize);
-        emit sendingRootFile(msg);
+        emit sendingRootFile(mConnection, msg);
         emit sendMsg(msg);
         sendFile();
     }
@@ -104,7 +104,7 @@ void FileSenderHandler::sendFile()
 {
     if (mCurrentFileIndex < mAllFiles.length()) {
         QFileInfo fi = mAllFiles.at(mCurrentFileIndex);
-        emit startingFile(fi.absoluteFilePath());
+        emit startingFile(mConnection, fi.absoluteFilePath());
         mFileUuid = QUuid::createUuid().toString();
         FileTransferMsg* msg = new FileTransferMsg(mRootUuid, mFileUuid, fi.fileName());
         if (mIndexOfBasePath >= 0) {
@@ -151,7 +151,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
         if (msg->typeId() == FileTransferAckMsg::TypeID) {
             FileTransferAckMsg* ackMsg = qobject_cast<FileTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mFileUuid) {
-                emit fileSent(ackMsg);
+                emit fileSent(mConnection, ackMsg);
                 mFile = new QFile(mAllFiles.at(mCurrentFileIndex).absoluteFilePath());
                 qDebug() << "sending file "  << mFile->fileName();
                 if (mFile->open(QFile::ReadOnly)) {
@@ -162,7 +162,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
         else if (msg->typeId() == FilePartTransferAckMsg::TypeID) {
             FilePartTransferAckMsg* ackMsg = qobject_cast<FilePartTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mFileUuid) {
-                emit filePartSent(ackMsg);
+                emit filePartSent(mConnection, ackMsg);
                 sendFilePart(ackMsg->seqNo() + 1);
             }
         }
@@ -204,7 +204,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
            if (fptm->uuid() == mFileMsg->uuid()) {
                mFile->write(fptm->data());
                FilePartTransferAckMsg* ackMsg = new FilePartTransferAckMsg(fptm->rootUuid(), fptm->uuid(), fptm->fileNo(), fptm->seqNo(), fptm->size());
-               emit receivedFilePart(ackMsg);
+               emit receivedFilePart(mConnection, ackMsg);
                emit sendMsg(ackMsg);
                if (fptm->seqNo() + 1 == mFileMsg->seqCount()) {
                    mFile->close();
@@ -229,8 +229,8 @@ FileTransferUIInfoHandler* FileTransferUIInfoHandler::me()
 
 
 struct FileTransferUIInfoHandlerPrivate {
-    QHash<QString, RootFileSentUIInfo*> mSentInfoStore;
-    QHash<QString, RootFileReceivedUIInfo*> mReceivedInfoStore;
+    QHash < QString, RootFileUIInfo* >  mSentInfoStore;
+    QHash<QString, RootFileUIInfo* >  mReceivedInfoStore;
 };
 
 FileTransferUIInfoHandler::FileTransferUIInfoHandler(QObject *p)
@@ -245,40 +245,42 @@ FileTransferUIInfoHandler::~FileTransferUIInfoHandler() {delete d;}
 
 void FileTransferUIInfoHandler::addSenderHandler(Connection* conn, FileSenderHandler *fsh)
 {
-    connect(fsh, SIGNAL(sendingRootFile(FileTransferHeaderInfoMsg*)), SLOT(onSendingRootFile(FileTransferHeaderInfoMsg*)));
-    connect(fsh, SIGNAL(fileSent(FileTransferAckMsg*)), SLOT(onFileSent(FileTransferAckMsg*)));
-    connect(fsh, SIGNAL(filePartSent(FilePartTransferAckMsg*)), SLOT(onFilePartSent(FilePartTransferAckMsg*)));
+    connect(fsh, SIGNAL(sendingRootFile(Connection*, FileTransferHeaderInfoMsg*)), SLOT(onSendingRootFile(Connection*, FileTransferHeaderInfoMsg*)));
+    connect(fsh, SIGNAL(fileSent(Connection*, FileTransferAckMsg*)), SLOT(onFileSent(Connection*, FileTransferAckMsg*)));
+    connect(fsh, SIGNAL(filePartSent(Connection*, FilePartTransferAckMsg*)), SLOT(onFilePartSent(Connection*, FilePartTransferAckMsg*)));
 }
 
 
-void FileTransferUIInfoHandler::onSendingRootFile(FileTransferHeaderInfoMsg *msg)
+void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg *msg)
 {
     if (!d->mSentInfoStore.contains(msg->rootUuid())) {
-        RootFileSentUIInfo* info = new RootFileSentUIInfo(this);
+        RootFileUIInfo* info = new RootFileUIInfo(this);
+        info->isSending(true);
         info->filePath(msg->filePath());
         info->countTotalFile(msg->fileCount());
-        info->countFileSent(0);
+        info->countFileProgress(0);
         info->sizeTotalFile(msg->totalSize());
-        info->sizeFileSent(0);
+        info->sizeFileProgress(0);
         d->mSentInfoStore[msg->rootUuid()] = info;
+        emit fileTransfer(conn, info);
     }
 }
 
 
-void FileTransferUIInfoHandler::onFileSent(FileTransferAckMsg *msg)
+void FileTransferUIInfoHandler::onFileSent(Connection* conn, FileTransferAckMsg *msg)
 {
 
 }
 
 
-void FileTransferUIInfoHandler::onFilePartSent(FilePartTransferAckMsg *msg)
+void FileTransferUIInfoHandler::onFilePartSent(Connection* conn, FilePartTransferAckMsg *msg)
 {
-    RootFileSentUIInfo* rfi = d->mSentInfoStore.value(msg->rootUuid(), 0);
+    RootFileUIInfo* rfi = d->mSentInfoStore.value(msg->rootUuid(), 0);
     if (rfi) {
-        rfi->sizeFileSent(rfi->sizeFileSent() + msg->size());
-        rfi->countFileSent(msg->fileNo() - 1);
-        if (rfi->sizeFileSent() == rfi->sizeTotalFile()) {
-            rfi->countFileSent(msg->fileNo());
+        rfi->sizeFileProgress(rfi->sizeFileProgress() + msg->size());
+        rfi->countFileProgress(msg->fileNo() - 1);
+        if (rfi->sizeFileProgress() == rfi->sizeTotalFile()) {
+            rfi->countFileProgress(msg->fileNo());
         }
     }
 }
@@ -287,31 +289,33 @@ void FileTransferUIInfoHandler::onFilePartSent(FilePartTransferAckMsg *msg)
 void FileTransferUIInfoHandler::addRootFileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg *msg)
 {
     if (!d->mReceivedInfoStore.contains(msg->rootUuid())) {
-        RootFileReceivedUIInfo* info = new RootFileReceivedUIInfo(this);
+        RootFileUIInfo* info = new RootFileUIInfo(this);
+        info->isSending(false);
         info->filePath(msg->filePath());
         info->countTotalFile(msg->fileCount());
-        info->countFileReceived(0);
+        info->countFileProgress(0);
         info->sizeTotalFile(msg->totalSize());
-        info->sizeFileReceived(0);
+        info->sizeFileProgress(0);
         d->mReceivedInfoStore[msg->rootUuid()] = info;
+        emit fileTransfer(conn, info);
     }
 }
 
 
 void FileTransferUIInfoHandler::addReceiverHandler(Connection* conn, FileReceiverHandler *frh)
 {
-    connect(frh, SIGNAL(receivedFilePart(FilePartTransferAckMsg*)), SLOT(onReceivedFilePart(FilePartTransferAckMsg*)));
+    connect(frh, SIGNAL(receivedFilePart(Connection*, FilePartTransferAckMsg*)), SLOT(onReceivedFilePart(Connection*, FilePartTransferAckMsg*)));
 }
 
 
-void FileTransferUIInfoHandler::onReceivedFilePart(FilePartTransferAckMsg *msg)
+void FileTransferUIInfoHandler::onReceivedFilePart(Connection* conn, FilePartTransferAckMsg *msg)
 {
-    RootFileReceivedUIInfo* rfi = d->mReceivedInfoStore.value(msg->rootUuid(), 0);
+    RootFileUIInfo* rfi = d->mReceivedInfoStore.value(msg->rootUuid(), 0);
     if (rfi) {
-        rfi->sizeFileReceived(rfi->sizeFileReceived() + msg->size());
-        rfi->countFileReceived(msg->fileNo() - 1);
-        if (rfi->sizeFileReceived() == rfi->sizeTotalFile()) {
-            rfi->countFileReceived(msg->fileNo());
+        rfi->sizeFileProgress(rfi->sizeFileProgress() + msg->size());
+        rfi->countFileProgress(msg->fileNo() - 1);
+        if (rfi->sizeFileProgress() == rfi->sizeTotalFile()) {
+            rfi->countFileProgress(msg->fileNo());
         }
     }
 }

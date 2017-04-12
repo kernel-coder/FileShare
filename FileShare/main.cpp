@@ -10,12 +10,14 @@
 #include <QDir>
 #include <QtQml>
 #include "FileTransferManager.h"
+#include "FileTransferHandlers.h"
 
 
 void registersQmlComponents()
 {
     qmlRegisterType<Connection>("com.kcl.fileshare", 1, 0, "Connection");
     qmlRegisterType<PeerViewInfoMsg>("com.kcl.fileshare", 1, 0, "PeerViewInfoMsg");
+    qmlRegisterType<RootFileUIInfo>("com.kcl.fileshare", 1, 0, "RootFileUIInfo");
 }
 
 
@@ -46,11 +48,20 @@ static QObject* fileMgrProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
 }
 
 
+static QObject* fileMgrUIHandlerProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return FileMgrUIHandler;
+}
+
 void registersSingletonObjects()
 {
     qmlRegisterSingletonType<Utils>("com.kcl.fileshare", 1, 0, "Utils", utilsProvider);
     qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "NetMgr", netMgrProvider);
     qmlRegisterSingletonType<FileTransferManager>("com.kcl.fileshare", 1, 0, "FileMgr", fileMgrProvider);
+    qmlRegisterSingletonType<FileTransferUIInfoHandler>("com.kcl.fileshare", 1, 0, "FileMgrUIHandler", fileMgrUIHandlerProvider);
 }
 
 

@@ -214,6 +214,7 @@ Window {
         }
     }
 
+
     Component {
         id: compUserView
         UserTransferView {

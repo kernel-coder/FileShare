@@ -76,3 +76,34 @@ QStringList Utils::urlsToFiles(const QList<QUrl> &urls)
     }
     return files;
 }
+
+
+QString Utils::formatSize(qint64 size)
+{
+    QString unit = "B";
+    double s = size;
+    if (s >= 1024) {
+        s /= 1024;
+        unit = "kB";
+    }
+    if (s >= 1024) {
+        s /= 1024;
+        unit = "MB";
+    }
+    if (s >= 1024) {
+        s /= 1024;
+        unit = "GB";
+    }
+    return QString("%1%2").arg(QString::number(s, 'f', 2)).arg(unit);
+}
+
+
+QString Utils::formatTime(qint64 ms)
+{
+    qint32 minute = ms / (1000 * 60);
+    ms = ms % (1000 * 60);
+    qint32 second = ms / 1000;
+    //qint32 msec = ms % 1000;
+    QString formated("%1:%2");
+    return formated.arg(minute, 2, 10, QChar('0')).arg(second, 2, 10, QChar('0'));
+}

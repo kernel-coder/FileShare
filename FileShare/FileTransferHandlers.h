@@ -5,12 +5,15 @@
 #include <QFileInfoList>
 #include <QThread>
 
+#define FileMgrUIHandler FileTransferUIInfoHandler::me()
+
 class Connection;
 class Message;
 class FileTransferHeaderInfoMsg;
 class FileTransferMsg;
 class FileTransferAckMsg;
 class FilePartTransferAckMsg;
+
 
 
 class FileHandler : public QThread
@@ -33,6 +36,8 @@ protected:
     Connection* mConnection;
 };
 
+
+
 class FileSenderHandler : public FileHandler
 {
     Q_OBJECT
@@ -44,10 +49,10 @@ protected:
     void handleMessageComingFrom(Connection* conn, Message* msg);
 
 signals:
-    void startingFile(const QString& file);
-    void sendingRootFile(FileTransferHeaderInfoMsg* msg);
-    void fileSent(FileTransferAckMsg* msg);
-    void filePartSent(FilePartTransferAckMsg* msg);
+    void startingFile(Connection* conn, const QString& file);
+    void sendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg);
+    void fileSent(Connection* conn, FileTransferAckMsg* msg);
+    void filePartSent(Connection* conn, FilePartTransferAckMsg* msg);
 
 private slots:
     void sendRootFile();
@@ -74,6 +79,8 @@ private:
     QFile* mFile;
 };
 
+
+
 class FileReceiverHandler : public FileHandler
 {
     Q_OBJECT
@@ -81,39 +88,32 @@ public:
     FileReceiverHandler(Connection* conn, FileTransferMsg* msg, QObject* p = 0);
 
 signals:
-    void receivedFilePart(FilePartTransferAckMsg* msg);
+    void receivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);
 
 protected:
     void handleThreadStarting();
     void handleMessageComingFrom(Connection* conn, Message* msg);
-
 
 private:
     FileTransferMsg* mFileMsg;
     QFile* mFile;
 };
 
-class RootFileSentUIInfo : public JObject {
+
+
+class RootFileUIInfo : public JObject {
     Q_OBJECT
 public:
-    RootFileSentUIInfo(QObject* p = 0) : JObject(p) {}
+    RootFileUIInfo(QObject* p = 0) : JObject(p) {}
+     MetaPropertyPublicSet_Ex(bool, isSending)
     MetaPropertyPublicSet_Ex(QString, filePath)
     MetaPropertyPublicSet_Ex(int, countTotalFile)
-    MetaPropertyPublicSet_Ex(int, countFileSent)
+    MetaPropertyPublicSet_Ex(int, countFileProgress)
     MetaPropertyPublicSet_Ex(quint64, sizeTotalFile)
-    MetaPropertyPublicSet_Ex(quint64, sizeFileSent)
+    MetaPropertyPublicSet_Ex(quint64, sizeFileProgress)
 };
 
-class RootFileReceivedUIInfo : public JObject {
-    Q_OBJECT
-public:
-    RootFileReceivedUIInfo(QObject* p = 0) : JObject(p) {}
-    MetaPropertyPublicSet_Ex(QString, filePath)
-    MetaPropertyPublicSet_Ex(int, countTotalFile)
-    MetaPropertyPublicSet_Ex(int, countFileReceived)
-    MetaPropertyPublicSet_Ex(quint64, sizeTotalFile)
-    MetaPropertyPublicSet_Ex(quint64, sizeFileReceived)
-};
+
 
 struct FileTransferUIInfoHandlerPrivate;
 class FileTransferUIInfoHandler : public QObject {
@@ -128,11 +128,14 @@ public:
     void addRootFileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg* msg );
     void addReceiverHandler(Connection* conn, FileReceiverHandler* frh);
 
+signals:
+    void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);
+
 private slots:
-    void onSendingRootFile(FileTransferHeaderInfoMsg* msg);
-    void onFileSent(FileTransferAckMsg* msg);
-    void onFilePartSent(FilePartTransferAckMsg* msg);
-    void onReceivedFilePart(FilePartTransferAckMsg* msg);
+    void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg);
+    void onFileSent(Connection* conn, FileTransferAckMsg* msg);
+    void onFilePartSent(Connection* conn, FilePartTransferAckMsg* msg);
+    void onReceivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);
 
 private:
     FileTransferUIInfoHandlerPrivate* d;

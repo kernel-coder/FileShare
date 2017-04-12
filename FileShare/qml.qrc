@@ -25,5 +25,8 @@
         <file>rsrc/images/btn-install-hovered.png</file>
         <file>rsrc/images/btn-install-pressed.png</file>
         <file>rsrc/images/logo.png</file>
+        <file>rsrc/images/btn-upload.png</file>
+        <file>rsrc/images/btn-upload-hovered.png</file>
+        <file>rsrc/images/btn-upload-pressed.png</file>
     </qresource>
 </RCC>
