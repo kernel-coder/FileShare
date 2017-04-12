@@ -43,6 +43,7 @@ public:
     Connection(int sockId = 0, QObject *parent = 0);
     ~Connection();
     MetaPropertyPrivateSet_Ex(PeerViewInfoMsg* , peerViewInfo)
+    MetaPropertyPrivateSet_Ex(int , id)
 
 public:
     TcpSocket* socket() {return mSocket;}

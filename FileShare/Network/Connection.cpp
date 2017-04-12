@@ -43,7 +43,7 @@ void TcpSocket::sendRawMessage(const QByteArray& data)
 }
 
 
-
+static int cRefCounter = 0;
 Connection::Connection(int sockId, QObject *parent)
     : QThread(parent)
     , mSockId(sockId)
@@ -51,12 +51,14 @@ Connection::Connection(int sockId, QObject *parent)
     , mSocket(0)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
-
+    _id = ++cRefCounter;
+    qDebug() << "Conn Construction " << _id;
 }
 
 
 Connection::~Connection()
 {
+    qDebug() << "Conn Destruction " << _id;
     if (mSocket) {
         mSocket->deleteLater();
     }
@@ -82,7 +84,7 @@ void Connection::sendClientViewInfo()
 void Connection::sendMessage(Message *msg)
 {
     if(msg){
-        qDebug() << QString("Message Sending: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
+        qDebug() << QString("Message %1 sending to %2").arg(msg->metaObject()->className()).arg(_id);
         QByteArray block;
         {QDataStream stream(&block, QIODevice::WriteOnly);
         stream.setVersion(QDataStream::Qt_4_6);
@@ -100,7 +102,7 @@ void Connection::onNewRawMessageReceived(const QByteArray& data)
     QDataStream in(data);
     in.setVersion(QDataStream::Qt_4_6);
     Message *msg = MsgSystem::readAndContruct(in);
-    qDebug() << QString("Message Received: %1, %2").arg(msg->typeId()).arg(msg->metaObject()->className());
+    qDebug() << QString("Message %1 receiving from %2").arg(msg->metaObject()->className()).arg(_id);
 
     if(msg){
         if(msg->typeId() == PeerViewInfoMsg::TypeID) {
