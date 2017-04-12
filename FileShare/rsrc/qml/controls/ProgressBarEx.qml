@@ -13,6 +13,7 @@ ProgressBar {
 
     anchors.left: parent.left; anchors.right: parent.right; height: 20;
     minimumValue: 0; maximumValue: 100; value: 40;
+
     style: ProgressBarStyle {
         background: Rectangle {
             color: progressbar.backColor
@@ -28,6 +29,14 @@ ProgressBar {
         anchors.centerIn: parent; color: progressbar.textColor
         font.pixelSize: progressbar.fontPixelSize
         text: "%1/%2".arg(Utils.formatSize(progressbar.value)).arg(Utils.formatSize(progressbar.maximumValue));
+    }
+
+    LabelEx {
+        anchors.right: parent.right
+        anchors.rightMargin: 2
+        anchors.verticalCenter: parent.verticalCenter
+        font.pixelSize: progressbar.fontPixelSize
+        text: "[%1%]".arg((progressbar.value * 100 / progressbar.maximumValue).toFixed(0))
     }
 }
 

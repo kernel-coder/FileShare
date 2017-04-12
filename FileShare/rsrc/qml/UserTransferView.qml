@@ -55,7 +55,12 @@ Rectangle {
                     Image {
                         id: imgDirection
                         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                        source: info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" : "qrc:/images/rsrc/images/btn-download.png"
+                        source: info.sizeTotalFile != info.sizeFileProgress ?
+                                    (info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" :
+                                                      "qrc:/images/rsrc/images/btn-download.png")
+                                  :
+                                    (info.isSending ? "qrc:/images/rsrc/images/btn-upload-hovered.png" :
+                                                      "qrc:/images/rsrc/images/btn-download-hovered.png")
                     }
                     Column {
                         anchors.left: imgDirection.right; anchors.leftMargin: 5
