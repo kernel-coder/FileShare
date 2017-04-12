@@ -154,7 +154,6 @@ void NetworkManager::onDisconnected()
 {
     if (Connection *conn = qobject_cast<Connection *>(sender())){
         if (mPeers.values().contains(conn)) {
-            participantLeft(conn);
             removeConnection(conn);
         }
     }
@@ -178,6 +177,7 @@ void NetworkManager::removeConnection(Connection *conn)
         iter.next();
         if (iter.value() == conn) {
             mPeers.remove(iter.key());
+            emit participantLeft(conn);
             StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
             qDebug() << "removed connection " << iter.key();
             break;

@@ -6,7 +6,7 @@
 Server::Server(QObject *parent) :
     QTcpServer(parent)
 {
-    listen(QHostAddress::Any);
+    listen(QHostAddress::AnyIPv4);
 }
 
 

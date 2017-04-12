@@ -77,6 +77,7 @@ void Connection::startAndWait()
 
 void Connection::sendClientViewInfo()
 {
+    mPeerInfoSent = true;
     PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
     sendMessage(pvi);
 }
