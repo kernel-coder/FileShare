@@ -44,4 +44,4 @@ FileTransferAckMsg::FileTransferAckMsg(const QString& uuid, const QString& filen
 }
 
 
-int FileTransferAckMsg::typeId() { return FileTransferMsg::TypeID;}
+int FileTransferAckMsg::typeId() { return FileTransferAckMsg::TypeID;}
