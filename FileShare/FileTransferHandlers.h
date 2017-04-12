@@ -7,7 +7,10 @@
 
 class Connection;
 class Message;
+class FileTransferHeaderInfoMsg;
 class FileTransferMsg;
+class FileTransferAckMsg;
+class FilePartTransferAckMsg;
 
 
 class FileHandler : public QThread
@@ -42,6 +45,9 @@ protected:
 
 signals:
     void startingFile(const QString& file);
+    void sendingRootFile(FileTransferHeaderInfoMsg* msg);
+    void fileSent(FileTransferAckMsg* msg);
+    void filePartSent(FilePartTransferAckMsg* msg);
 
 private slots:
     void sendRootFile();
@@ -74,6 +80,9 @@ class FileReceiverHandler : public FileHandler
 public:
     FileReceiverHandler(Connection* conn, FileTransferMsg* msg, QObject* p = 0);
 
+signals:
+    void receivedFilePart(FilePartTransferAckMsg* msg);
+
 protected:
     void handleThreadStarting();
     void handleMessageComingFrom(Connection* conn, Message* msg);
@@ -84,12 +93,47 @@ private:
     QFile* mFile;
 };
 
+class RootFileSentUIInfo : public JObject {
+    Q_OBJECT
+public:
+    RootFileSentUIInfo(QObject* p = 0) : JObject(p) {}
+    MetaPropertyPublicSet_Ex(QString, filePath)
+    MetaPropertyPublicSet_Ex(int, countTotalFile)
+    MetaPropertyPublicSet_Ex(int, countFileSent)
+    MetaPropertyPublicSet_Ex(quint64, sizeTotalFile)
+    MetaPropertyPublicSet_Ex(quint64, sizeFileSent)
+};
 
+class RootFileReceivedUIInfo : public JObject {
+    Q_OBJECT
+public:
+    RootFileReceivedUIInfo(QObject* p = 0) : JObject(p) {}
+    MetaPropertyPublicSet_Ex(QString, filePath)
+    MetaPropertyPublicSet_Ex(int, countTotalFile)
+    MetaPropertyPublicSet_Ex(int, countFileReceived)
+    MetaPropertyPublicSet_Ex(quint64, sizeTotalFile)
+    MetaPropertyPublicSet_Ex(quint64, sizeFileReceived)
+};
+
+struct FileTransferUIInfoHandlerPrivate;
 class FileTransferUIInfoHandler : public QObject {
     Q_OBJECT
     FileTransferUIInfoHandler(QObject* p = 0);
 
 public:
     static FileTransferUIInfoHandler* me();
+    ~FileTransferUIInfoHandler();
 
+    void addSenderHandler(Connection* conn, FileSenderHandler* fsh);
+    void addRootFileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg* msg );
+    void addReceiverHandler(Connection* conn, FileReceiverHandler* frh);
+
+private slots:
+    void onSendingRootFile(FileTransferHeaderInfoMsg* msg);
+    void onFileSent(FileTransferAckMsg* msg);
+    void onFilePartSent(FilePartTransferAckMsg* msg);
+    void onReceivedFilePart(FilePartTransferAckMsg* msg);
+
+private:
+    FileTransferUIInfoHandlerPrivate* d;
 };

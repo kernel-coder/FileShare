@@ -14,7 +14,6 @@ include ($$PWD/Network/Network.pri)
 
 RESOURCES += qml.qrc
 
-
 SOURCES += main.cpp \
     StatusViewer.cpp \
     Utils.cpp \

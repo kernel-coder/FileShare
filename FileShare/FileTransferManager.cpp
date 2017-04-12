@@ -35,14 +35,19 @@ void FileTransferManager::shareFilesTo(Connection *conn, const QList<QUrl> &urls
     qDebug() << urls.first().toString();
     QStringList files = Utils::me()->urlsToFiles(urls);
     FileSenderHandler* handler = new FileSenderHandler(conn, files);
+    FileTransferUIInfoHandler::me()->addSenderHandler(conn, handler);
     handler->start();
 }
 
 
 void FileTransferManager::onNewMsgCome(Connection *sender, Message *msg)
 {
+    if (msg->typeId() == FileTransferHeaderInfoMsg::TypeID) {
+        FileTransferUIInfoHandler::me()->addRootFileReceiverHandler(sender, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
+    }
     if (msg->typeId() == FileTransferMsg::TypeID) {
         FileReceiverHandler* handler = new FileReceiverHandler(sender, qobject_cast<FileTransferMsg*>(msg));
+        FileTransferUIInfoHandler::me()->addReceiverHandler(sender, handler);
         handler->start();
     }
 }

@@ -31,6 +31,7 @@ public:
     MetaPropertyPublicSet_Ex(QString, uuid)
     MetaPropertyPublicSet_Ex(QString, basePath)
     MetaPropertyPublicSet_Ex(QString, filename)
+    MetaPropertyPublicSet_Ex(int, fileNo)
     MetaPropertyPublicSet_Ex(qint64, size)
     MetaPropertyPublicSet_Ex(int, seqCount)
 
