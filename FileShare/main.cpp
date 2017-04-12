@@ -80,10 +80,12 @@ int main(int argc, char *argv[])
     registersQmlComponents();
     registersSingletonObjects();
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/qml/rsrc/qml/main.qml")));
-
     NetworkManager::me();
+    FileTransferManager::me();
+
+    QQmlApplicationEngine engine;
+    engine.load(QUrl(QStringLiteral("qrc:/qml/rsrc/qml/main.qml")));    
+
 
     return app.exec();
 }

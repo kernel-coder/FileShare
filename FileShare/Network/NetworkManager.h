@@ -47,12 +47,7 @@ public:
 signals:
     void newParticipant(Connection *connection);
     void participantLeft(Connection *connection);
-    void chatMsgCame(Connection *sender, ChatMsg *msg);
-    void playRequestCame(Connection *sender, PlayRequestMsg *msg);
-    void playRequestResultCame(Connection *sender, PlayRequestResultMsg *msg);
-    void gameCanceledMsgCame(Connection *sender, GameCanceledMsg *msg);
-    void lineAddedMsgCame(Connection *sender, LineAddedMsg *msg);
-    void newMsgCame(Connection *sender, Message *msg); 
+    void newMsgCome(Connection *sender, Message *msg);
 
 public slots:
     void broadcastUserInfoChanged();

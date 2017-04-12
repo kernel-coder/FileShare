@@ -31,7 +31,7 @@ FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files,
 
 void FileSenderHandler::startSending()
 {
-    connect(mConnection, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMsgCame(Connection*, Message*)));
+    connect(mConnection, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMsgCome(Connection*, Message*)));
     sendRootFile();
 }
 
@@ -102,7 +102,7 @@ void FileSenderHandler::sendFilePart(int seqNo)
 }
 
 
-void FileSenderHandler::onNewMsgCame(Connection *sender, Message *msg)
+void FileSenderHandler::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (sender == mConnection) {
         if (msg->typeId() == FilePartTransferAckMsg::TypeID) {
@@ -135,7 +135,7 @@ FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferMsg *msg,
 
 void FileReceiverHandler::startReceiving()
 {
-    connect(mConnection, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMsgCame(Connection*, Message*)));
+    connect(mConnection, SIGNAL(newMessageArrived(Connection*, Message*)), SLOT(onNewMsgCome(Connection*, Message*)));
     QString filename = Utils::me()->dataDirCommon(mFileMsg->basePath());
     Utils::me()->makePath(filename);
     if (!filename.endsWith("/")) filename += "/";
@@ -150,7 +150,7 @@ void FileReceiverHandler::startReceiving()
 }
 
 
-void FileReceiverHandler::onNewMsgCame(Connection *sender, Message *msg)
+void FileReceiverHandler::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (mConnection == sender) {
         if (msg->typeId() == FilePartTransferMsg::TypeID) {
@@ -189,7 +189,7 @@ FileTransferManager* FileTransferManager::me()
 FileTransferManager::FileTransferManager(QObject* p)
     : JObject(p), d(new FileTransferManagerPri)
 {
-    connect(NetMgr, SIGNAL(newMsgCame(Connection*, Message*)), SLOT(onNewMsgCame(Connection*, Message*)));
+    connect(NetMgr, SIGNAL(newMsgCome(Connection*, Message*)), SLOT(onNewMsgCome(Connection*, Message*)));
 }
 
 
@@ -207,7 +207,7 @@ void FileTransferManager::shareFilesTo(Connection *conn, const QList<QUrl> &urls
 }
 
 
-void FileTransferManager::onNewMsgCame(Connection *sender, Message *msg)
+void FileTransferManager::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (msg->typeId() == FileTransferMsg::TypeID) {
         FileReceiverHandler* handler = new FileReceiverHandler(sender, qobject_cast<FileTransferMsg*>(msg));

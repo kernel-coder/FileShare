@@ -24,7 +24,7 @@ signals:
 private slots:
     void startSending();
     void sendRootFile();
-    void onNewMsgCame(Connection *sender, Message *msg);
+    void onNewMsgCome(Connection *sender, Message *msg);
 
 private:
     void parseFile(const QFileInfo& file);
@@ -57,7 +57,7 @@ signals:
 
 private slots:
     void startReceiving();
-    void onNewMsgCame(Connection *sender, Message *msg);
+    void onNewMsgCome(Connection *sender, Message *msg);
 
 private:
     Connection* mConnection;
@@ -79,7 +79,7 @@ public slots:
     void shareFilesTo(Connection* conn, const QList<QUrl> &urls);
 
 private slots:
-    void onNewMsgCame(Connection *sender, Message *msg);
+    void onNewMsgCome(Connection *sender, Message *msg);
 
 private:
     FileTransferManagerPri* d;

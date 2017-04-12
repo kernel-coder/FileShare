@@ -190,7 +190,7 @@ void NetworkManager::removeConnection(Connection *conn)
 void NetworkManager::onNewMessageArrived(Connection *conn, Message *msg)
 {
     if (mPeers.values().contains(conn)) {
-        emit newMsgCame(conn, msg);
+        emit newMsgCome(conn, msg);
     }
 }
 
