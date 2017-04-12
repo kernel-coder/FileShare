@@ -74,6 +74,7 @@ Connection::Connection(int sockId, QObject *parent)
     connect(this, SIGNAL(sigClose()), mSocket, SLOT(slotClose()));
 
     connect(thread, &QThread::started, [&]() {
+        qDebug() << "setting up socket";
         mSocket->setupSocket(sockId);
     });
     thread->start();
