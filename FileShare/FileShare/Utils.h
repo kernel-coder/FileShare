@@ -2,6 +2,8 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QStringList>
+
 
 class Utils : public QObject
 {

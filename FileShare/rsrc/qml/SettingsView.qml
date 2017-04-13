@@ -1,6 +1,6 @@
-import QtQuick 2.5
+import QtQuick 2.3
 import QtQuick.Layouts 1.1
-import QtQuick.Controls 1.4
+import QtQuick.Controls 1.2
 import "controls"
 import com.kcl.fileshare 1.0
 import QtQuick.Dialogs 1.0
@@ -32,7 +32,6 @@ Rectangle {
         title: "Please Select Path Where to Save File"
         selectFolder : true
         selectMultiple : false
-        sidebarVisible: true
         onAccepted: {
             NetMgr.updateSavedFolderPath(Utils.urlToFile(fileDialog.folder))
         }
