@@ -158,6 +158,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
                     sendFilePart(0);
                 }
             }
+            ackMsg->deleteLater();
         }
         else if (msg->typeId() == FilePartTransferAckMsg::TypeID) {
             FilePartTransferAckMsg* ackMsg = qobject_cast<FilePartTransferAckMsg*>(msg);
@@ -165,6 +166,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
                 emit filePartSent(mConnection, ackMsg);
                 sendFilePart(ackMsg->seqNo() + 1);
             }
+            ackMsg->deleteLater();
         }
     }
 }
@@ -175,6 +177,12 @@ FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferMsg *msg,
     , mFileMsg(msg)
     , mFile(0)
 {
+}
+
+
+FileReceiverHandler::~FileReceiverHandler()
+{
+    delete mFileMsg;
 }
 
 
@@ -215,6 +223,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
                    exit();
                }
            }
+           msg->deleteLater();
         }
     }
 }
@@ -315,6 +324,7 @@ void FileTransferUIInfoHandler::addRootFileReceiverHandler(Connection* conn, Fil
         d->mReceivedInfoStore[msg->rootUuid()] = info;
         emit fileTransfer(conn, info);
     }
+    msg->deleteLater();
 }
 
 

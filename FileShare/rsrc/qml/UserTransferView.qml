@@ -29,7 +29,7 @@ Rectangle {
                 text: ", on port " + view.connObj.peerViewInfo.port + ", "
             }
             LabelEx {
-                text: view.connObj.peerViewInfo.status == PeerViewInfoMsg.Free ? "Availale" : "Busy"
+                text: view.connObj.peerViewInfo.status == PeerViewInfoMsg.Free ? "Available" : "Busy"
             }
         }
     }

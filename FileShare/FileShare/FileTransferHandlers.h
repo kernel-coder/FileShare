@@ -86,6 +86,7 @@ class FileReceiverHandler : public FileHandler
     Q_OBJECT
 public:
     FileReceiverHandler(Connection* conn, FileTransferMsg* msg, QObject* p = 0);
+    ~FileReceiverHandler();
 
 signals:
     void receivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);

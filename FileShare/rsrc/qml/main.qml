@@ -62,7 +62,7 @@ Window {
             }
 
             LabelEx {
-                text: NetMgr.status == PeerViewInfoMsg.Free ? "Availale" : "Busy"
+                text: NetMgr.status == PeerViewInfoMsg.Free ? "Available" : "Busy"
             }
             CheckBox {
                 anchors.verticalCenter: parent.verticalCenter
@@ -137,7 +137,7 @@ Window {
                         radius: 0
                         colorNormal: "#333333"
                         impHeight: 30
-                        text: connObj.peerViewInfo.name + ": " + (connObj.peerViewInfo.status == PeerViewInfoMsg.Free ? "Availale" : "Busy")
+                        text: connObj.peerViewInfo.name + ": " + (connObj.peerViewInfo.status == PeerViewInfoMsg.Free ? "Available" : "Busy")
                     }
                 }
             }

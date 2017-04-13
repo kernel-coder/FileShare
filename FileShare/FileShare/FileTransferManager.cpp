@@ -45,6 +45,7 @@ void FileTransferManager::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (msg->typeId() == FileTransferHeaderInfoMsg::TypeID) {
         FileMgrUIHandler->addRootFileReceiverHandler(sender, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
+        msg->deleteLater();
     }
     if (msg->typeId() == FileTransferMsg::TypeID) {
         FileReceiverHandler* handler = new FileReceiverHandler(sender, qobject_cast<FileTransferMsg*>(msg));

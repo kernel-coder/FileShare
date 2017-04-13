@@ -97,6 +97,7 @@ void Connection::sendMessage(Message *msg)
         stream.device()->seek(0);
         stream << (qint64)(block.size() - sizeof(qint64));
         write(block);
+        msg->deleteLater();
     }
 }
 
