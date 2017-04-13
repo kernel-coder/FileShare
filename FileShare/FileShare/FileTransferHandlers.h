@@ -119,7 +119,6 @@ struct FileTransferUIInfoHandlerPrivate;
 class FileTransferUIInfoHandler : public QObject {
     Q_OBJECT
     FileTransferUIInfoHandler(QObject* p = 0);
-
 public:
     static FileTransferUIInfoHandler* me();
     ~FileTransferUIInfoHandler();

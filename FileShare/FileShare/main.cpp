@@ -93,10 +93,10 @@ int main(int argc, char *argv[])
 
     NetworkManager::me();
     FileTransferManager::me();
+    FileTransferUIInfoHandler::me();
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/qml/rsrc/qml/main.qml")));    
-
 
     return app.exec();
 }

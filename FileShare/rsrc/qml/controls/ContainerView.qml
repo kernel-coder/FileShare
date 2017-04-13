@@ -22,7 +22,7 @@ Rectangle {
         if (index >= 0 && index < __views.length) {
             view = __views[index];
             view.parent = null
-            _views.splice(index, 1)
+            __views.splice(index, 1)
         }
         return view;
     }

@@ -10,6 +10,7 @@
         <file>rsrc/qml/main.qml</file>
         <file>rsrc/qml/UserTransferView.qml</file>
         <file>rsrc/qml/controls/ContainerView.qml</file>
+        <file>rsrc/qml/SettingsView.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>rsrc/images/btn-cancel.png</file>
@@ -28,5 +29,7 @@
         <file>rsrc/images/btn-upload.png</file>
         <file>rsrc/images/btn-upload-hovered.png</file>
         <file>rsrc/images/btn-upload-pressed.png</file>
+        <file>rsrc/images/settings.png</file>
+        <file>rsrc/images/settings-pressed.png</file>
     </qresource>
 </RCC>

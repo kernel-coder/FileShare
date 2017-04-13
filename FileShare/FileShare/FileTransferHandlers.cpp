@@ -220,8 +220,8 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
 
 FileTransferUIInfoHandler* FileTransferUIInfoHandler::me()
 {
-    static FileTransferUIInfoHandler* _gftuih = 0;
-    if (_gftuih == 0) {
+    static FileTransferUIInfoHandler* _gftuih = nullptr;
+    if (_gftuih == nullptr) {
         _gftuih = new FileTransferUIInfoHandler(qApp);
     }
     return _gftuih;

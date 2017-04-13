@@ -11,17 +11,7 @@ include(deployment.pri)
 include ($$PWD/QsLog/QsLog.pri)
 include ($$PWD/QtJson/QtJson.pri)
 include ($$PWD/Network/Network.pri)
+include ($$PWD/FileShare/FileShare.pri)
 
 RESOURCES += qml.qrc
 
-SOURCES += main.cpp \
-    StatusViewer.cpp \
-    Utils.cpp \
-    FileTransferManager.cpp \
-    FileTransferHandlers.cpp
-
-HEADERS += \
-    StatusViewer.h \
-    Utils.h \
-    FileTransferManager.h \
-    FileTransferHandlers.h

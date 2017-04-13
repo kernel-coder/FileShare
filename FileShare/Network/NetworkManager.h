@@ -36,6 +36,7 @@ public:
     MetaPropertyPublicSet_Ex(QString, ip)
     MetaPropertyPublicSet_Ex(int, port)
     MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
+    MetaPropertyPublicSet_Ex(bool, broadcastingEnabled)
 
     void sendMessage(Connection *conn, Message *msg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort);
@@ -50,6 +51,7 @@ signals:
     void newMsgCome(Connection *sender, Message *msg);
 
 public slots:
+    void updateBCEnabledChanged(bool on);
     void connectManual(const QString& host, int port);
     void broadcastUserInfoChanged();
 

@@ -23,7 +23,7 @@ void Server::incomingConnection(int sockId)
     conn->setSocketDescriptor(sockId);
     qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
     //NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
-    addPendingConnection(conn);
+    //addPendingConnection(conn);
 }
 
 

@@ -13,6 +13,7 @@
 struct FileTransferManagerPri {
 };
 
+
 FileTransferManager* FileTransferManager::me()
 {
     static FileTransferManager* _gftm = nullptr;

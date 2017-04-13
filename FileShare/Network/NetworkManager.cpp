@@ -18,11 +18,11 @@
 
 NetworkManager* NetworkManager::me()
 {
-    static NetworkManager* _nm = 0;
-    if (_nm == 0) {
-        _nm = new NetworkManager(qApp);
+    static NetworkManager* _gNM = nullptr;
+    if (_gNM == nullptr) {
+        _gNM = new NetworkManager(qApp);
     }
-    return _nm;
+    return _gNM;
 }
 
 
@@ -32,6 +32,7 @@ NetworkManager::NetworkManager(QObject *parent) :
     QSettings s;
     _username = s.value("username", QHostInfo::localHostName()).toString();
     _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();
+    _broadcastingEnabled = s.value("bcenabled", true).toBool();
 
     mpPeerManager = new PeerManager(this, this);
     _port = mServer.serverPort();
@@ -46,6 +47,13 @@ NetworkManager::NetworkManager(QObject *parent) :
 NetworkManager::~NetworkManager()
 {
     closeAllSocks();
+}
+
+
+void NetworkManager::updateBCEnabledChanged(bool on)
+{
+    QSettings s;
+    s.setValue("bcenabled", on);
 }
 
 
@@ -146,9 +154,9 @@ void NetworkManager::onReadyForUse()
         removeConnection(conn);
     }
 
-    if (!mPeers.contains(key)) {
-        qDebug() << "new connection found " << key;
-        mPeers.insert(key, conn);        
+    if (!mPeers.contains(key)) {        
+        mPeers.insert(key, conn);
+        qDebug() << "peer connected, total peer count " << mPeers.size();
         emit newParticipant(conn);
         StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
     }
@@ -183,8 +191,8 @@ void NetworkManager::removeConnection(Connection *conn)
         if (iter.value() == conn) {
             mPeers.remove(iter.key());
             emit participantLeft(conn);
-            StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr("has just left from the network"), LONG_DURATION);
-            qDebug() << "removed connection " << iter.key();
+            StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just left from the network"), LONG_DURATION);
+            qDebug() << "peer left, total peer count " << mPeers.size();
             break;
         }
     }

@@ -40,6 +40,7 @@ Window {
                         txtUsername.visible = true
                     }
                 }
+
                 TextField {
                     id: txtUsername
                     visible: false
@@ -70,6 +71,14 @@ Window {
                     NetMgr.broadcastUserInfoChanged()
                 }
             }
+        }
+        ImageButton {
+            anchors.right: parent.right; anchors.rightMargin: 3
+            anchors.verticalCenter: parent.verticalCenter
+            imgNormal: "qrc:/images/rsrc/images/settings.png"
+            imgHover: "qrc:/images/rsrc/images/settings-pressed.png"
+            imgPressed: "qrc:/images/rsrc/images/settings-pressed.png"
+            onClicked2: rectSettingsView.visible = !rectSettingsView.visible
         }
     }
 
@@ -193,6 +202,12 @@ Window {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
         }
+
+        SettingsView {
+            id: rectSettingsView
+            visible: false
+            anchors.fill: parent
+        }
     }
 
     Connections {
@@ -205,6 +220,7 @@ Window {
         }
 
         onParticipantLeft: {
+            console.log('ui particapath left called')
             for (var i = 0; i < peersModel.count; i++) {
                 var obj = peersModel.get(i);
                 if (obj.connObj == connection) {
