@@ -72,7 +72,29 @@ Window {
                 }
             }
         }
+        Row {
+            anchors.right: btnSettings.left; anchors.rightMargin: 10
+            anchors.verticalCenter: parent.verticalCenter
+            LabelEx {
+                text: "Broadcast?"
+                font.pixelSize: 12
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            CheckBox {
+                anchors.verticalCenter: parent.verticalCenter
+                checked: NetMgr.broadcastingEnabled
+                onClicked: {
+                    if (checked != NetMgr.broadcastingEnabled) {
+                        console.log("checked unchecked")
+                        NetMgr.updateBCEnabledChanged(checked)
+                    }
+                }
+            }
+        }
+
         ImageButton {
+            id: btnSettings
             anchors.right: parent.right; anchors.rightMargin: 3
             anchors.verticalCenter: parent.verticalCenter
             imgNormal: "qrc:/images/rsrc/images/settings.png"

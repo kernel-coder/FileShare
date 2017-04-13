@@ -50,7 +50,7 @@ protected:
 
 signals:
     void startingFile(Connection* conn, const QString& file);
-    void sendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg);
+    void sendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
     void fileSent(Connection* conn, FileTransferAckMsg* msg);
     void filePartSent(Connection* conn, FilePartTransferAckMsg* msg);
 
@@ -105,7 +105,8 @@ class RootFileUIInfo : public JObject {
     Q_OBJECT
 public:
     RootFileUIInfo(QObject* p = 0) : JObject(p) {}
-     MetaPropertyPublicSet_Ex(bool, isSending)
+    MetaPropertyPublicSet_Ex(bool, isSending)
+    MetaPropertyPublicSet_Ex(QString, filePathRoot)
     MetaPropertyPublicSet_Ex(QString, filePath)
     MetaPropertyPublicSet_Ex(int, countTotalFile)
     MetaPropertyPublicSet_Ex(int, countFileProgress)
@@ -124,14 +125,15 @@ public:
     ~FileTransferUIInfoHandler();
 
     void addSenderHandler(Connection* conn, FileSenderHandler* fsh);
-    void addRootFileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg* msg );
+    void addRootFileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg* msg);
     void addReceiverHandler(Connection* conn, FileReceiverHandler* frh);
+    QString saveFolderPathForRootUUID(const QString& rootUuid);
 
 signals:
     void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);
 
 private slots:
-    void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg);
+    void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
     void onFileSent(Connection* conn, FileTransferAckMsg* msg);
     void onFilePartSent(Connection* conn, FilePartTransferAckMsg* msg);
     void onReceivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);

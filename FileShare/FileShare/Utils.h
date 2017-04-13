@@ -17,6 +17,7 @@ public:
     Q_INVOKABLE QStringList urlsToFiles(const QList<QUrl>& url);
     Q_INVOKABLE QString formatSize(qint64 size);
     Q_INVOKABLE QString formatTime(qint64 ms);
+    Q_INVOKABLE void openUrl(const QString& path);
 
 };
 

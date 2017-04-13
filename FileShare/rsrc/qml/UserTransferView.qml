@@ -69,7 +69,8 @@ Rectangle {
                         LabelEx {
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 12
-                            text: info.filePath + "( %1/%2)".arg(info.countFileProgress).arg(info.countTotalFile)
+                            text: "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile)
+                            onLinkActivated: Utils.openUrl(link)
                         }
                         ProgressBarEx {
                             anchors.left: parent.left; anchors.right: parent.right

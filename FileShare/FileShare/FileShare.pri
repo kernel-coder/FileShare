@@ -7,6 +7,7 @@ SOURCES += $$PWD/main.cpp \
     $$PWD/FileTransferHandlers.cpp \
     $$PWD/AppSettings.cpp
 
+
 HEADERS += \
     $$PWD/StatusViewer.h \
     $$PWD/Utils.h \

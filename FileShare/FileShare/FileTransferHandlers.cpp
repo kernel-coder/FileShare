@@ -90,7 +90,7 @@ void FileSenderHandler::sendRootFile()
         mIndexOfBasePath = fi.isDir() ? fi.absoluteFilePath().lastIndexOf(QDir(fi.absoluteFilePath()).dirName()) : -1;
         mCurrentFileIndex = 0;
         FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(mRootUuid, fi.fileName(), mAllFiles.length(), mRootTotalSize);
-        emit sendingRootFile(mConnection, msg);
+        emit sendingRootFile(mConnection, msg, fi.absolutePath());
         emit sendMsg(msg);
         sendFile();
     }
@@ -180,7 +180,10 @@ FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferMsg *msg,
 
 void FileReceiverHandler::handleThreadStarting()
 {
-    QString filename = Utils::me()->dataDirCommon(mFileMsg->basePath());
+    QString filename = FileMgrUIHandler->saveFolderPathForRootUUID(mFileMsg->rootUuid());
+    filename = filename.replace("\\", "/");
+    if (!filename.endsWith("/")) filename += "/";
+    filename += mFileMsg->basePath();
     Utils::me()->makePath(filename);
     if (!filename.endsWith("/")) filename += "/";
     filename += mFileMsg->filename();
@@ -245,13 +248,13 @@ FileTransferUIInfoHandler::~FileTransferUIInfoHandler() {delete d;}
 
 void FileTransferUIInfoHandler::addSenderHandler(Connection* conn, FileSenderHandler *fsh)
 {
-    connect(fsh, SIGNAL(sendingRootFile(Connection*, FileTransferHeaderInfoMsg*)), SLOT(onSendingRootFile(Connection*, FileTransferHeaderInfoMsg*)));
+    connect(fsh, SIGNAL(sendingRootFile(Connection*, FileTransferHeaderInfoMsg*, QString)), SLOT(onSendingRootFile(Connection*, FileTransferHeaderInfoMsg*, QString)));
     connect(fsh, SIGNAL(fileSent(Connection*, FileTransferAckMsg*)), SLOT(onFileSent(Connection*, FileTransferAckMsg*)));
     connect(fsh, SIGNAL(filePartSent(Connection*, FilePartTransferAckMsg*)), SLOT(onFilePartSent(Connection*, FilePartTransferAckMsg*)));
 }
 
 
-void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg *msg)
+void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg *msg, const QString& sourcePath)
 {
     if (!d->mSentInfoStore.contains(msg->rootUuid())) {
         RootFileUIInfo* info = new RootFileUIInfo(this);
@@ -261,6 +264,7 @@ void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransfer
         info->countFileProgress(0);
         info->sizeTotalFile(msg->totalSize());
         info->sizeFileProgress(0);
+        info->filePathRoot(sourcePath);
         d->mSentInfoStore[msg->rootUuid()] = info;
         emit fileTransfer(conn, info);
     }
@@ -286,16 +290,28 @@ void FileTransferUIInfoHandler::onFilePartSent(Connection* conn, FilePartTransfe
 }
 
 
+QString FileTransferUIInfoHandler::saveFolderPathForRootUUID(const QString &rootUuid)
+{
+    RootFileUIInfo* info = d->mReceivedInfoStore.value(rootUuid, 0);
+    if (info) {
+        return info->filePathRoot();
+    }
+    return NetMgr->saveFolderName();
+}
+
+
 void FileTransferUIInfoHandler::addRootFileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg *msg)
 {
     if (!d->mReceivedInfoStore.contains(msg->rootUuid())) {
         RootFileUIInfo* info = new RootFileUIInfo(this);
         info->isSending(false);
+
         info->filePath(msg->filePath());
         info->countTotalFile(msg->fileCount());
         info->countFileProgress(0);
         info->sizeTotalFile(msg->totalSize());
         info->sizeFileProgress(0);
+        info->filePathRoot(NetMgr->saveFolderName());
         d->mReceivedInfoStore[msg->rootUuid()] = info;
         emit fileTransfer(conn, info);
     }

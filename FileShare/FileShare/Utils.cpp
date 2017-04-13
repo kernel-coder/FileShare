@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
-
+#include <QDesktopServices>
 
 Utils* Utils::me()
 {
@@ -106,4 +106,10 @@ QString Utils::formatTime(qint64 ms)
     //qint32 msec = ms % 1000;
     QString formated("%1:%2");
     return formated.arg(minute, 2, 10, QChar('0')).arg(second, 2, 10, QChar('0'));
+}
+
+
+void Utils::openUrl(const QString &path)
+{
+    QDesktopServices::openUrl(QUrl(path));
 }

@@ -32,6 +32,7 @@ public:
     Connection* createConnection();
     void connectionHandShakeFialed();
 
+    MetaPropertyPublicSet_Ex(QString, saveFolderName)
     MetaPropertyPublicSet_Ex(QString, username)
     MetaPropertyPublicSet_Ex(QString, ip)
     MetaPropertyPublicSet_Ex(int, port)
@@ -51,6 +52,7 @@ signals:
     void newMsgCome(Connection *sender, Message *msg);
 
 public slots:
+    void updateSavedFolderPath(const QString& path);
     void updateBCEnabledChanged(bool on);
     void connectManual(const QString& host, int port);
     void broadcastUserInfoChanged();

@@ -12,6 +12,7 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include <QSettings>
+#include "Utils.h"
 
 #define IP_PORT_PAIR(ip, port) QString("%1:%2").arg(ip).arg(port)
 
@@ -33,6 +34,7 @@ NetworkManager::NetworkManager(QObject *parent) :
     _username = s.value("username", QHostInfo::localHostName()).toString();
     _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();
     _broadcastingEnabled = s.value("bcenabled", true).toBool();
+    _saveFolderName = s.value("savedFolderName", Utils::me()->dataDirCommon()).toString();
 
     mpPeerManager = new PeerManager(this, this);
     _port = mServer.serverPort();
@@ -52,11 +54,19 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::updateBCEnabledChanged(bool on)
 {
-    _broadcastingEnabled = on;
+    broadcastingEnabled(on);
     QSettings s;
     s.setValue("bcenabled", on);
 }
 
+
+void NetworkManager::updateSavedFolderPath(const QString &path)
+{
+    saveFolderName(path);
+    QSettings s;
+    s.setValue("savedFolderName", path);
+    qDebug() << "saving path set to " << path;
+}
 
 void NetworkManager::connectManual(const QString &host, int port)
 {
