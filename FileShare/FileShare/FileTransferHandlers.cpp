@@ -67,7 +67,7 @@ void FileSenderHandler::parseFile(const QFileInfo &fi)
 {
     if (fi.isDir()) {
         QDir dir(fi.absoluteFilePath());
-        QFileInfoList fis = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+        QFileInfoList fis = dir.entryInfoList(QDir::AllDirs | QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
         foreach (QFileInfo fi, fis) {
             parseFile(fi);
         }
