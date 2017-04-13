@@ -52,6 +52,7 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::updateBCEnabledChanged(bool on)
 {
+    _broadcastingEnabled = on;
     QSettings s;
     s.setValue("bcenabled", on);
 }
