@@ -18,12 +18,12 @@ Server::~Server()
 
 void Server::incomingConnection(int sockId)
 {
-    Connection *conn = NetMgr->createConnection(sockId);
+    Connection *conn = NetMgr->createConnection();
     connect(conn, SIGNAL(connected()), this, SLOT(onPeerConnectedInServer()));
-    conn->startAndWait();
+    conn->setSocketDescriptor(sockId);
     qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
     //NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
-    addPendingConnection(conn->socket());       
+    addPendingConnection(conn);
 }
 
 

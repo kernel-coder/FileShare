@@ -113,9 +113,9 @@ Connection *NetworkManager::hasConnection(const QHostAddress &senderIp, int port
 }
 
 
-Connection* NetworkManager::createConnection(int sockId)
+Connection* NetworkManager::createConnection()
 {
-    Connection* conn = new Connection(sockId, this);
+    Connection* conn = new Connection(this);
     connect(conn, SIGNAL(readyForUse()), this, SLOT(onReadyForUse()));
     connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(connectionError(QAbstractSocket::SocketError)));
     connect(conn, SIGNAL(disconnected()), this, SLOT(onDisconnected()));

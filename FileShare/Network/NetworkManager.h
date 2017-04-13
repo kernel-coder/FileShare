@@ -29,7 +29,7 @@ public:
     static NetworkManager* me();
     ~NetworkManager();
 
-    Connection* createConnection(int sockId = 0);
+    Connection* createConnection();
     void connectionHandShakeFialed();
 
     MetaPropertyPublicSet_Ex(QString, username)

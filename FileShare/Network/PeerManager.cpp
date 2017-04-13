@@ -138,7 +138,6 @@ void PeerManager::connectManual(const QHostAddress &host, int port)
             qDebug() << "connecting to peer: " << host.toString() << port;
             connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
             connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
-            conn->startAndWait();
             conn->connectToHost(host, port);
         }
     }
