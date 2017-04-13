@@ -14,7 +14,7 @@ Window {
 
     Rectangle {
         id: titlebar
-        color: "#555555"
+        color: "#D03A41"
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -209,7 +209,8 @@ Window {
                 var obj = peersModel.get(i);
                 if (obj.connObj == connection) {
                     container.removeAt(i)
-                    peersModel.remove(i, 1);                    
+                    peersModel.remove(i, 1);
+                    console.log('removed peer from ui');
                     break;
                 }
             }

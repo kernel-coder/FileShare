@@ -208,7 +208,7 @@ void NetworkManager::closeAllSocks()
     foreach(Connection* conn, socks){
         if(conn){
             conn->close();
-            conn->deleteLater();
+            removeConnection(conn);
         }
     }
 }
