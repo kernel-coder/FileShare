@@ -25,7 +25,8 @@ PeerManager::PeerManager(NetworkManager *netMgr, QObject *parent)
 
     mBroadcastTimer.setInterval(BroadcastInterval);
     connect(&mBroadcastTimer, SIGNAL(timeout()), SLOT(sendBroadcastDatagram()));
-    sendBroadcastDatagram();
+
+    QTimer::singleShot(1000, this, SLOT(sendBroadcastDatagram()));
 }
 
 
