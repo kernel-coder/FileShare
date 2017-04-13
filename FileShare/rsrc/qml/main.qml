@@ -20,7 +20,8 @@ Window {
         anchors.right: parent.right
         height: 30
         Row {
-            anchors.centerIn: parent
+            anchors.left: parent.left; anchors.leftMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
             spacing: 10
             LabelEx {
                 text: "I'm "
@@ -75,9 +76,9 @@ Window {
         Row {
             anchors.right: btnSettings.left; anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
+            spacing: 2
             LabelEx {
                 text: "Broadcast?"
-                font.pixelSize: 12
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -86,7 +87,6 @@ Window {
                 checked: NetMgr.broadcastingEnabled
                 onClicked: {
                     if (checked != NetMgr.broadcastingEnabled) {
-                        console.log("checked unchecked")
                         NetMgr.updateBCEnabledChanged(checked)
                     }
                 }
