@@ -20,7 +20,7 @@ Window {
 
     Rectangle {
         id: titlebar
-        color: "#D03A41"
+        color: "#0072C5"
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right

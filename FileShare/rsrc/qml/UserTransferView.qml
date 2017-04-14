@@ -14,7 +14,7 @@ Rectangle {
 
     Rectangle {
         id: rectTitle
-        color: "#0072C5"
+        color: "#D03A41"
         anchors.left: parent.left; anchors.right: parent.right
         anchors.top: parent.top; height: 30
 
@@ -22,7 +22,7 @@ Rectangle {
             anchors.centerIn: parent
             spacing: 5
             LabelEx {
-                color: "#D03A41"
+                color: "#00ff00"
                 text: view.connObj.peerViewInfo.name
             }
             LabelEx {
