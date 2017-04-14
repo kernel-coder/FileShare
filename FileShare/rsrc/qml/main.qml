@@ -7,8 +7,14 @@ import com.kcl.fileshare 1.0
 
 Window {
     visible: true
-    width: 640
-    height: 480
+    x: AppSettings.appPosX
+    onXChanged: AppSettings.updateAppGeometry(x, y, width, height)
+    y: AppSettings.appPosY
+    onYChanged:  AppSettings.updateAppGeometry(x, y, width, height)
+    width: AppSettings.appWidth
+    onWidthChanged:  AppSettings.updateAppGeometry(x, y, width, height)
+    height: AppSettings.appHeight
+    onHeightChanged:  AppSettings.updateAppGeometry(x, y, width, height)
     title: qsTr("QFileShare")
     property var peersModel : ListModel{}
 
@@ -115,12 +121,16 @@ Window {
             anchors.top: parent.top;
             anchors.bottom: parent.bottom
             width: parent.width * .3
+
             ListView {
                 id: peerListView
                 spacing: 5
                 anchors.margins: 5
                 anchors.fill: parent
                 model: peersModel
+                highlightFollowsCurrentItem: false
+                ExclusiveGroup {id: exPeerGroup;}
+                onCurrentIndexChanged: if (currentIndex >= 0 && !exPeerGroup.current) exPeerGroup.current = peerListView.currentItem
                 function currentConnection() {
                     if (currentIndex >= 0) {
                         return peersModel.get(currentIndex).connObj
@@ -129,15 +139,18 @@ Window {
 
                 delegate:  Component {
                     BorderedButton {
+                        id: btnDelegate
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        checkable: true;
-                        isRadioMode: true
+                        checkable: true
+                        radioMode: true
                         borderWidth: 0
                         radius: 0
+                        exclusiveGroup: exPeerGroup
                         colorNormal: "#333333"
                         impHeight: 30
                         text: connObj.peerViewInfo.name + ": " + (connObj.peerViewInfo.status == PeerViewInfoMsg.Free ? "Available" : "Busy")
+                        onClicked2: if (checked) peerListView.currentIndex = index
                     }
                 }
             }
@@ -261,5 +274,32 @@ Window {
         UserTransferView {
             anchors.fill: parent
         }
+    }
+
+    Component.onCompleted: {
+//        {
+//        var connection = {peerViewInfo: {name:'Peer 1', status: PeerViewInfoMsg.Free, port: 145}};
+//        var view = compUserView.createObject(container, {connObj: connection})
+//        view.connObj = connection
+//        view.color = "red"
+//        container.addView(view)
+//        peersModel.append({connObj :  connection})
+//        }
+//        {
+//        var connection = {peerViewInfo: {name:'Peer 2', status: PeerViewInfoMsg.Busy, port: 146}};
+//        var view = compUserView.createObject(container, {connObj: connection})
+//        view.color = "black"
+//        view.connObj = connection
+//        container.addView(view)
+//        peersModel.append({connObj :  connection})
+//        }
+//        {
+//        var connection = {peerViewInfo: {name:'Peer 3', status: PeerViewInfoMsg.Free, port: 145}};
+//        var view = compUserView.createObject(container, {connObj: connection})
+//        view.color = "maroon"
+//        view.connObj = connection
+//        container.addView(view)
+//        peersModel.append({connObj :  connection})
+//        }
     }
 }

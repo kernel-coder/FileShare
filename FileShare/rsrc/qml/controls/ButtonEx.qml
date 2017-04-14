@@ -6,7 +6,7 @@ Button {
     property bool down: pressed || (checkable && checked)
     property string sTag: ""
     property int    iTag: -1
-    property bool isRadioMode: false
+    property bool radioMode: false
 
     signal clicked2(Button sender)
     signal toggled(Button sender, bool isOn)
@@ -14,7 +14,7 @@ Button {
     onClicked: {
         btn.clicked2(btn);
         if (checkable) {
-            if (!isRadioMode) {
+            if (!radioMode || (radioMode && !checked)) {
                 checked = !checked
                 btn.toggled(btn, checked)
             }

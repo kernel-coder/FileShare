@@ -10,7 +10,6 @@ ButtonEx {
     property url imgDisabled
     property bool fontWieghtBold: false
     property real textPixelSize: 18
-    property bool down: pressed || (checkable && checked)
     property color textColorDisabled: "#5D5D5D"
     property color textColorNormal: "white"
     property color textColorHovered: "white"

@@ -11,6 +11,7 @@
 #include <QtQml>
 #include "FileTransferManager.h"
 #include "FileTransferHandlers.h"
+#include "AppSettings.h"
 
 
 void registersQmlComponents()
@@ -27,6 +28,15 @@ static QObject* utilsProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
     Q_UNUSED(scriptEngine);
 
     return Utils::me();
+}
+
+
+static QObject* appSettingsProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return AppSettings::me();
 }
 
 
@@ -58,6 +68,7 @@ static QObject* fileMgrUIHandlerProvider(QQmlEngine *engine, QJSEngine *scriptEn
 
 void registersSingletonObjects()
 {
+    qmlRegisterSingletonType<AppSettings>("com.kcl.fileshare", 1, 0, "AppSettings", appSettingsProvider);
     qmlRegisterSingletonType<Utils>("com.kcl.fileshare", 1, 0, "Utils", utilsProvider);
     qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "NetMgr", netMgrProvider);
     qmlRegisterSingletonType<FileTransferManager>("com.kcl.fileshare", 1, 0, "FileMgr", fileMgrProvider);
@@ -91,6 +102,7 @@ int main(int argc, char *argv[])
     registersQmlComponents();
     registersSingletonObjects();
 
+    AppSettings::me();
     NetworkManager::me();
     FileTransferManager::me();
     FileTransferUIInfoHandler::me();

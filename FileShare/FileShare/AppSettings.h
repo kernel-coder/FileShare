@@ -1,12 +1,20 @@
-#ifndef APPSETTINGS_H
-#define APPSETTINGS_H
+#pragma once
 
-#include <QObject>
+#include "JObject.h"
 
-class AppSettings
+class AppSettings : public JObject
 {
+    Q_OBJECT
+    AppSettings(QObject* p = 0);
 public:
-    AppSettings();
-};
+    static AppSettings* me();
+    ~AppSettings();
+    MetaPropertyPublicSet_Ex(qreal, appPosX)
+    MetaPropertyPublicSet_Ex(qreal, appPosY)
+    MetaPropertyPublicSet_Ex(qreal, appWidth)
+    MetaPropertyPublicSet_Ex(qreal, appHeight)
 
-#endif // APPSETTINGS_H
+public slots:
+    void updateAppGeometry(qreal x, qreal y, qreal w, qreal h);
+
+};
