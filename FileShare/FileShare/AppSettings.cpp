@@ -3,6 +3,9 @@
 #include <QCoreApplication>
 
 
+#define W_CHECK(x) qMax(680., x)
+#define H_CHECK(x) qMax(480., x)
+
 AppSettings* AppSettings::me()
 {
     static AppSettings* _gAppSettings = nullptr;
@@ -17,8 +20,8 @@ AppSettings::AppSettings(QObject* p) : JObject(p)
     QSettings s;
     _appPosX = s.value("appPosX", 0).toReal();
     _appPosY = s.value("appPosY", 0).toReal();
-    _appWidth = s.value("appWidth", 640).toReal();
-    _appHeight = s.value("appHeight", 480).toReal();
+    _appWidth = W_CHECK(s.value("appWidth", 680).toReal());
+    _appHeight = H_CHECK(s.value("appHeight", 480).toReal());
 }
 
 
@@ -40,10 +43,14 @@ void AppSettings::updateAppGeometry(qreal x, qreal y, qreal w, qreal h)
         s.setValue("appPosY", y);
     }
 
+    w = W_CHECK(w);
+
     if (w != _appWidth) {
         appWidth(w);
         s.setValue("appWidth", w);
     }
+
+    h = H_CHECK(h);
 
     if (h != _appHeight) {
         appHeight(h);
