@@ -157,6 +157,7 @@ void NetworkManager::newConnection(Connection *conn)
 
 void NetworkManager::onReadyForUse()
 {
+    qDebug() << "ReadyForUse get called";
     Connection *conn = qobject_cast<Connection *>(sender());
     QString key = IP_PORT_PAIR(conn->peerAddress().toIPv4Address(), conn->peerViewInfo()->port());    
     removePendingPeers(conn);

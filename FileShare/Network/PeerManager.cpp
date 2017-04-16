@@ -138,8 +138,8 @@ void PeerManager::connectManual(const QHostAddress &host, int port)
             conn = NetMgr->createConnection();
             mpNetManager->addPendingPeers(host, port, conn);
             qDebug() << "connecting to peer: " << host.toString() << port;
-            connect(conn, SIGNAL(connected()), SLOT(onPeerConnected()));
-            connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
+            connect(conn, SIGNAL(connected()), this, SLOT(onPeerConnected()));
+            connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
             conn->connectToHost(host, port);
         }
     }
@@ -151,7 +151,8 @@ void PeerManager::onPeerConnected()
     Connection *conn = qobject_cast<Connection*>(sender());
     if(conn) {
         qDebug() << "Peer conneciton success " <<  conn->peerAddress().toString();
-        conn->disconnect(this);
+        disconnect(conn, SIGNAL(connected()), this, SLOT(onPeerConnected()));
+        disconnect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
         emit newPeer(conn);
     }
 }
@@ -161,7 +162,8 @@ void PeerManager::onPeerConnectingError(QAbstractSocket::SocketError socketError
     Connection *conn = qobject_cast<Connection*>(sender());
     if(conn) {
         qDebug() << "Peer conneciton error " <<  conn->errorString();
-        conn->disconnect(this);
+        disconnect(conn, SIGNAL(connected()), this, SLOT(onPeerConnected()));
+        disconnect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
         mpNetManager->removePendingPeers(conn);
         conn->deleteLater();
     }
