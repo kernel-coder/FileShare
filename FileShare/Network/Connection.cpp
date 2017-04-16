@@ -38,7 +38,7 @@ void Connection::onConnected()
 
 void Connection::onDataReadReady()
 {
-    qDebug() << "GOT BYTES";
+    qDebug() << "GOT BYTES " << bytesAvailable();
     QMutexLocker locker(&mMutex);
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_4_6);
