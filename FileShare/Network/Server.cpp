@@ -6,13 +6,24 @@
 Server::Server(QObject *parent) :
     QTcpServer(parent)
 {
-    listen(QHostAddress::AnyIPv4);
+    if (listen(QHostAddress("192.168.0.100"))) {
+        qDebug() << QString("server listening: %1:%2").arg(serverAddress().toString()).arg(serverPort());
+    }
+    else {
+        qDebug() << "server listening failed: " << errorString();
+    }
 }
 
 
 Server::~Server()
 {
     close();
+}
+
+
+void Server::onAcceptError(QAbstractSocket::SocketError socketError)
+{
+    qWarning() << "server accepting error: " << socketError << ", " << errorString();
 }
 
 
@@ -24,7 +35,7 @@ void Server::incomingConnection(int sockId)
     conn->setSocketDescriptor(sockId);
     qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
     //NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
-    addPendingConnection(conn);
+    //addPendingConnection(conn);
 }
 
 

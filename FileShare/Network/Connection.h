@@ -31,6 +31,7 @@ public slots:
     void sendClientViewInfo();
 
 private slots:
+    void onConnected();
     void onDataReadReady();
 
 private:

@@ -19,7 +19,7 @@ Connection::Connection(QObject *parent)
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     _id = ++cRefCounter;
     qDebug() << "Conn Construction " << _id;
-    connect(this, SIGNAL(connected()), this, SLOT(sendClientViewInfo()));
+    connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(this, SIGNAL(readyRead()), this, SLOT(onDataReadReady()));
 }
 
@@ -30,8 +30,15 @@ Connection::~Connection()
 }
 
 
+void Connection::onConnected()
+{
+    qDebug() << "Connected";
+    QTimer::singleShot(100, this, SLOT(onDataReadReady()));
+}
+
 void Connection::onDataReadReady()
 {
+    qDebug() << "GOT BYTES";
     QMutexLocker locker(&mMutex);
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_4_6);
