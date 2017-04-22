@@ -6,7 +6,7 @@
 Server::Server(QObject *parent) :
     QTcpServer(parent)
 {
-    if (listen(QHostAddress("192.168.0.100"))) {
+    if (listen(QHostAddress::Any)) {
         qDebug() << QString("server listening: %1:%2").arg(serverAddress().toString()).arg(serverPort());
     }
     else {
