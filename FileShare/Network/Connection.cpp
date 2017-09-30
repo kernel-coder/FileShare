@@ -33,7 +33,7 @@ Connection::~Connection()
 void Connection::onConnected()
 {
     qDebug() << "Connected";
-    QTimer::singleShot(100, this, SLOT(onDataReadReady()));
+    QTimer::singleShot(100, this, SLOT(sendClientViewInfo()));
 }
 
 void Connection::onDataReadReady()

@@ -22,7 +22,7 @@ public:
     ~PeerManager();
     void setServerPort(int nPort);
     QByteArray userName() const;
-    void startBroadcasting();
+    void startBroadcasting(bool on);
     bool isLocalHostAddress(const QHostAddress &address);
 
 signals:

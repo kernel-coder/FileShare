@@ -39,7 +39,7 @@ NetworkManager::NetworkManager(QObject *parent) :
     mpPeerManager = new PeerManager(this, this);
     _port = mServer.serverPort();
     mpPeerManager->setServerPort(_port);
-    mpPeerManager->startBroadcasting();
+    mpPeerManager->startBroadcasting(_broadcastingEnabled);
 
     connect(mpPeerManager, SIGNAL(newPeer(Connection*)), SLOT(newConnection(Connection*)));
     connect(&mServer, SIGNAL(newPeer(Connection*)), SLOT(newConnection(Connection*)));
@@ -57,6 +57,7 @@ void NetworkManager::updateBCEnabledChanged(bool on)
     broadcastingEnabled(on);
     QSettings s;
     s.setValue("bcenabled", on);
+    mpPeerManager->startBroadcasting(on);
 }
 
 
