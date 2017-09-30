@@ -67,7 +67,6 @@ void Connection::onDataReadReady()
                     }
                     else {
                         if (!mPeerInfoSent) {
-                            mPeerInfoSent = true;
                             sendClientViewInfo();
                         }
                         peerViewInfo(pvi);

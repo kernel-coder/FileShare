@@ -31,11 +31,10 @@ void Server::incomingConnection(int sockId)
 {
     Connection *conn = NetMgr->createConnection();
     connect(conn, SIGNAL(connected()), this, SLOT(onPeerConnectedInServer()));
-    connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
+    connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));    
     conn->setSocketDescriptor(sockId);
     qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
-    //NetMgr->addPendingPeers(conn->peerAddress(), conn->peerPort(), conn);
-    //addPendingConnection(conn);
+    NetMgr->replacePendingPeer(conn->peerAddress(), conn->peerPort(), conn);
 }
 
 

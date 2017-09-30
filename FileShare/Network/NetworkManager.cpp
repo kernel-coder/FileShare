@@ -98,12 +98,14 @@ void NetworkManager::sendMessage(Connection *conn, Message *msg)
 }
 
 
-void NetworkManager::addPendingPeers(const QHostAddress &senderIp, int port, Connection *conn)
+bool NetworkManager::addPendingPeers(const QHostAddress &senderIp, int port, Connection *conn)
 {
     QString key = IP_PORT_PAIR(senderIp.toIPv4Address(), port);
     if (!mPendingPeers.contains(key)) {
         mPendingPeers.insert(key, conn);
+        return true;
     }
+    return false;
 }
 
 
@@ -211,6 +213,19 @@ void NetworkManager::removeConnection(Connection *conn)
     }
 
     conn->deleteLater();
+}
+
+
+void NetworkManager::replacePendingPeer(const QHostAddress &senderIp, int port, Connection* conn)
+{
+    QString key = IP_PORT_PAIR(senderIp.toIPv4Address(), port);
+    auto exitingConn = mPendingPeers.value(key, NULL);
+    if (exitingConn) {
+        mPendingPeers.remove(key);
+        exitingConn->close();
+        delete exitingConn;
+    }
+    addPendingPeers(senderIp, port, conn);
 }
 
 

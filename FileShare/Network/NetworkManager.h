@@ -42,9 +42,11 @@ public:
     void sendMessage(Connection *conn, Message *msg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort);
 
-    void addPendingPeers(const QHostAddress &senderIp, int port, Connection* conn);
+    bool addPendingPeers(const QHostAddress &senderIp, int port, Connection* conn);
     void removePendingPeers(Connection* conn);
     Connection *hasPendingConnection(const QHostAddress &senderIp, int nSenderPort);
+
+    void replacePendingPeer(const QHostAddress &senderIp, int port, Connection* conn);
 
 signals:
     void newParticipant(Connection *connection);
