@@ -68,6 +68,7 @@ bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 void PeerManager::sendBroadcastDatagram()
 {
     if (!mpNetManager->broadcastingEnabled()) return;
+    qDebug() << "Starting BC...";
     QMutexLocker locker(&mMutex);
     QByteArray datagram = serverInfo();
     bool bValidBroadcastAddresses = true;
@@ -75,6 +76,9 @@ void PeerManager::sendBroadcastDatagram()
     foreach (QHostAddress address, mBroadcastAddresses){
         if (mBroadcastSocket.writeDatagram(datagram, address, BroadcastPort) == -1){
             bValidBroadcastAddresses = false;
+        }
+        else {
+            qDebug() << "BC to " << address.toIPv4Address();
         }
     }
 
