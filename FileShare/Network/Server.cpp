@@ -29,12 +29,18 @@ void Server::onAcceptError(QAbstractSocket::SocketError socketError)
 
 void Server::incomingConnection(int sockId)
 {
-    Connection *conn = NetMgr->createConnection();
-    connect(conn, SIGNAL(connected()), this, SLOT(onPeerConnectedInServer()));
-    connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));    
-    conn->setSocketDescriptor(sockId);
-    qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
-    NetMgr->replacePendingPeer(conn->peerAddress(), conn->peerPort(), conn);
+    Connection *conn = NetMgr->createConnection();    
+    if (!conn->setSocketDescriptor(sockId) || NetMgr->hasConnection(conn->peerAddress(), conn->peerPort())) {
+        qDebug() << "Destroying socket from server " << conn->peerAddress().toString() << conn->peerPort();
+        conn->close();
+        conn->deleteLater();
+    }
+    else {
+        NetMgr->replacePendingPeer(conn->peerAddress(), conn->peerPort(), conn);
+        connect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
+        qDebug() << "Adding pending peer from server " << conn->peerAddress().toString() << conn->peerPort();
+        emit newPeer(conn);
+    }
 }
 
 
@@ -55,8 +61,8 @@ void Server::onPeerConnectingError(QAbstractSocket::SocketError socketError)
     Connection *conn = qobject_cast<Connection*>(sender());
     if(conn) {
         qDebug() << "Peer conneciton error " <<  conn->errorString();
-        disconnect(conn, SIGNAL(connected()), this, SLOT(onPeerConnectedInServer()));
         disconnect(conn, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onPeerConnectingError(QAbstractSocket::SocketError)));
+        NetMgr->removePendingPeers(conn);
         conn->deleteLater();
     }
 }
