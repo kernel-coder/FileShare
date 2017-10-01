@@ -11,6 +11,8 @@
         <file>rsrc/qml/UserTransferView.qml</file>
         <file>rsrc/qml/controls/ContainerView.qml</file>
         <file>rsrc/qml/SettingsView.qml</file>
+        <file>rsrc/qml/MainWindow.qml</file>
+        <file>rsrc/qml/SplashView.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>rsrc/images/btn-cancel.png</file>

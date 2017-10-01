@@ -12,7 +12,7 @@
 #include "FileTransferManager.h"
 #include "FileTransferHandlers.h"
 #include "AppSettings.h"
-
+#include <QTime>
 
 void registersQmlComponents()
 {

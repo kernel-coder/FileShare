@@ -25,8 +25,6 @@ PeerManager::PeerManager(NetworkManager *netMgr, QObject *parent)
 
     mBroadcastTimer.setInterval(BroadcastInterval);
     connect(&mBroadcastTimer, SIGNAL(timeout()), SLOT(sendBroadcastDatagram()));
-
-    //QTimer::singleShot(1000, this, SLOT(sendBroadcastDatagram()));
 }
 
 
@@ -45,6 +43,7 @@ void PeerManager::setServerPort(int port)
 void PeerManager::startBroadcasting(bool on)
 {
     if (on) {
+        QTimer::singleShot(100, this, SLOT(sendBroadcastDatagram()));
         mBroadcastTimer.start();
     }
     else {
@@ -68,18 +67,20 @@ bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 void PeerManager::sendBroadcastDatagram()
 {
     if (!mpNetManager->broadcastingEnabled()) return;
-    qDebug() << "Starting BC...";
+    //qDebug() << "Starting BC...";
     QMutexLocker locker(&mMutex);
     QByteArray datagram = serverInfo();
     bool bValidBroadcastAddresses = true;
 
+    int counter = 0;
     foreach (QHostAddress address, mBroadcastAddresses){
         if (mBroadcastSocket.writeDatagram(datagram, address, BroadcastPort) == -1){
             bValidBroadcastAddresses = false;
         }
         else {
-            qDebug() << "BC to " << address.toIPv4Address();
+            //qDebug() << "BC to " << mIPAddresses.at(counter).toString();
         }
+        counter++;
     }
 
     if (!bValidBroadcastAddresses){
