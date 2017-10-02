@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
            QsLogging::DestinationFactory::MakeDebugOutputDestination() );
         logger.addDestination(debugDestination.get());
 
-    const QString sLogPath = app.applicationDirPath() + "/log-fs.txt";
+    const QString sLogPath = Utils::me()->findUniqueLogFilename("log-fs.txt");
     QsLogging::DestinationPtr fileDestination(
          QsLogging::DestinationFactory::MakeFileDestination(sLogPath));
     logger.addDestination(fileDestination.get());

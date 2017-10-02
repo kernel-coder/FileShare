@@ -13,6 +13,12 @@ public:
     static Utils* me();
     Q_INVOKABLE bool makePath(const QString& path);
     Q_INVOKABLE QString dataDirCommon(const QString& file = QString(""));
+    Q_INVOKABLE QString dataDirUser(const QString& file = QString());
+    Q_INVOKABLE QString logDirUser(const QString& file = QString());
+    Q_INVOKABLE QString findUniqueLogFilename(const QString& prefix);
+    Q_INVOKABLE QString findUniqueFilename(const QString& dir, const QString& prefix, const QString& ext);
+    Q_INVOKABLE QByteArray readFile(const QString& filename);
+    Q_INVOKABLE bool writeFile(const QString& filename, const QByteArray& data);
     Q_INVOKABLE QString fileRelativeAppPath(const QString& file);
     Q_INVOKABLE QUrl urlRelativeAppPath(const QString& file);
     Q_INVOKABLE QString urlToFile(const QUrl& url);

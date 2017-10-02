@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QStandardPaths>
 #include <QDesktopServices>
+#include <QDateTime>
 
 Utils* Utils::me()
 {
@@ -44,6 +45,68 @@ QString Utils::dataDirCommon(const QString& file)
         path  = path + file;      
     }
     return path;
+}
+
+
+QString Utils::dataDirUser(const QString &file)
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/";
+    makePath(path);
+    if (!file.isEmpty()) {
+        path  = path + file;
+    }
+    return path;
+}
+
+
+QString Utils::logDirUser(const QString &fileName)
+{
+    QString path = dataDirUser() + "Log/";
+    makePath(path);
+    if (!fileName.isEmpty())
+        path = path + fileName;
+    return path;
+}
+
+
+QString Utils::findUniqueLogFilename(const QString& prefix)
+{
+    return findUniqueFilename(logDirUser(), prefix, "txt");
+}
+
+
+QString Utils::findUniqueFilename(const QString& dir, const QString& prefix, const QString& ext)
+{
+    int counter = 1;
+    QString file = dir + QString("%1-%2.%3").arg(prefix).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")).arg(ext);
+    if (QFile::exists(file)) {
+        file = dir + QString("%1-%2-%3.%4").arg(prefix).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd-HH-mm-ss")).arg(counter).arg(ext);
+        counter++;
+    }
+    return file;
+}
+
+
+QByteArray Utils::readFile(const QString &filename)
+{
+    QFile file(filename);
+    if (file.open(QFile::ReadOnly)) {
+        QByteArray data = file.readAll();
+        file.close();
+        return data;
+    }
+    return QByteArray();
+}
+
+
+bool Utils::writeFile(const QString &filename, const QByteArray &data)
+{
+    QFile file(filename);
+    if (file.open(QFile::WriteOnly)) {
+        file.write(data);
+        return true;
+    }
+    return false;
 }
 
 
