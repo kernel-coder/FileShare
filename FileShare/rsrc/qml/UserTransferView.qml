@@ -90,7 +90,7 @@ Rectangle {
                         wrapMode: Text.WordWrap
                         color: "blue"
                         visible: chat != undefined && chat.sending
-                        text : chat != undefined ? + chat.msg + " :ME"  : ""
+                        text : chat != undefined ? + chat.msg + " #ME"  : ""
                         onLinkActivated: Utils.openUrl(link)
                     }
                     LabelEx {
@@ -101,7 +101,7 @@ Rectangle {
                         wrapMode: Text.WordWrap
                         color: "red"
                         visible: chat != undefined && !chat.sending
-                        text : chat != undefined ? "BUDDY: " + chat.msg : ""
+                        text : chat != undefined ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
                         onLinkActivated: Utils.openUrl(link)
                     }
                 }
@@ -158,11 +158,11 @@ Rectangle {
         enabled: view.connObj.peerViewInfo.status == PeerViewInfoMsg.Free
         anchors.left: parent.left; anchors.right: parent.right
         anchors.bottom: parent.bottom;
-        placeholderText: "Chat Box"
+        placeholderText: "message to " + view.connObj.peerViewInfo.name
         onAccepted: {
-            if (teChat.text) {
-                FileMgr.sendChatTo(view.connObj, teChat.text)
-                transferHistoryModel.append({chat : {msg: teChat.text, sending: true}})
+            if (teChat.text.trim()) {
+                FileMgr.sendChatTo(view.connObj, teChat.text.trim())
+                transferHistoryModel.append({chat : {msg: teChat.text.trim(), sending: true}})
             }
         }
     }
