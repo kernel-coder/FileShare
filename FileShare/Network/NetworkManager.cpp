@@ -51,6 +51,12 @@ NetworkManager::~NetworkManager()
 }
 
 
+void NetworkManager::initialize()
+{
+    mpPeerManager->initialize();
+    updateBCEnabledChanged(_broadcastingEnabled);
+}
+
 void NetworkManager::updateBCEnabledChanged(bool on)
 {
     broadcastingEnabled(on);

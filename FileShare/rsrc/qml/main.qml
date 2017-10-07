@@ -33,7 +33,7 @@ Window {
             onStatusChanged: {
                 if( mainLoader.status == Loader.Ready ) {
                     splash.visible = false
-                    NetMgr.updateBCEnabledChanged(NetMgr.broadcastingEnabled);
+                    NetMgr.initialize();
                 }
             }
         }

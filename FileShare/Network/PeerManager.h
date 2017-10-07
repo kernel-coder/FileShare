@@ -20,10 +20,11 @@ Q_OBJECT
 public:
     PeerManager(NetworkManager *netMgr, QObject *parent = 0);
     ~PeerManager();
+    void initialize();
     void setServerPort(int nPort);
     QByteArray userName() const;
     void startBroadcasting(bool on);
-    bool isLocalHostAddress(const QHostAddress &address);
+    bool isLocalHostAddress(const QHostAddress &address);    
 
 signals:
     void newPeer(Connection *conn);

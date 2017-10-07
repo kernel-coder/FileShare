@@ -54,6 +54,7 @@ signals:
     void newMsgCome(Connection *sender, Message *msg);
 
 public slots:
+    void initialize();
     void updateSavedFolderPath(const QString& path);
     void updateBCEnabledChanged(bool on);
     void connectManual(const QString& host, int port);

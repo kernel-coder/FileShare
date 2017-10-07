@@ -20,10 +20,7 @@ PeerManager::PeerManager(NetworkManager *netMgr, QObject *parent)
 , mpNetManager(netMgr)
 {
     updateAddresses();
-    mnServerPort = 0;
-
-    mBroadcastSocket.bind(QHostAddress::Any, BroadcastPort, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
-    connect(&mBroadcastSocket, SIGNAL(readyRead()), SLOT(readBroadcastDatagram()));
+    mnServerPort = 0;    
 
     mBroadcastTimer.setInterval(BroadcastInterval);
     connect(&mBroadcastTimer, SIGNAL(timeout()), SLOT(sendBroadcastDatagram()));
@@ -33,6 +30,13 @@ PeerManager::PeerManager(NetworkManager *netMgr, QObject *parent)
 PeerManager::~PeerManager()
 {
     mBroadcastSocket.close();
+}
+
+
+void PeerManager::initialize()
+{
+    mBroadcastSocket.bind(QHostAddress::Any, BroadcastPort, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
+    connect(&mBroadcastSocket, SIGNAL(readyRead()), SLOT(readBroadcastDatagram()));
 }
 
 
@@ -70,7 +74,10 @@ bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 
 void PeerManager::sendBroadcastDatagram()
 {
-    if (!mpNetManager->broadcastingEnabled()) return;
+    if (!mpNetManager->broadcastingEnabled()){
+        return;
+    }
+
     qDebug() << "Starting BC...";
     QMutexLocker locker(&mMutex);
     QByteArray datagram = serverInfo();
