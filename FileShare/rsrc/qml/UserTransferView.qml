@@ -51,15 +51,18 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 5
                     anchors.bottomMargin: 0
+                    visible: info != undefined
                     Image {
                         id: imgDirection
                         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                        source: info.sizeTotalFile != info.sizeFileProgress ?
+                        source: info != undefined ? ( info.sizeTotalFile != info.sizeFileProgress ?
                                     (info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" :
                                                       "qrc:/images/rsrc/images/btn-download.png")
                                   :
                                     (info.isSending ? "qrc:/images/rsrc/images/btn-upload-hovered.png" :
                                                       "qrc:/images/rsrc/images/btn-download-hovered.png")
+                                                     )
+                                                  : ""
                     }
                     Column {
                         anchors.left: imgDirection.right; anchors.leftMargin: 5
@@ -70,14 +73,36 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 12
                             linkColor: "white"
-                            text: "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile)
+                            text: info != undefined ? "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile) : ""
                             onLinkActivated: Utils.openUrl(link)
                         }
                         ProgressBarEx {
                             anchors.left: parent.left; anchors.right: parent.right
-                            maximumValue: info.sizeTotalFile
-                            value: info.sizeFileProgress
+                            maximumValue: info != undefined ? info.sizeTotalFile : 0
+                            value: info != undefined ? info.sizeFileProgress : 0
                         }
+                    }
+                    LabelEx {
+                        anchors.fill: parent
+                        font.pixelSize: 12
+                        horizontalAlignment: Qt.AlignRight
+                        verticalAlignment: Qt.AlignVCenter
+                        wrapMode: Text.WordWrap
+                        color: "blue"
+                        visible: chat != undefined && chat.sending
+                        text : chat != undefined ? + chat.msg + " :ME"  : ""
+                        onLinkActivated: Utils.openUrl(link)
+                    }
+                    LabelEx {
+                        anchors.fill: parent
+                        font.pixelSize: 12
+                        horizontalAlignment: Qt.AlignLeft
+                        verticalAlignment: Qt.AlignVCenter
+                        wrapMode: Text.WordWrap
+                        color: "red"
+                        visible: chat != undefined && !chat.sending
+                        text : chat != undefined ? "BUDDY: " + chat.msg : ""
+                        onLinkActivated: Utils.openUrl(link)
                     }
                 }
             }
@@ -134,6 +159,12 @@ Rectangle {
         anchors.left: parent.left; anchors.right: parent.right
         anchors.bottom: parent.bottom;
         placeholderText: "Chat Box"
+        onAccepted: {
+            if (teChat.text) {
+                FileMgr.sendChatTo(view.connObj, teChat.text)
+                transferHistoryModel.append({chat : {msg: teChat.text, sending: true}})
+            }
+        }
     }
 
 
@@ -150,10 +181,18 @@ Rectangle {
 
     Connections {
         target: FileMgrUIHandler
-        //void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);
         onFileTransfer: {
             if (conn == view.connObj) {
                 transferHistoryModel.append({info :  uiInfo})
+            }
+        }
+    }
+
+    Connections {
+        target: FileMgr
+        onChatReceived: {
+            if (conn == view.connObj) {
+                transferHistoryModel.append({chat : {msg: msg, sending: false}})
             }
         }
     }

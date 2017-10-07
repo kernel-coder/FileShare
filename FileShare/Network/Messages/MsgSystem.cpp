@@ -66,6 +66,9 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
     else if(msgTypeId == FilePartTransferAckMsg::TypeID){
         msg = new FilePartTransferAckMsg();
     }
+    else if (msgTypeId == ChatMsg::TypeID) {
+        msg = new ChatMsg();
+    }
 
     if(msg){
         msg->read(stream);

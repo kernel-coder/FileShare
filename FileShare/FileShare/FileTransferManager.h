@@ -20,8 +20,12 @@ class FileTransferManager : public JObject
 public:
     static FileTransferManager* me();
 
+signals:
+    void chatReceived(Connection* conn, const QString& msg);
+
 public slots:
     void shareFilesTo(Connection* conn, const QList<QUrl> &urls);
+    void sendChatTo(Connection* conn, const QString& msg);
 
 private slots:
     void onNewMsgCome(Connection *sender, Message *msg);

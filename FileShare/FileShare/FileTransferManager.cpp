@@ -7,8 +7,10 @@
 #include "Messages/ShareResponseMsg.h"
 #include "Messages/FileTransferMsg.h"
 #include "Messages/FilePartTransferMsg.h"
+#include "Messages/ChatMsg.h"
 #include "FileTransferHandlers.h"
 #include "Utils.h"
+
 
 struct FileTransferManagerPri {
 };
@@ -41,15 +43,28 @@ void FileTransferManager::shareFilesTo(Connection *conn, const QList<QUrl> &urls
 }
 
 
+void FileTransferManager::sendChatTo(Connection *conn, const QString &msg)
+{
+    ChatMsg* chatMsg = new ChatMsg(msg);
+    conn->sendMessage(chatMsg);
+}
+
+
 void FileTransferManager::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (msg->typeId() == FileTransferHeaderInfoMsg::TypeID) {
         FileMgrUIHandler->addRootFileReceiverHandler(sender, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
         msg->deleteLater();
     }
+
     if (msg->typeId() == FileTransferMsg::TypeID) {
         FileReceiverHandler* handler = new FileReceiverHandler(sender, qobject_cast<FileTransferMsg*>(msg));
         FileMgrUIHandler->addReceiverHandler(sender, handler);
         handler->start();
+    }
+
+    if (msg->typeId() == ChatMsg::TypeID) {
+        emit chatReceived(sender, (qobject_cast<ChatMsg*>(msg))->string());
+        msg->deleteLater();
     }
 }

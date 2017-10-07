@@ -131,7 +131,7 @@ public:
     QString saveFolderPathForRootUUID(const QString& rootUuid);
 
 signals:
-    void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);
+    void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);    
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
