@@ -162,7 +162,7 @@ Rectangle {
         onAccepted: {
             if (teChat.text.trim()) {
                 FileMgr.sendChatTo(view.connObj, teChat.text.trim())
-                transferHistoryModel.append({chat : {msg: teChat.text.trim(), sending: true}})
+                transferHistoryModel.append({chat : {msg: teChat.text.trim(), sending: true}, info: undefined})
             }
         }
     }
@@ -183,7 +183,7 @@ Rectangle {
         target: FileMgrUIHandler
         onFileTransfer: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({info :  uiInfo})
+                transferHistoryModel.append({info :  uiInfo, chat: undefined})
             }
         }
     }
@@ -192,7 +192,7 @@ Rectangle {
         target: FileMgr
         onChatReceived: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({chat : {msg: msg, sending: false}})
+                transferHistoryModel.append({chat : {msg: msg, sending: false}, info: undefined})
             }
         }
     }
