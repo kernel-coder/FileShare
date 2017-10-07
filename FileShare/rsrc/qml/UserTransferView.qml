@@ -51,11 +51,11 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 5
                     anchors.bottomMargin: 0
-                    visible: info
+                    visible: isFile
                     Image {
                         id: imgDirection
                         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                        source: info ? ( info.sizeTotalFile != info.sizeFileProgress ?
+                        source: isFile ? ( info.sizeTotalFile != info.sizeFileProgress ?
                                     (info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" :
                                                       "qrc:/images/rsrc/images/btn-download.png")
                                   :
@@ -73,13 +73,15 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 12
                             linkColor: "white"
-                            text: info ? "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile) : ""
+                            text: isFile ? "<a href=\"file:///%1\">%2</a> [%3/%4]"
+                                           .arg(info.filePathRoot).arg(info.filePath)
+                                           .arg(info.countFileProgress).arg(info.countTotalFile) : ""
                             onLinkActivated: Utils.openUrl(link)
                         }
                         ProgressBarEx {
                             anchors.left: parent.left; anchors.right: parent.right
-                            maximumValue: info ? info.sizeTotalFile : 0
-                            value: info ? info.sizeFileProgress : 0
+                            maximumValue: isFile ? info.sizeTotalFile : 0
+                            value: isFile ? info.sizeFileProgress : 0
                         }
                     }
                 }
@@ -90,7 +92,7 @@ Rectangle {
                     verticalAlignment: Qt.AlignVCenter
                     wrapMode: Text.WordWrap
                     color: "blue"
-                    visible: chat && chat.sending
+                    visible: !isFile && chat && chat.sending
                     text : chat ? + chat.msg + " #ME"  : ""
                     onLinkActivated: Utils.openUrl(link)
                 }
@@ -101,7 +103,7 @@ Rectangle {
                     verticalAlignment: Qt.AlignVCenter
                     wrapMode: Text.WordWrap
                     color: "red"
-                    visible: chat && !chat.sending
+                    visible: !isFile && chat && !chat.sending
                     text : chat ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
                     onLinkActivated: Utils.openUrl(link)
                 }
@@ -162,7 +164,7 @@ Rectangle {
         onAccepted: {
             if (teChat.text.trim()) {
                 FileMgr.sendChatTo(view.connObj, teChat.text.trim())
-                transferHistoryModel.append({chat : {msg: teChat.text.trim(), sending: true}, info: null})
+                transferHistoryModel.append({info: null, isFile: false, chat : {msg: teChat.text.trim(), sending: true}})
             }
         }
     }
@@ -183,7 +185,7 @@ Rectangle {
         target: FileMgrUIHandler
         onFileTransfer: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({info :  uiInfo, chat: null})
+                transferHistoryModel.append({info : uiInfo, isFile: true, chat: null})
             }
         }
     }
@@ -192,7 +194,7 @@ Rectangle {
         target: FileMgr
         onChatReceived: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({chat : {msg: msg, sending: false}, info: null})
+                transferHistoryModel.append({info: null, isFile: false, chat : {msg: msg, sending: false}})
             }
         }
     }
