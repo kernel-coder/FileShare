@@ -251,8 +251,10 @@ Item {
             for (var i = 0; i < peersModel.count; i++) {
                 var obj = peersModel.get(i);
                 if (obj.connObj == connection) {
+                    var discView = container.viewAt(i)
                     container.removeAt(i)
                     peersModel.remove(i, 1);
+                    discView.destroy()
                     console.log('removed peer from ui');
                     break;
                 }

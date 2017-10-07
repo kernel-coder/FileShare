@@ -51,11 +51,11 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 5
                     anchors.bottomMargin: 0
-                    visible: info != undefined
+                    visible: info != null
                     Image {
                         id: imgDirection
                         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                        source: info != undefined ? ( info.sizeTotalFile != info.sizeFileProgress ?
+                        source: info != null ? ( info.sizeTotalFile != info.sizeFileProgress ?
                                     (info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" :
                                                       "qrc:/images/rsrc/images/btn-download.png")
                                   :
@@ -73,13 +73,13 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 12
                             linkColor: "white"
-                            text: info != undefined ? "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile) : ""
+                            text: info != null ? "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile) : ""
                             onLinkActivated: Utils.openUrl(link)
                         }
                         ProgressBarEx {
                             anchors.left: parent.left; anchors.right: parent.right
-                            maximumValue: info != undefined ? info.sizeTotalFile : 0
-                            value: info != undefined ? info.sizeFileProgress : 0
+                            maximumValue: info != null ? info.sizeTotalFile : 0
+                            value: info != null ? info.sizeFileProgress : 0
                         }
                     }
                     LabelEx {
@@ -89,8 +89,8 @@ Rectangle {
                         verticalAlignment: Qt.AlignVCenter
                         wrapMode: Text.WordWrap
                         color: "blue"
-                        visible: chat != undefined && chat.sending
-                        text : chat != undefined ? + chat.msg + " #ME"  : ""
+                        visible: chat != null && chat.sending
+                        text : chat != null ? + chat.msg + " #ME"  : ""
                         onLinkActivated: Utils.openUrl(link)
                     }
                     LabelEx {
@@ -100,8 +100,8 @@ Rectangle {
                         verticalAlignment: Qt.AlignVCenter
                         wrapMode: Text.WordWrap
                         color: "red"
-                        visible: chat != undefined && !chat.sending
-                        text : chat != undefined ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
+                        visible: chat != null && !chat.sending
+                        text : chat != null ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
                         onLinkActivated: Utils.openUrl(link)
                     }
                 }
@@ -162,7 +162,7 @@ Rectangle {
         onAccepted: {
             if (teChat.text.trim()) {
                 FileMgr.sendChatTo(view.connObj, teChat.text.trim())
-                transferHistoryModel.append({chat : {msg: teChat.text.trim(), sending: true}, info: undefined})
+                transferHistoryModel.append({chat : {msg: teChat.text.trim(), sending: true}, info: null})
             }
         }
     }
@@ -183,7 +183,7 @@ Rectangle {
         target: FileMgrUIHandler
         onFileTransfer: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({info :  uiInfo, chat: undefined})
+                transferHistoryModel.append({info :  uiInfo, chat: null})
             }
         }
     }
@@ -192,7 +192,7 @@ Rectangle {
         target: FileMgr
         onChatReceived: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({chat : {msg: msg, sending: false}, info: undefined})
+                transferHistoryModel.append({chat : {msg: msg, sending: false}, info: null})
             }
         }
     }
