@@ -51,11 +51,11 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 5
                     anchors.bottomMargin: 0
-                    visible: info != null
+                    visible: info
                     Image {
                         id: imgDirection
                         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                        source: info != null ? ( info.sizeTotalFile != info.sizeFileProgress ?
+                        source: info ? ( info.sizeTotalFile != info.sizeFileProgress ?
                                     (info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" :
                                                       "qrc:/images/rsrc/images/btn-download.png")
                                   :
@@ -73,37 +73,37 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 12
                             linkColor: "white"
-                            text: info != null ? "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile) : ""
+                            text: info ? "<a href=\"file:///%1\">%2</a> [%3/%4]".arg(info.filePathRoot).arg(info.filePath).arg(info.countFileProgress).arg(info.countTotalFile) : ""
                             onLinkActivated: Utils.openUrl(link)
                         }
                         ProgressBarEx {
                             anchors.left: parent.left; anchors.right: parent.right
-                            maximumValue: info != null ? info.sizeTotalFile : 0
-                            value: info != null ? info.sizeFileProgress : 0
+                            maximumValue: info ? info.sizeTotalFile : 0
+                            value: info ? info.sizeFileProgress : 0
                         }
                     }
-                    LabelEx {
-                        anchors.fill: parent
-                        font.pixelSize: 12
-                        horizontalAlignment: Qt.AlignRight
-                        verticalAlignment: Qt.AlignVCenter
-                        wrapMode: Text.WordWrap
-                        color: "blue"
-                        visible: chat != null && chat.sending
-                        text : chat != null ? + chat.msg + " #ME"  : ""
-                        onLinkActivated: Utils.openUrl(link)
-                    }
-                    LabelEx {
-                        anchors.fill: parent
-                        font.pixelSize: 12
-                        horizontalAlignment: Qt.AlignLeft
-                        verticalAlignment: Qt.AlignVCenter
-                        wrapMode: Text.WordWrap
-                        color: "red"
-                        visible: chat != null && !chat.sending
-                        text : chat != null ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
-                        onLinkActivated: Utils.openUrl(link)
-                    }
+                }
+                LabelEx {
+                    anchors.fill: parent
+                    font.pixelSize: 12
+                    horizontalAlignment: Qt.AlignRight
+                    verticalAlignment: Qt.AlignVCenter
+                    wrapMode: Text.WordWrap
+                    color: "blue"
+                    visible: chat && chat.sending
+                    text : chat ? + chat.msg + " #ME"  : ""
+                    onLinkActivated: Utils.openUrl(link)
+                }
+                LabelEx {
+                    anchors.fill: parent
+                    font.pixelSize: 12
+                    horizontalAlignment: Qt.AlignLeft
+                    verticalAlignment: Qt.AlignVCenter
+                    wrapMode: Text.WordWrap
+                    color: "red"
+                    visible: chat && !chat.sending
+                    text : chat ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
+                    onLinkActivated: Utils.openUrl(link)
                 }
             }
         }
