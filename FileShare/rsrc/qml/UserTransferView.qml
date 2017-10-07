@@ -87,17 +87,19 @@ Rectangle {
                 }
                 LabelEx {
                     anchors.fill: parent
+                    anchors.margins: 2
                     font.pixelSize: 12
                     horizontalAlignment: Qt.AlignRight
                     verticalAlignment: Qt.AlignVCenter
                     wrapMode: Text.WordWrap
                     color: "blue"
                     visible: !isFile && chat && chat.sending
-                    text : chat ? + chat.msg + " #ME"  : ""
+                    text : chat ? chat.msg + " #ME"  : ""
                     onLinkActivated: Utils.openUrl(link)
                 }
                 LabelEx {
                     anchors.fill: parent
+                    anchors.margins: 2
                     font.pixelSize: 12
                     horizontalAlignment: Qt.AlignLeft
                     verticalAlignment: Qt.AlignVCenter
@@ -141,7 +143,7 @@ Rectangle {
         }
 
         Rectangle {
-            anchors.fill: parent
+            anchors.fill: parent;
             opacity: .5
             color: "gray"
             visible: dragArea.containsDrag
@@ -160,11 +162,12 @@ Rectangle {
         enabled: view.connObj.peerViewInfo.status == PeerViewInfoMsg.Free
         anchors.left: parent.left; anchors.right: parent.right
         anchors.bottom: parent.bottom;
-        placeholderText: "message to " + view.connObj.peerViewInfo.name
+        placeholderText: "Chat with " + view.connObj.peerViewInfo.name
         onAccepted: {
             if (teChat.text.trim()) {
                 FileMgr.sendChatTo(view.connObj, teChat.text.trim())
                 transferHistoryModel.append({info: null, isFile: false, chat : {msg: teChat.text.trim(), sending: true}})
+                teChat.text = ""
             }
         }
     }

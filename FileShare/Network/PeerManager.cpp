@@ -10,8 +10,10 @@
 #include <QNetworkConfigurationManager>
 #include <QNetworkSession>
 
+
 static const qint32 BroadcastInterval = 10000;
 static const unsigned BroadcastPort = 45000;
+
 
 PeerManager::PeerManager(NetworkManager *netMgr, QObject *parent) 
 : QObject(parent)

@@ -76,7 +76,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2
             LabelEx {
-                text: "Broadcast?"
+                text: "Broadcast"
                 anchors.verticalCenter: parent.verticalCenter
             }
 

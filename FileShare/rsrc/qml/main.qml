@@ -32,7 +32,8 @@ Window {
             anchors.fill: parent
             onStatusChanged: {
                 if( mainLoader.status == Loader.Ready ) {
-                    //splash.visible = false
+                    splash.visible = false
+                    NetMgr.updateBCEnabledChanged(NetMgr.broadcastingEnabled);
                 }
             }
         }
