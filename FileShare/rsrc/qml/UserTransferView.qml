@@ -92,7 +92,7 @@ Rectangle {
                     horizontalAlignment: Qt.AlignRight
                     verticalAlignment: Qt.AlignVCenter
                     wrapMode: Text.WordWrap
-                    color: "blue"
+                    color: "#0072C5"
                     visible: !isFile && chat && chat.sending
                     text : chat ? chat.msg + " #ME"  : ""
                     onLinkActivated: Utils.openUrl(link)
@@ -104,7 +104,7 @@ Rectangle {
                     horizontalAlignment: Qt.AlignLeft
                     verticalAlignment: Qt.AlignVCenter
                     wrapMode: Text.WordWrap
-                    color: "red"
+                    color: "#D03A41"
                     visible: !isFile && chat && !chat.sending
                     text : chat ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
                     onLinkActivated: Utils.openUrl(link)
