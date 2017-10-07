@@ -45,7 +45,9 @@ void PeerManager::setServerPort(int port)
 void PeerManager::startBroadcasting(bool on)
 {
     if (on) {
-        QTimer::singleShot(100, this, SLOT(sendBroadcastDatagram()));
+        if (!mBroadcastTimer.isActive()) {
+            QTimer::singleShot(100, this, SLOT(sendBroadcastDatagram()));
+        }
         mBroadcastTimer.start();
     }
     else {
@@ -69,7 +71,7 @@ bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 void PeerManager::sendBroadcastDatagram()
 {
     if (!mpNetManager->broadcastingEnabled()) return;
-    //qDebug() << "Starting BC...";
+    qDebug() << "Starting BC...";
     QMutexLocker locker(&mMutex);
     QByteArray datagram = serverInfo();
     bool bValidBroadcastAddresses = true;
