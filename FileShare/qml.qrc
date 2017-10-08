@@ -33,5 +33,9 @@
         <file>rsrc/images/btn-upload-pressed.png</file>
         <file>rsrc/images/settings.png</file>
         <file>rsrc/images/settings-pressed.png</file>
+        <file>rsrc/images/lan24.png</file>
+        <file>rsrc/images/lan64.png</file>
+        <file>rsrc/images/lan512.png</file>
+        <file>rsrc/images/lan16.ico</file>
     </qresource>
 </RCC>

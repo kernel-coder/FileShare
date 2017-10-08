@@ -33,7 +33,8 @@ Window {
             onStatusChanged: {
                 if( mainLoader.status == Loader.Ready ) {
                     splash.visible = false
-                    NetMgr.initialize();
+                    TrayMgr.showMessage("LAN SHaring", "App loaded!")
+                    NetMgr.initialize();                    
                 }
             }
         }
@@ -41,5 +42,15 @@ Window {
 
     Component.onCompleted: {
         mainLoader.source = "MainWindow.qml"
+    }
+
+    onClosing : {
+        close.accepted = false
+        hide()
+    }
+
+    Connections {
+        target: TrayMgr
+        onActiveWindow : show()
     }
 }

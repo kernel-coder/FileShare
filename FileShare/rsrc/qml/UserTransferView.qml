@@ -88,6 +88,7 @@ Rectangle {
                 LabelEx {
                     anchors.fill: parent
                     anchors.margins: 2
+                    anchors.leftMargin: 20
                     font.pixelSize: 12
                     horizontalAlignment: Qt.AlignRight
                     verticalAlignment: Qt.AlignVCenter
@@ -100,6 +101,7 @@ Rectangle {
                 LabelEx {
                     anchors.fill: parent
                     anchors.margins: 2
+                    anchors.rightMargin: 20
                     font.pixelSize: 12
                     horizontalAlignment: Qt.AlignLeft
                     verticalAlignment: Qt.AlignVCenter

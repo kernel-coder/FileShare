@@ -209,15 +209,19 @@ Item {
             anchors.bottom: parent.bottom
             visible: peerListView.currentIndex < 0
             color: "#000000"
+            ImageEx {
+                anchors.centerIn: parent
+                source: "qrc:/images/rsrc/images/lan512.png"
+            }
+
             LabelEx {
                 anchors.fill: parent
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter
-                color: "#ff0000"
+                color: "#00ff00"
                 text: "Seems no machines available around"
             }
         }
-
 
         ContainerView {
             id: container

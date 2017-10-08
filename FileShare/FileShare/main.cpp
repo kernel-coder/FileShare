@@ -1,4 +1,4 @@
-#include <QGuiApplication>
+#include <QApplication>
 #include <QQmlApplicationEngine>
 #include "NetworkManager.h"
 #include "Connection.h"
@@ -13,6 +13,7 @@
 #include "FileTransferHandlers.h"
 #include "AppSettings.h"
 #include <QTime>
+#include "TrayManager.h"
 
 void registersQmlComponents()
 {
@@ -28,6 +29,15 @@ static QObject* utilsProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
     Q_UNUSED(scriptEngine);
 
     return Utils::me();
+}
+
+
+static QObject* trayMgrProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return TrayMgr;
 }
 
 
@@ -69,6 +79,7 @@ static QObject* fileMgrUIHandlerProvider(QQmlEngine *engine, QJSEngine *scriptEn
 void registersSingletonObjects()
 {
     qmlRegisterSingletonType<AppSettings>("com.kcl.fileshare", 1, 0, "AppSettings", appSettingsProvider);
+    qmlRegisterSingletonType<TrayManager>("com.kcl.fileshare", 1, 0, "TrayMgr", trayMgrProvider);
     qmlRegisterSingletonType<Utils>("com.kcl.fileshare", 1, 0, "Utils", utilsProvider);
     qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "NetMgr", netMgrProvider);
     qmlRegisterSingletonType<FileTransferManager>("com.kcl.fileshare", 1, 0, "FileMgr", fileMgrProvider);
@@ -84,7 +95,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
     qInstallMessageHandler(customMessageHandler);
 
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
     app.setOrganizationName("KCL");
     app.setApplicationName("QFileShare");
 
@@ -102,6 +113,8 @@ int main(int argc, char *argv[])
     registersQmlComponents();
     registersSingletonObjects();
 
+    TrayMgr->showMessage("LAN Sharing", "Starting...", QSystemTrayIcon::Information);
+
     AppSettings::me();
     NetworkManager::me();
     FileTransferManager::me();
@@ -109,6 +122,8 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/qml/rsrc/qml/main.qml")));    
+
+
 
     return app.exec();
 }
