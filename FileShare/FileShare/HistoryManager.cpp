@@ -63,7 +63,7 @@ QList<UITransferInfoItem*> HistoryManager::getHistoryForDevice(const QString &de
         d_ptr->HistoryMap[deviceId] = mhi;
     }
 
-    QByteArray fileData = Utils::readFile(Utils::machineHistoryDir(QString("%1.json").arg(deviceId)));
+    QByteArray fileData = Utils::me()->readFile(Utils::me()->machineHistoryDir(QString("%1.json").arg(deviceId)));
 
     if (!fileData.isEmpty()) {
         if(!mhi->importFromJson(fileData)) {
@@ -86,7 +86,7 @@ void HistoryManager::onConnectionClosed(Connection *conn)
     QString deviceId = conn->peerViewInfo()->deviceId();
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
     if (mhi != nullptr) {
-        Utils::writeFile(Utils::machineHistoryDir(QString("%1.json").arg(deviceId)),
+        Utils::me()->writeFile(Utils::me()->machineHistoryDir(QString("%1.json").arg(deviceId)),
                          mhi->exportToJson());
     }
 }

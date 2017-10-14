@@ -1,11 +1,11 @@
 #pragma once
 
 #include "JObject.h"
+#include "FileTransferHandlers.h"
 
 #define HistoryMgr HistoryManager::me()
 
 class HistoryManagerPrivate;
-class UITransferInfoItem;
 class Connection;
 
 class MachineHistoryItem : public JObject
@@ -14,7 +14,7 @@ class MachineHistoryItem : public JObject
 public:
     MachineHistoryItem(QObject* p = 0) : JObject(p) {}
     MetaPropertyPublicSet(QString, deviceId)
-    MetaPropertyPublicSet_Ptr_List(UITransferInfoItem,  items)
+    MetaPropertyPublicSet_Ptr_List(UITransferInfoItem,  histories)
 };
 
 class HistoryManager : public QObject
