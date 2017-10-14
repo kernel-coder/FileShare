@@ -63,6 +63,16 @@ QString Utils::dataDirUser(const QString &file)
 }
 
 
+QString Utils::machineHistoryDir(const QString& fileName)
+{
+    QString path = dataDirUser() + "History/";
+    makePath(path);
+    if (!fileName.isEmpty())
+        path = path + fileName;
+    return path;
+}
+
+
 QString Utils::logDirUser(const QString &fileName)
 {
     QString path = dataDirUser() + "Log/";

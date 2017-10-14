@@ -106,13 +106,13 @@ class RootFileUIInfo : public JObject {
     Q_OBJECT
 public:
     RootFileUIInfo(QObject* p = 0) : JObject(p) {}
-    MetaPropertyPublicSet_Ex(bool, isSending)
-    MetaPropertyPublicSet_Ex(QString, filePathRoot)
-    MetaPropertyPublicSet_Ex(QString, filePath)
-    MetaPropertyPublicSet_Ex(int, countTotalFile)
-    MetaPropertyPublicSet_Ex(int, countFileProgress)
-    MetaPropertyPublicSet_Ex(quint64, sizeTotalFile)
-    MetaPropertyPublicSet_Ex(quint64, sizeFileProgress)
+    MetaPropertyPublicSet(bool, isSending)
+    MetaPropertyPublicSet(QString, filePathRoot)
+    MetaPropertyPublicSet(QString, filePath)
+    MetaPropertyPublicSet(int, countTotalFile)
+    MetaPropertyPublicSet(int, countFileProgress)
+    MetaPropertyPublicSet(quint64, sizeTotalFile)
+    MetaPropertyPublicSet(quint64, sizeFileProgress)
 };
 
 
@@ -122,12 +122,10 @@ public:
     static UITransferInfoItem* create(QObject* parent, RootFileUIInfo* rootFileInfo);
     static UITransferInfoItem* create(QObject* parent, const QString& chatMsg, bool sending);
     UITransferInfoItem(QObject* p = 0) : JObject(p) {}
-    MetaPropertyPublicSet_Ex(RootFileUIInfo*, fileInfo)
-    MetaPropertyPublicSet_Ex(bool, isFileTransfer)
-    MetaPropertyPublicSet_Ex(QString, chatMsg)
-    MetaPropertyPublicSet_Ex(bool, isChatSending)
-
-
+    MetaPropertyPublicSet_Ptr(RootFileUIInfo, fileInfo)
+    MetaPropertyPublicSet(bool, isFileTransfer)
+    MetaPropertyPublicSet(QString, chatMsg)
+    MetaPropertyPublicSet(bool, isChatSending)
 };
 
 

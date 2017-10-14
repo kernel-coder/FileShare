@@ -15,6 +15,7 @@ public:
     Q_INVOKABLE QString dataDirCommon(const QString& file = QString(""));
     Q_INVOKABLE QString dataDirUser(const QString& file = QString());
     Q_INVOKABLE QString logDirUser(const QString& file = QString());
+    Q_INVOKABLE QString machineHistoryDir(const QString& file = QString());
     Q_INVOKABLE QString findUniqueLogFilename(const QString& prefix);
     Q_INVOKABLE QString findUniqueFilename(const QString& dir, const QString& prefix, const QString& ext);
     Q_INVOKABLE QByteArray readFile(const QString& filename);

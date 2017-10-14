@@ -2,15 +2,17 @@
 #include <QCoreApplication>
 #include "FileTransferHandlers.h"
 #include "FileTransferManager.h"
+#include "NetworkManager.h"
 #include "Connection.h"
 #include "Utils.h"
 #include <QHash>
+#include <QDebug>
 
 class HistoryManagerPrivate {
     HistoryManager* q_ptr;
 public:
     static HistoryManager* _ParentStatic;
-    QHash<QString, QList<UITransferInfoItem*>> HistoryMap;
+    QHash<QString, MachineHistoryItem*> HistoryMap;
 
     HistoryManagerPrivate(HistoryManager* qptr)
         : q_ptr(qptr)
@@ -38,16 +40,53 @@ HistoryManager::HistoryManager(QObject *parent) : QObject(parent)
             SLOT(onNewTransferArrived(Connection*,UITransferInfoItem*)));
     connect(FileMgrUIHandler, SIGNAL(fileTransfer(Connection*,UITransferInfoItem*)),
             SLOT(onNewTransferArrived(Connection*,UITransferInfoItem*)));
+    connect(NetMgr, SIGNAL(participantLeft(Connection*)), SLOT(onConnectionClosed(Connection*)));
 }
 
 
 void HistoryManager::onNewTransferArrived(Connection *conn, UITransferInfoItem *item)
 {
-    d_ptr->HistoryMap[conn->peerViewInfo()->deviceId()].append(item);
+    QString deviceId = conn->peerViewInfo()->deviceId();
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
+    if (mhi != nullptr) {
+        mhi->appendUITransferInfoItem(item);
+    }
 }
 
 
 QList<UITransferInfoItem*> HistoryManager::getHistoryForDevice(const QString &deviceId)
 {
-    return d_ptr->HistoryMap.value(deviceId, QList<UITransferInfoItem*>());
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
+    if (mhi == nullptr) {
+        mhi = new MachineHistoryItem(this);
+        mhi->deviceId(deviceId);
+        d_ptr->HistoryMap[deviceId] = mhi;
+    }
+
+    QByteArray fileData = Utils::readFile(Utils::machineHistoryDir(QString("%1.json").arg(deviceId)));
+
+    if (!fileData.isEmpty()) {
+        if(!mhi->importFromJson(fileData)) {
+            qDebug() << "Failed to read history file for device " << deviceId;
+        }
+    }
+
+    QList<UITransferInfoItem*> items;
+
+    for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
+        items.append(mhi->itemUITransferInfoItemAt(i));
+    }
+
+    return items;
+}
+
+
+void HistoryManager::onConnectionClosed(Connection *conn)
+{
+    QString deviceId = conn->peerViewInfo()->deviceId();
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
+    if (mhi != nullptr) {
+        Utils::writeFile(Utils::machineHistoryDir(QString("%1.json").arg(deviceId)),
+                         mhi->exportToJson());
+    }
 }
