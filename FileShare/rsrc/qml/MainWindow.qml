@@ -245,10 +245,10 @@ Item {
         target: NetMgr
         onNewParticipant: {
             var view = compUserView.createObject(container, {connObj: connection})
-            view.connObj = connection
-            view.initialize();
+            view.connObj = connection            
             container.addView(view)
             peersModel.append({connObj :  connection})
+            view.initialize();
         }
 
         onParticipantLeft: {

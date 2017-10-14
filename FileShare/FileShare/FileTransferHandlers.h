@@ -105,7 +105,7 @@ private:
 class RootFileUIInfo : public JObject {
     Q_OBJECT
 public:
-    RootFileUIInfo(QObject* p = 0) : JObject(p) {}
+    Q_INVOKABLE explicit RootFileUIInfo(QObject* p = 0) : JObject(p) {}
     MetaPropertyPublicSet(bool, isSending)
     MetaPropertyPublicSet(QString, filePathRoot)
     MetaPropertyPublicSet(QString, filePath)
@@ -121,7 +121,7 @@ class UITransferInfoItem: public JObject {
 public:
     static UITransferInfoItem* create(QObject* parent, RootFileUIInfo* rootFileInfo);
     static UITransferInfoItem* create(QObject* parent, const QString& chatMsg, bool sending);
-    UITransferInfoItem(QObject* p = 0) : JObject(p) {}
+    Q_INVOKABLE explicit UITransferInfoItem(QObject* p = 0) : JObject(p) {}
     MetaPropertyPublicSet_Ptr(RootFileUIInfo, fileInfo)
     MetaPropertyPublicSet(bool, isFileTransfer)
     MetaPropertyPublicSet(QString, chatMsg)
