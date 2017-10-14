@@ -88,5 +88,7 @@ void HistoryManager::onConnectionClosed(Connection *conn)
     if (mhi != nullptr) {
         Utils::me()->writeFile(Utils::me()->machineHistoryDir(QString("%1.json").arg(deviceId)),
                          mhi->exportToJson());
+        d_ptr->HistoryMap.remove(deviceId);
+        mhi->deleteLater();
     }
 }
