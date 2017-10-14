@@ -26,6 +26,7 @@ public:
     Q_INVOKABLE QString formatSize(qint64 size);
     Q_INVOKABLE QString formatTime(qint64 ms);
     Q_INVOKABLE void openUrl(const QString& path);
+    Q_INVOKABLE QString deviceId();
 
 };
 

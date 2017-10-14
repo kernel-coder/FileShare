@@ -9,6 +9,9 @@
 #include <QHostInfo>
 #include "Server.h"
 #include "Messages/PeerViewInfoMsg.h"
+#include <QSettings>
+#include <QUuid>
+
 
 #define NetMgr NetworkManager::me()
 

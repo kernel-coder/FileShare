@@ -7,6 +7,7 @@
 #include <QSysInfo>
 #include <QtQml>
 #include <QTimer>
+#include "Utils.h"
 
 
 static int cRefCounter = 0;
@@ -87,6 +88,7 @@ void Connection::sendClientViewInfo()
 {
     mPeerInfoSent = true;
     PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
+    pvi->deviceId(Utils::me()->deviceId());
     sendMessage(pvi);
 }
 

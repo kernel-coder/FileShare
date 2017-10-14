@@ -5,6 +5,10 @@
 #include <QStandardPaths>
 #include <QDesktopServices>
 #include <QDateTime>
+#include <QString>
+#include <QUuid>
+#include <QSettings>
+
 
 Utils* Utils::me()
 {
@@ -175,4 +179,35 @@ QString Utils::formatTime(qint64 ms)
 void Utils::openUrl(const QString &path)
 {
     QDesktopServices::openUrl(QUrl(path));
+}
+
+
+QString Utils::deviceId()
+{
+    QSettings s;
+    if( s.contains("deviceId") )
+    {
+        return s.value("deviceId").toString();
+    }
+    else
+    {
+#if defined (_WIN32)
+        QString id = "W";
+#elif defined (PK_TARGET_IS_MACOS)
+        QString id = "M";
+#elif defined (PK_TARGET_IS_IOS)
+        QString id = "I";
+#elif defined (__ANDROID__)
+        QString id = "A";
+#else
+        QString id = "L";
+#endif
+
+        id += ";";
+        id += QUuid::createUuid().toString().remove('{').remove('}').toUpper().toUtf8().constData();
+        id = id.replace('-', ';');
+
+        s.setValue("deviceId", id);
+        return id;
+    }
 }

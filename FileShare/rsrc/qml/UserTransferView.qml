@@ -37,12 +37,6 @@ Rectangle {
     Item {
         anchors.left: parent.left; anchors.right: parent.right
         anchors.top: rectTitle.bottom; anchors.bottom: teChat.top
-/*
-    MetaPropertyPublicSet_Ex(RootFileUIInfo, fileInfo)
-    MetaPropertyPublicSet_Ex(bool, isFileTransfer)
-    MetaPropertyPublicSet_Ex(QString, chatMsg)
-    MetaPropertyPublicSet_Ex(bool, isChatSending)
-  */
         ListView {
             spacing: 20
             anchors.margins: 20

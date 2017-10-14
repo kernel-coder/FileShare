@@ -10,8 +10,6 @@
 #include "StatusViewer.h"
 #include "Messages/PeerViewInfoMsg.h"
 #include <QCoreApplication>
-#include <QSettings>
-#include <QSettings>
 #include "Utils.h"
 
 #define IP_PORT_PAIR(ip, port) QString("%1:%2").arg(ip).arg(port)

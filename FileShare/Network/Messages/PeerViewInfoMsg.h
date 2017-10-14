@@ -15,6 +15,7 @@ public:
     MetaPropertyPublicSet_Ex(QString, name)
     MetaPropertyPublicSet_Ex(int, port)
     MetaPropertyPublicSet_Ex(PeerStatus, status)
+    MetaPropertyPublicSet_Ex(QString, deviceId)
 
     virtual void read(QDataStream &buf);
     virtual void write(QDataStream &buf);
