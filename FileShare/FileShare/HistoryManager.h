@@ -24,7 +24,7 @@ public:
     explicit HistoryManager(QObject *parent = 0);
     static HistoryManager* me();
 
-    Q_INVOKABLE QList<UITransferInfoItem*> getHistoryForDevice(const QString& deviceId);
+    Q_INVOKABLE QVariantList getHistoryForDevice(const QString& deviceId);
 signals:
 
 public slots:

@@ -14,10 +14,10 @@ Rectangle {
 
     function initialize() {
         var historyItems = HistoryMgr.getHistoryForDevice(connObj.peerViewInfo.deviceId)
-        console.log('got histories ', historyItems)
+        console.log('got histories ', historyItems.length)
         for (var i = 0; i < historyItems.length; i++) {
-            transferHistoryModel.append(historyItems[i]);
             console.log('adding history ot ui ', historyItems[i])
+            transferHistoryModel.append(historyItems[i]);
         }
     }
 

@@ -54,7 +54,7 @@ void HistoryManager::onNewTransferArrived(Connection *conn, UITransferInfoItem *
 }
 
 
-QList<UITransferInfoItem*> HistoryManager::getHistoryForDevice(const QString &deviceId)
+QVariantList HistoryManager::getHistoryForDevice(const QString &deviceId)
 {
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
     if (mhi == nullptr) {
@@ -71,13 +71,7 @@ QList<UITransferInfoItem*> HistoryManager::getHistoryForDevice(const QString &de
         }
     }
 
-    QList<UITransferInfoItem*> items;
-
-    for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
-        items.append(mhi->itemUITransferInfoItemAt(i));
-    }
-
-    return items;
+    return mhi->histories();
 }
 
 

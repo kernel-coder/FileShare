@@ -212,11 +212,9 @@ QString Utils::deviceId()
 #else
         QString id = "L";
 #endif
-
-        id += ";";
-        id += QUuid::createUuid().toString().remove('{').remove('}').toUpper().toUtf8().constData();
-        id = id.replace('-', ';');
-
+        QString guid = QUuid::createUuid().toString().remove('{').remove('}').toUpper().toUtf8().constData();
+        guid = guid.replace("-", "");
+        id = id + "_" + guid;
         s.setValue("deviceId", id);
         return id;
     }
