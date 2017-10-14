@@ -10,7 +10,8 @@ public:
     static int TypeID ;
     enum PeerStatus {Busy,Free};
     Q_ENUMS(PeerStatus)
-    PeerViewInfoMsg(const QString& name = "", int port = 0, PeerStatus status = Free, QObject* p = 0);
+    PeerViewInfoMsg(const QString& name = "", int port = 0, PeerStatus status = Free,
+                    const QString& deviceId = "", QObject* p = 0);
 
     MetaPropertyPublicSet_Ex(QString, name)
     MetaPropertyPublicSet_Ex(int, port)

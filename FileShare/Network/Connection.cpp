@@ -87,8 +87,8 @@ void Connection::onDataReadReady()
 void Connection::sendClientViewInfo()
 {
     mPeerInfoSent = true;
-    PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(), NetMgr->status());
-    pvi->deviceId(Utils::me()->deviceId());
+    PeerViewInfoMsg* pvi = new PeerViewInfoMsg(NetMgr->username(), NetMgr->port(),
+                                               NetMgr->status(), Utils::me()->deviceId());
     sendMessage(pvi);
 }
 
