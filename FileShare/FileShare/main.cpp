@@ -105,6 +105,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QMap<QString, QByteArray>>("QMap<QString,QByteArray>");
     qRegisterMetaType<QHostAddress>("QHostAddress");
     qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
+    qRegisterMetaType<QList<UITransferInfoItem*>>("QList<UITransferInfoItem*>");
+
     qInstallMessageHandler(customMessageHandler);
 
     QApplication app(argc, argv);
