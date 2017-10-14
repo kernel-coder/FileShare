@@ -20,6 +20,7 @@ void registersQmlComponents()
     qmlRegisterType<Connection>("com.kcl.fileshare", 1, 0, "Connection");
     qmlRegisterType<PeerViewInfoMsg>("com.kcl.fileshare", 1, 0, "PeerViewInfoMsg");
     qmlRegisterType<RootFileUIInfo>("com.kcl.fileshare", 1, 0, "RootFileUIInfo");
+    qmlRegisterType<UITransferInfoItem>("com.kcl.fileshare", 1, 0, "UITransferInfoItem");
 }
 
 

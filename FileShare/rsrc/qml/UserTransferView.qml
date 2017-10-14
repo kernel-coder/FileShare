@@ -37,7 +37,12 @@ Rectangle {
     Item {
         anchors.left: parent.left; anchors.right: parent.right
         anchors.top: rectTitle.bottom; anchors.bottom: teChat.top
-
+/*
+    MetaPropertyPublicSet_Ex(RootFileUIInfo, fileInfo)
+    MetaPropertyPublicSet_Ex(bool, isFileTransfer)
+    MetaPropertyPublicSet_Ex(QString, chatMsg)
+    MetaPropertyPublicSet_Ex(bool, isChatSending)
+  */
         ListView {
             spacing: 20
             anchors.margins: 20
@@ -51,18 +56,16 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 5
                     anchors.bottomMargin: 0
-                    visible: isFile
+                    visible: isFileTransfer
                     Image {
                         id: imgDirection
                         anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                        source: isFile ? ( info.sizeTotalFile != info.sizeFileProgress ?
-                                    (info.isSending ? "qrc:/images/rsrc/images/btn-upload.png" :
+                        source: fileInfo.sizeTotalFile != fileInfo.sizeFileProgress ?
+                                    (fileInfo.isSending ? "qrc:/images/rsrc/images/btn-upload.png" :
                                                       "qrc:/images/rsrc/images/btn-download.png")
                                   :
-                                    (info.isSending ? "qrc:/images/rsrc/images/btn-upload-hovered.png" :
+                                    (fileInfo.isSending ? "qrc:/images/rsrc/images/btn-upload-hovered.png" :
                                                       "qrc:/images/rsrc/images/btn-download-hovered.png")
-                                                     )
-                                                  : ""
                     }
                     Column {
                         anchors.left: imgDirection.right; anchors.leftMargin: 5
@@ -73,15 +76,15 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             font.pixelSize: 12
                             linkColor: "white"
-                            text: isFile ? "<a href=\"file:///%1\">%2</a> [%3/%4]"
-                                           .arg(info.filePathRoot).arg(info.filePath)
-                                           .arg(info.countFileProgress).arg(info.countTotalFile) : ""
+                            text: "<a href=\"file:///%1\">%2</a> [%3/%4]"
+                                           .arg(fileInfo.filePathRoot).arg(fileInfo.filePath)
+                                           .arg(fileInfo.countFileProgress).arg(fileInfo.countTotalFile)
                             onLinkActivated: Utils.openUrl(link)
                         }
                         ProgressBarEx {
                             anchors.left: parent.left; anchors.right: parent.right
-                            maximumValue: isFile ? info.sizeTotalFile : 0
-                            value: isFile ? info.sizeFileProgress : 0
+                            maximumValue: fileInfo.sizeTotalFile
+                            value: fileInfo.sizeFileProgress
                         }
                     }
                 }
@@ -94,8 +97,8 @@ Rectangle {
                     verticalAlignment: Qt.AlignVCenter
                     wrapMode: Text.WordWrap
                     color: "#0072C5"
-                    visible: !isFile && chat && chat.sending
-                    text : chat ? chat.msg + " #ME"  : ""
+                    visible: !isFileTransfer && isChatSending
+                    text : chatMsg + " #ME"
                     onLinkActivated: Utils.openUrl(link)
                 }
                 LabelEx {
@@ -107,8 +110,8 @@ Rectangle {
                     verticalAlignment: Qt.AlignVCenter
                     wrapMode: Text.WordWrap
                     color: "#D03A41"
-                    visible: !isFile && chat && !chat.sending
-                    text : chat ? view.connObj.peerViewInfo.name + "# " + chat.msg : ""
+                    visible: !isFileTransfer && !isChatSending
+                    text : view.connObj.peerViewInfo.name + "# " + chatMsg
                     onLinkActivated: Utils.openUrl(link)
                 }
             }
@@ -168,7 +171,6 @@ Rectangle {
         onAccepted: {
             if (teChat.text.trim()) {
                 FileMgr.sendChatTo(view.connObj, teChat.text.trim())
-                transferHistoryModel.append({info: null, isFile: false, chat : {msg: teChat.text.trim(), sending: true}})
                 teChat.text = ""
             }
         }
@@ -190,16 +192,16 @@ Rectangle {
         target: FileMgrUIHandler
         onFileTransfer: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({info : uiInfo, isFile: true, chat: null})
+                transferHistoryModel.append(uiInfo)
             }
         }
     }
 
     Connections {
         target: FileMgr
-        onChatReceived: {
+        onChatTransfer: {
             if (conn == view.connObj) {
-                transferHistoryModel.append({info: null, isFile: false, chat : {msg: msg, sending: false}})
+                transferHistoryModel.append(uiInfo)
             }
         }
     }

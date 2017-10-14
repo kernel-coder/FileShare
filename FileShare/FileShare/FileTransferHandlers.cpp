@@ -228,6 +228,24 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
     }
 }
 
+UITransferInfoItem* UITransferInfoItem::create(QObject* parent, RootFileUIInfo* rootFileInfo)
+{
+    UITransferInfoItem* item = new UITransferInfoItem(parent);
+    item->fileInfo(rootFileInfo);
+    item->isFileTransfer(true);
+    return item;
+}
+
+UITransferInfoItem* UITransferInfoItem::create(QObject* parent, const QString& chatMsg, bool sending)
+{
+    UITransferInfoItem* item = new UITransferInfoItem(parent);
+    item->fileInfo(new RootFileUIInfo(parent));
+    item->isFileTransfer(false);
+    item->chatMsg(chatMsg);
+    item->isChatSending(sending);
+    return item;
+}
+
 
 
 FileTransferUIInfoHandler* FileTransferUIInfoHandler::me()
@@ -275,7 +293,7 @@ void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransfer
         info->sizeFileProgress(0);
         info->filePathRoot(sourcePath);
         d->mSentInfoStore[msg->rootUuid()] = info;
-        emit fileTransfer(conn, info);
+        emit fileTransfer(conn, UITransferInfoItem::create(conn, info));
     }
 }
 
@@ -314,7 +332,6 @@ void FileTransferUIInfoHandler::addRootFileReceiverHandler(Connection* conn, Fil
     if (!d->mReceivedInfoStore.contains(msg->rootUuid())) {
         RootFileUIInfo* info = new RootFileUIInfo(this);
         info->isSending(false);
-
         info->filePath(msg->filePath());
         info->countTotalFile(msg->fileCount());
         info->countFileProgress(0);
@@ -322,7 +339,7 @@ void FileTransferUIInfoHandler::addRootFileReceiverHandler(Connection* conn, Fil
         info->sizeFileProgress(0);
         info->filePathRoot(NetMgr->saveFolderName());
         d->mReceivedInfoStore[msg->rootUuid()] = info;
-        emit fileTransfer(conn, info);
+        emit fileTransfer(conn, UITransferInfoItem::create(conn, info));
     }
     msg->deleteLater();
 }

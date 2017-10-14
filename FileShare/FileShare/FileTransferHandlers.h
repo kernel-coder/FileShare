@@ -116,6 +116,20 @@ public:
 };
 
 
+class UITransferInfoItem: public JObject {
+    Q_OBJECT
+public:
+    static UITransferInfoItem* create(QObject* parent, RootFileUIInfo* rootFileInfo);
+    static UITransferInfoItem* create(QObject* parent, const QString& chatMsg, bool sending);
+    UITransferInfoItem(QObject* p = 0) : JObject(p) {}
+    MetaPropertyPublicSet_Ex(RootFileUIInfo*, fileInfo)
+    MetaPropertyPublicSet_Ex(bool, isFileTransfer)
+    MetaPropertyPublicSet_Ex(QString, chatMsg)
+    MetaPropertyPublicSet_Ex(bool, isChatSending)
+
+
+};
+
 
 struct FileTransferUIInfoHandlerPrivate;
 class FileTransferUIInfoHandler : public QObject {
@@ -131,7 +145,7 @@ public:
     QString saveFolderPathForRootUUID(const QString& rootUuid);
 
 signals:
-    void fileTransfer(Connection* conn, RootFileUIInfo* uiInfo);    
+    void fileTransfer(Connection* conn, UITransferInfoItem* uiInfo);
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);

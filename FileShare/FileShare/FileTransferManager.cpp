@@ -47,6 +47,7 @@ void FileTransferManager::sendChatTo(Connection *conn, const QString &msg)
 {
     ChatMsg* chatMsg = new ChatMsg(msg);
     conn->sendMessage(chatMsg);
+    emit chatTransfer(conn, UITransferInfoItem::create(conn, msg, true));
 }
 
 
@@ -64,7 +65,7 @@ void FileTransferManager::onNewMsgCome(Connection *sender, Message *msg)
     }
 
     if (msg->typeId() == ChatMsg::TypeID) {
-        emit chatReceived(sender, (qobject_cast<ChatMsg*>(msg))->string());
+        emit chatTransfer(sender, UITransferInfoItem::create(sender, (qobject_cast<ChatMsg*>(msg))->string(), false));
         msg->deleteLater();
     }
 }

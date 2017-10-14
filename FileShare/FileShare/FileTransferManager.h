@@ -12,6 +12,7 @@ class Connection;
 class Message;
 
 struct FileTransferManagerPri;
+class UITransferInfoItem;
 
 class FileTransferManager : public JObject
 {
@@ -21,7 +22,7 @@ public:
     static FileTransferManager* me();
 
 signals:
-    void chatReceived(Connection* conn, const QString& msg);
+    void chatTransfer(Connection* conn, UITransferInfoItem* uiInfo);
 
 public slots:
     void shareFilesTo(Connection* conn, const QList<QUrl> &urls);
