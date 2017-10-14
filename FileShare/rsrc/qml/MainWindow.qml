@@ -246,6 +246,7 @@ Item {
         onNewParticipant: {
             var view = compUserView.createObject(container, {connObj: connection})
             view.connObj = connection
+            view.initialize();
             container.addView(view)
             peersModel.append({connObj :  connection})
         }

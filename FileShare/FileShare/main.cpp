@@ -14,6 +14,7 @@
 #include "AppSettings.h"
 #include <QTime>
 #include "TrayManager.h"
+#include "HistoryManager.h"
 
 void registersQmlComponents()
 {
@@ -21,6 +22,7 @@ void registersQmlComponents()
     qmlRegisterType<PeerViewInfoMsg>("com.kcl.fileshare", 1, 0, "PeerViewInfoMsg");
     qmlRegisterType<RootFileUIInfo>("com.kcl.fileshare", 1, 0, "RootFileUIInfo");
     qmlRegisterType<UITransferInfoItem>("com.kcl.fileshare", 1, 0, "UITransferInfoItem");
+    qmlRegisterType<HistoryManager>("com.kcl.fileshare", 1, 0, "HistoryManager");
 }
 
 
@@ -77,6 +79,14 @@ static QObject* fileMgrUIHandlerProvider(QQmlEngine *engine, QJSEngine *scriptEn
     return FileMgrUIHandler;
 }
 
+static QObject* historyManagerProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine);
+    Q_UNUSED(scriptEngine);
+
+    return HistoryMgr;
+}
+
 void registersSingletonObjects()
 {
     qmlRegisterSingletonType<AppSettings>("com.kcl.fileshare", 1, 0, "AppSettings", appSettingsProvider);
@@ -85,6 +95,7 @@ void registersSingletonObjects()
     qmlRegisterSingletonType<NetworkManager>("com.kcl.fileshare", 1, 0, "NetMgr", netMgrProvider);
     qmlRegisterSingletonType<FileTransferManager>("com.kcl.fileshare", 1, 0, "FileMgr", fileMgrProvider);
     qmlRegisterSingletonType<FileTransferUIInfoHandler>("com.kcl.fileshare", 1, 0, "FileMgrUIHandler", fileMgrUIHandlerProvider);
+    qmlRegisterSingletonType<HistoryManager>("com.kcl.fileshare", 1, 0, "HistoryMgr", historyManagerProvider);
 }
 
 

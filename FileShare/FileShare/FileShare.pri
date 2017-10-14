@@ -6,8 +6,8 @@ SOURCES += $$PWD/main.cpp \
     $$PWD/FileTransferManager.cpp \
     $$PWD/FileTransferHandlers.cpp \
     $$PWD/AppSettings.cpp \
-    $$PWD/TrayManager.cpp
-
+    $$PWD/TrayManager.cpp \
+    $$PWD/HistoryManager.cpp
 
 HEADERS += \
     $$PWD/StatusViewer.h \
@@ -15,4 +15,5 @@ HEADERS += \
     $$PWD/FileTransferManager.h \
     $$PWD/FileTransferHandlers.h \
     $$PWD/AppSettings.h \
-    $$PWD/TrayManager.h
+    $$PWD/TrayManager.h \
+    $$PWD/HistoryManager.h

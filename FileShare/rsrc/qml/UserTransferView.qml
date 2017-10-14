@@ -12,6 +12,13 @@ Rectangle {
 
     property var transferHistoryModel : ListModel{}
 
+    function initialize() {
+        var historyItems = HistoryMgr.getHistoryForDevice(connObj.peerViewInfo.deviceId)
+        for (var i = 0; i < historyItems.length; i++) {
+            transferHistoryModel.append(historyItems[i]);
+        }
+    }
+
     Rectangle {
         id: rectTitle
         color: "#D03A41"
