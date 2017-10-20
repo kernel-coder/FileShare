@@ -37,5 +37,6 @@
         <file>rsrc/images/lan64.png</file>
         <file>rsrc/images/lan512.png</file>
         <file>rsrc/images/lan16.ico</file>
+        <file>rsrc/images/app.ico</file>
     </qresource>
 </RCC>

@@ -24,7 +24,7 @@ TrayManager* TrayManager::me()
 TrayManager::TrayManager(QObject *parent) : QSystemTrayIcon(parent)
 {
 #ifdef _WIN32
-    setIcon(QIcon("qrc:/images/rsrc/images/lan16.icon"));
+    setIcon(QIcon("qrc:/images/rsrc/images/app.ico"));
 #else
     setIcon(QIcon(QPixmap("qrc:/images/rsrc/images/lan24.png")));
 #endif

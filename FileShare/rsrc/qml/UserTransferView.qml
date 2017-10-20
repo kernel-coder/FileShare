@@ -194,6 +194,9 @@ Rectangle {
         onFileTransfer: {
             if (conn == view.connObj) {
                 transferHistoryModel.append(uiInfo)
+                if (!appWindow.visible || appWindow.visibility == Window.Minimized) {
+                    TrayMgr.showMessage(view.connObj.peerViewInfo.name, "Sending: %1".arg(uiInfofileInfo.filePath))
+                }
             }
         }
     }
@@ -203,6 +206,9 @@ Rectangle {
         onChatTransfer: {
             if (conn == view.connObj) {
                 transferHistoryModel.append(uiInfo)
+                if (!appWindow.visible || appWindow.visibility == Window.Minimized) {
+                    TrayMgr.showMessage(view.connObj.peerViewInfo.name, uiInfo.chatMsg)
+                }
             }
         }
     }

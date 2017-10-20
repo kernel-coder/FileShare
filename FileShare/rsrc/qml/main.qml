@@ -6,6 +6,7 @@ import "controls"
 import com.kcl.fileshare 1.0
 
 Window {
+    id: appWindow
     visible: true
     x: AppSettings.appPosX
     onXChanged: AppSettings.updateAppGeometry(x, y, width, height)
