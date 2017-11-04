@@ -20,6 +20,7 @@ class FileHandler : public QThread
 {
     Q_OBJECT
 public:
+    const int MSG_LEN = 4*1024*1024;
     FileHandler(Connection* conn, QObject* p = 0);
 signals:
     void sendMsg(Message* msg);

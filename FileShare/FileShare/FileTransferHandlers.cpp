@@ -17,8 +17,6 @@
 #include <QtMath>
 #include <QThread>
 
-#define MSG_LEN (1*1024*1024)
-
 
 FileHandler::FileHandler(Connection *conn, QObject *p)
     : QThread(p)
