@@ -27,16 +27,11 @@
         <file>rsrc/images/btn-install-disabled.png</file>
         <file>rsrc/images/btn-install-hovered.png</file>
         <file>rsrc/images/btn-install-pressed.png</file>
-        <file>rsrc/images/logo.png</file>
         <file>rsrc/images/btn-upload.png</file>
         <file>rsrc/images/btn-upload-hovered.png</file>
         <file>rsrc/images/btn-upload-pressed.png</file>
         <file>rsrc/images/settings.png</file>
         <file>rsrc/images/settings-pressed.png</file>
-        <file>rsrc/images/lan24.png</file>
-        <file>rsrc/images/lan64.png</file>
         <file>rsrc/images/lan512.png</file>
-        <file>rsrc/images/lan16.ico</file>
-        <file>rsrc/images/app.ico</file>
     </qresource>
 </RCC>

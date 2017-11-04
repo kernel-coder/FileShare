@@ -14,4 +14,4 @@ include ($$PWD/Network/Network.pri)
 include ($$PWD/FileShare/FileShare.pri)
 
 RESOURCES += qml.qrc
-
+win32:RC_FILE = app.rc

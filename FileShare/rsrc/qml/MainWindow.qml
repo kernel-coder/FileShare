@@ -210,8 +210,9 @@ Item {
             visible: peerListView.currentIndex < 0
             color: "#000000"
             ImageEx {
-                anchors.centerIn: parent
+                anchors.fill: parent
                 source: "qrc:/images/rsrc/images/lan512.png"
+                fillMode: Image.PreserveAspectFit
             }
 
             LabelEx {

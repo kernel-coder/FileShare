@@ -52,6 +52,6 @@ Window {
 
     Connections {
         target: TrayMgr
-        onActiveWindow : show()
+        onActivateWindow : show()
     }
 }

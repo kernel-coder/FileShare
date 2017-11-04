@@ -23,21 +23,17 @@ TrayManager* TrayManager::me()
 
 TrayManager::TrayManager(QObject *parent) : QSystemTrayIcon(parent)
 {
-#ifdef _WIN32
-    setIcon(QIcon("qrc:/images/rsrc/images/app.ico"));
-#else
-    setIcon(QIcon(QPixmap("qrc:/images/rsrc/images/lan24.png")));
-#endif
+    setIcon(QIcon(QPixmap(":/images/rsrc/images/btn-install.png")));
 
     QMenu* menu = new QMenu;
-    menu->addAction("Quite", []() {
+    menu->addAction("Quit", []() {
         qApp->quit();
     });
     setContextMenu(menu);
 
     connect(this, &QSystemTrayIcon::activated, [=](QSystemTrayIcon::ActivationReason reason) {
         if (reason == DoubleClick) {
-            emit activeWindow();
+            emit activateWindow();
         }
     });
     show();

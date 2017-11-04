@@ -13,7 +13,7 @@ public:
     static TrayManager* me();
 
 signals:
-    void activeWindow();
+    void activateWindow();
 
 public slots:
 };
