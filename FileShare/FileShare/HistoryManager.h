@@ -1,7 +1,7 @@
 #pragma once
 
 #include "JObject.h"
-#include "FileTransferHandlers.h"
+#include "FileTransfer/FileTransferUIInfoHandler.h"
 
 #define HistoryMgr HistoryManager::me()
 

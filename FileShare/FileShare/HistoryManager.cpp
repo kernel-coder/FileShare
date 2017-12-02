@@ -1,7 +1,6 @@
 #include "HistoryManager.h"
 #include <QCoreApplication>
-#include "FileTransferHandlers.h"
-#include "FileTransferManager.h"
+#include "FileTransfer/FileTransferManager.h"
 #include "NetworkManager.h"
 #include "Connection.h"
 #include "Utils.h"

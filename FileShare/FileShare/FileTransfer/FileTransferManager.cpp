@@ -8,7 +8,9 @@
 #include "Messages/FileTransferMsg.h"
 #include "Messages/FilePartTransferMsg.h"
 #include "Messages/ChatMsg.h"
-#include "FileTransferHandlers.h"
+#include "FileTransferUIInfoHandler.h"
+#include "FileSenderHandler.h"
+#include "FileReceiverHandler.h"
 #include "Utils.h"
 
 

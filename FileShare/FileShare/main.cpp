@@ -9,8 +9,8 @@
 #include "CustomLogger.h"
 #include <QDir>
 #include <QtQml>
-#include "FileTransferManager.h"
-#include "FileTransferHandlers.h"
+#include "FileTransfer/FileTransferManager.h"
+#include "FileTransfer/FileTransferUIInfoHandler.h"
 #include "AppSettings.h"
 #include <QTime>
 #include "TrayManager.h"
