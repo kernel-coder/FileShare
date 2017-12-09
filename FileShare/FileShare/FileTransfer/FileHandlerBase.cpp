@@ -12,6 +12,9 @@ FileHandlerBase::FileHandlerBase(Connection *conn, const QString& transferId, QO
     mTransferId = transferId.isEmpty() ? QUuid::createUuid().toString() : transferId;
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(this, SIGNAL(started()), this, SLOT(onThreadStarted()));
+
+    connect(mConnection, SIGNAL(newMessageArrived(Connection*,Message*)), this, SLOT(onMessageComeFrom(Connection*,Message*)));
+    connect(this, SIGNAL(sendMsg(Message*)), mConnection, SLOT(sendMessage(Message*)));
 }
 
 
@@ -21,9 +24,7 @@ QString FileHandlerBase::transferId() const
 }
 
 void FileHandlerBase::onThreadStarted()
-{
-    connect(mConnection, SIGNAL(newMessageArrived(Connection*,Message*)), this, SLOT(onMessageComeFrom(Connection*,Message*)));
-    connect(this, SIGNAL(sendMsg(Message*)), mConnection, SLOT(sendMessage(Message*)));
+{    
     handleThreadStarting();
 }
 
