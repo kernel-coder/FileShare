@@ -63,7 +63,7 @@ signals:
     void fileTransfer(Connection* conn, UITransferInfoItem* uiInfo);
 
 public slots:
-    void applyControlStatus(Connection* conn, UITransferInfoItem* item, TransferStatusFlag::ControlStatus status);
+    void applyControlStatus(Connection* conn, UITransferInfoItem* item, int status);
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);

@@ -76,6 +76,7 @@ Rectangle {
 
                         ImageButton {
                             property bool isPlaying: true
+                            width: 16; height: 16
                             visible: isFileTransfer && fileInfo.sizeFileProgress < fileInfo.sizeTotalFile &&
                                      (fileInfo.transferStatus == TransferStatusFlag.Pause
                                                         || fileInfo.transferStatus == TransferStatusFlag.Running)
@@ -84,10 +85,10 @@ Rectangle {
                             imgPressed: isPlaying ? "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
                             onClicked2: {
                                 if (isPlaying) {
-                                    FileMgrUIHandler.applyControlStatus(TransferStatusFlag.Pause)
+                                    FileMgrUIHandler.applyControlStatus(2)
                                 }
                                 else {
-                                    FileMgrUIHandler.applyControlStatus(TransferStatusFlag.Pause)
+                                    FileMgrUIHandler.applyControlStatus(1)
                                 }
 
                                 isPlaying = !isPlaying
@@ -95,6 +96,7 @@ Rectangle {
                         }
 
                         ImageButton {
+                            width: 16; height: 16
                             imgNormal: "qrc:/images/rsrc/images/btn-cancel.png"
                             imgHover: "qrc:/images/rsrc/images/btn-cancel.png"
                             imgPressed: "qrc:/images/rsrc/images/btn-cancel-pressed.png"
