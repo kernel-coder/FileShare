@@ -39,9 +39,11 @@ void FileTransferManager::shareFilesTo(Connection *conn, const QList<QUrl> &urls
 {
     qDebug() << urls.first().toString();
     QStringList files = Utils::me()->urlsToFiles(urls);
-    FileSenderHandler* handler = new FileSenderHandler(conn, files);
-    FileMgrUIHandler->addSenderHandler(conn, handler);
-    handler->start();
+    foreach (QString rootFile, files) {
+        FileSenderHandler* handler = new FileSenderHandler(conn, QStringList(rootFile));
+        FileMgrUIHandler->addSenderHandler(conn, handler);
+        handler->start();
+    }
 }
 
 
@@ -56,13 +58,8 @@ void FileTransferManager::sendChatTo(Connection *conn, const QString &msg)
 void FileTransferManager::onNewMsgCome(Connection *sender, Message *msg)
 {
     if (msg->typeId() == FileTransferHeaderInfoMsg::TypeID) {
-        FileMgrUIHandler->addRootFileReceiverHandler(sender, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
-        msg->deleteLater();
-    }
-
-    if (msg->typeId() == FileTransferMsg::TypeID) {
-        FileReceiverHandler* handler = new FileReceiverHandler(sender, qobject_cast<FileTransferMsg*>(msg));
-        FileMgrUIHandler->addReceiverHandler(sender, handler);
+        FileReceiverHandler* handler = new FileReceiverHandler(sender, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
+        FileMgrUIHandler->addReceiverHandler(sender, handler, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
         handler->start();
     }
 

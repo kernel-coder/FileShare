@@ -7,9 +7,13 @@ class FileTransferHeaderInfoMsg : public Message
     Q_OBJECT
 public:
     static int TypeID ;
-    FileTransferHeaderInfoMsg(const QString& rootUuid = "", const QString& filePath = "", int count = 0, quint64 size = 0, QObject* p =0);
+    FileTransferHeaderInfoMsg(const QString& transferId = ""
+            , const QString& filePath = ""
+            , int count = 0
+            , quint64 size = 0
+            , QObject* p = 0);
 
-    MetaPropertyPublicSet_Ex(QString, rootUuid)
+    MetaPropertyPublicSet_Ex(QString, transferId)
     MetaPropertyPublicSet_Ex(QString, filePath)
     MetaPropertyPublicSet_Ex(int, fileCount)
     MetaPropertyPublicSet_Ex(quint64, totalSize)
@@ -25,9 +29,12 @@ class FileTransferMsg : public Message
     Q_OBJECT
 public:
     static int TypeID ;
-    FileTransferMsg(const QString& rootUuid = "", const QString& uuid = "", const QString& filename = "", QObject* p =0);
+    FileTransferMsg(const QString& transferId = ""
+            , const QString& uuid = ""
+            , const QString& filename = ""
+            , QObject* p = 0);
 
-    MetaPropertyPublicSet_Ex(QString, rootUuid)
+    MetaPropertyPublicSet_Ex(QString, transferId)
     MetaPropertyPublicSet_Ex(QString, uuid)
     MetaPropertyPublicSet_Ex(QString, basePath)
     MetaPropertyPublicSet_Ex(QString, filename)
@@ -46,6 +53,10 @@ class FileTransferAckMsg : public FileTransferMsg
     Q_OBJECT
 public:
     static int TypeID ;
-    FileTransferAckMsg(const QString& rootUuid = "", const QString& uuid = "", const QString& filename = "", QObject* p =0);
+    FileTransferAckMsg(const QString& transferId = ""
+            , const QString& uuid = ""
+            , const QString& filename = ""
+            , QObject* p = 0);
+
     virtual int typeId();
 };

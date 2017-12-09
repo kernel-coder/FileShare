@@ -3,10 +3,6 @@
 #include "PeerManager.h"
 #include <QHostInfo>
 #include "Messages/ChatMsg.h"
-#include "Messages/PlayRequestMsg.h"
-#include "Messages/PlayRequestResultMsg.h"
-#include "Messages/GameCanceledMsg.h"
-#include "Messages/LineAddedMsg.h"
 #include "StatusViewer.h"
 #include "Messages/PeerViewInfoMsg.h"
 #include <QCoreApplication>

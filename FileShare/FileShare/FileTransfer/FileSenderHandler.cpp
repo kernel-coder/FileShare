@@ -19,7 +19,7 @@
 
 
 FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files, QObject *p)
-    : FileHandlerBase(conn, p)
+    : FileHandlerBase(conn, "", p)
     , mRootFiles(files)
     , mCurrentRootFileIndex(0)
     , mCurrentFileIndex(0)
@@ -27,11 +27,21 @@ FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files,
     , mIndexOfBasePath(-1)
     , mRootTotalSize(0)
 {
+    connect(this, &FileSenderHandler::transferStatusChanged, [=](TransferStatusFlag::ControlStatus status) {
+        switch (status) {
+            case TransferStatusFlag::Running:
+                if (mAllFiles.count()) {
+                    sendFilePart(mCurrentSeqNo + 1);
+                }
+            break;
+        }
+    });
 }
 
 
 void FileSenderHandler::handleThreadStarting()
 {
+    transferStatus(TransferStatusFlag::Running);
     sendRootFile();
 }
 
@@ -54,21 +64,24 @@ void FileSenderHandler::parseFile(const QFileInfo &fi)
 
 void FileSenderHandler::sendRootFile()
 {
+    // We need to merge all root files into one, so that a single transfer handles all the files
     mAllFiles.clear();
     if (mCurrentRootFileIndex < mRootFiles.length()) {
-        mRootUuid = QUuid::createUuid().toString();
         QFileInfo fi(mRootFiles.at(mCurrentRootFileIndex));
         mRootTotalSize = 0;
         parseFile(fi);
         mIndexOfBasePath = fi.isDir() ? fi.absoluteFilePath().lastIndexOf(QDir(fi.absoluteFilePath()).dirName()) : -1;
         mCurrentFileIndex = 0;
-        FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(mRootUuid, fi.fileName(), mAllFiles.length(), mRootTotalSize);
+        FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(transferId(), fi.fileName(), mAllFiles.length(), mRootTotalSize);
         emit sendingRootFile(mConnection, msg, fi.absolutePath());
         emit sendMsg(msg);
         sendFile();
     }
     else {
+        transferStatus(TransferStatusFlag::Finished);
+        emit transferDone();
         exit();
+        this->deleteLater();
     }
 }
 
@@ -79,7 +92,7 @@ void FileSenderHandler::sendFile()
         QFileInfo fi = mAllFiles.at(mCurrentFileIndex);
         emit startingFile(mConnection, fi.absoluteFilePath());
         mFileUuid = QUuid::createUuid().toString();
-        FileTransferMsg* msg = new FileTransferMsg(mRootUuid, mFileUuid, fi.fileName());
+        FileTransferMsg* msg = new FileTransferMsg(transferId(),  mFileUuid, fi.fileName());
         if (mIndexOfBasePath >= 0) {
             QString filename = fi.absoluteFilePath();
             int index = filename.lastIndexOf(QDir(filename).dirName());
@@ -104,16 +117,19 @@ void FileSenderHandler::sendFile()
 
 void FileSenderHandler::sendFilePart(int seqNo)
 {
-    if (seqNo < mTotalSeqCount) {
-        QByteArray data = mFile->read(MSG_LEN);
-        FilePartTransferMsg* msg = new FilePartTransferMsg(mRootUuid, mFileUuid, mCurrentFileIndex + 1, seqNo, data.length(), data);
-        emit sendMsg(msg);
-    }
-    else {
-        mFile->close();
-        mFile->deleteLater();
-        mCurrentFileIndex++;
-        sendFile();
+    if (transferStatus() == TransferStatusFlag::Running) {
+        mCurrentSeqNo = seqNo;
+        if (seqNo < mTotalSeqCount) {
+            QByteArray data = mFile->read(MSG_LEN);
+            FilePartTransferMsg* msg = new FilePartTransferMsg(transferId(), mFileUuid, mCurrentFileIndex + 1, seqNo, data.length(), data);
+            emit sendMsg(msg);
+        }
+        else {
+            mFile->close();
+            mFile->deleteLater();
+            mCurrentFileIndex++;
+            sendFile();
+        }
     }
 }
 

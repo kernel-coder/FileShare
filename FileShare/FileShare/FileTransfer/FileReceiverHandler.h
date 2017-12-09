@@ -9,7 +9,7 @@ class FileReceiverHandler : public FileHandlerBase
 {
     Q_OBJECT
 public:
-    FileReceiverHandler(Connection* conn, FileTransferMsg* msg, QObject* p = 0);
+    FileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg* msg, QObject* p = 0);
     ~FileReceiverHandler();
 
 signals:
@@ -20,6 +20,7 @@ protected:
     void handleMessageComingFrom(Connection* conn, Message* msg);
 
 private:
+    FileTransferHeaderInfoMsg* mHeaderInfoMsg;
     FileTransferMsg* mFileMsg;
     QFile* mFile;
 };

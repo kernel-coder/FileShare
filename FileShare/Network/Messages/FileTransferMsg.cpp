@@ -5,9 +5,9 @@
 #include <QDebug>
 
 
-FileTransferHeaderInfoMsg::FileTransferHeaderInfoMsg(const QString& rootUuid, const QString& filePath, int count, quint64 size, QObject* p)
+FileTransferHeaderInfoMsg::FileTransferHeaderInfoMsg(const QString& transferId,  const QString& filePath, int count, quint64 size, QObject* p)
     : Message(p)
-    , _rootUuid(rootUuid)
+    , _transferId(transferId)
     , _filePath(filePath)
     , _fileCount(count)
     , _totalSize(size)
@@ -19,7 +19,7 @@ FileTransferHeaderInfoMsg::FileTransferHeaderInfoMsg(const QString& rootUuid, co
 void FileTransferHeaderInfoMsg::write(QDataStream &buf)
 {
     buf << typeId();
-    buf << _rootUuid;
+    buf << _transferId;
     buf << _filePath;
     buf << _fileCount;
     buf << _totalSize;
@@ -28,7 +28,7 @@ void FileTransferHeaderInfoMsg::write(QDataStream &buf)
 
 void FileTransferHeaderInfoMsg::read(QDataStream &buf)
 {
-    buf >> _rootUuid;
+    buf >> _transferId;
     buf >> _filePath;
     buf >> _fileCount;
     buf >> _totalSize;
@@ -38,9 +38,9 @@ void FileTransferHeaderInfoMsg::read(QDataStream &buf)
 int FileTransferHeaderInfoMsg::typeId() { return FileTransferHeaderInfoMsg::TypeID;}
 
 
-FileTransferMsg::FileTransferMsg(const QString& rootUuid, const QString& uuid, const QString& filename, QObject* p)
+FileTransferMsg::FileTransferMsg(const QString& transferId, const QString& uuid, const QString& filename, QObject* p)
     : Message(p)
-    , _rootUuid(rootUuid)
+    , _transferId(transferId)
     , _uuid(uuid)
     , _filename(filename)
 {
@@ -51,7 +51,7 @@ FileTransferMsg::FileTransferMsg(const QString& rootUuid, const QString& uuid, c
 void FileTransferMsg::write(QDataStream &buf)
 {
     buf << typeId();
-    buf << _rootUuid;
+    buf << _transferId;
     buf << _uuid;
     buf << _basePath;
     buf << _filename;
@@ -62,7 +62,7 @@ void FileTransferMsg::write(QDataStream &buf)
 
 void FileTransferMsg::read(QDataStream &buf)
 {
-    buf >> _rootUuid;
+    buf >> _transferId;
     buf >> _uuid;
     buf >> _basePath;
     buf >> _filename;
@@ -74,8 +74,10 @@ void FileTransferMsg::read(QDataStream &buf)
 int FileTransferMsg::typeId() { return FileTransferMsg::TypeID;}
 
 
-FileTransferAckMsg::FileTransferAckMsg(const QString& rootUuid, const QString& uuid, const QString& filename, QObject* p)
-    : FileTransferMsg(rootUuid, uuid, filename, p)
+FileTransferAckMsg::FileTransferAckMsg(const QString& transferId,
+                                       const QString& uuid,
+                                       const QString& filename, QObject* p)
+    : FileTransferMsg(transferId, uuid, filename, p)
 {
 }
 

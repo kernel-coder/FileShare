@@ -2,7 +2,7 @@
 
 #include "JObject.h"
 #include <QThread>
-
+#include "Messages/TransferControlMsg.h"
 
 class Connection;
 class Message;
@@ -17,9 +17,15 @@ class FileHandlerBase : public QThread
     Q_OBJECT
 public:
     const int MSG_LEN = 4*1024*1024;
-    FileHandlerBase(Connection* conn, QObject* p = 0);
+    FileHandlerBase(Connection* conn, const QString& transferId = "", QObject* p = 0);
+    QString transferId() const;
+
 signals:
     void sendMsg(Message* msg);
+    void transferDone();
+
+public:
+    MetaPropertyPublicSet_Ex(TransferStatusFlag::ControlStatus, transferStatus)
 
 private slots:
     void onThreadStarted();
@@ -29,7 +35,9 @@ protected:
     virtual void handleThreadStarting() = 0;
     virtual void handleMessageComingFrom(Connection* conn, Message* msg) = 0;
 
-protected:
+protected:    
+    QString mTransferId;
     Connection* mConnection;
+
 };
 

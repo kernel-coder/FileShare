@@ -14,9 +14,5 @@ public:
     virtual void read(QDataStream &buf);
     virtual void write(QDataStream &buf);
     virtual int typeId();
-
-
-
-private:
 };
 

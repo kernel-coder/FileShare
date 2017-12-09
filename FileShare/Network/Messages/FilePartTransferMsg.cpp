@@ -1,10 +1,10 @@
 #include "FilePartTransferMsg.h"
 
 
-FilePartTransferAckMsg::FilePartTransferAckMsg(const QString& rootUuid, const QString &uuid,
+FilePartTransferAckMsg::FilePartTransferAckMsg(const QString& transferId, const QString &uuid,
                                                int fileNo, int seqNo, int size, QObject *p)
     : Message(p)
-    , _rootUuid(rootUuid)
+    , _transferId(transferId)
     , _uuid(uuid)
     , _fileNo(fileNo)
     , _seqNo(seqNo)
@@ -17,7 +17,7 @@ FilePartTransferAckMsg::FilePartTransferAckMsg(const QString& rootUuid, const QS
 void FilePartTransferAckMsg::write(QDataStream &buf)
 {
     buf << typeId();
-    buf << _rootUuid;
+    buf << _transferId;
     buf << _uuid;
     buf << _fileNo;
     buf << _seqNo;
@@ -27,7 +27,7 @@ void FilePartTransferAckMsg::write(QDataStream &buf)
 
 void FilePartTransferAckMsg::read(QDataStream &buf)
 {
-    buf >> _rootUuid;
+    buf >> _transferId;
     buf >> _uuid;
     buf >> _fileNo;
     buf >> _seqNo;
@@ -40,9 +40,9 @@ int FilePartTransferAckMsg::typeId() { return FilePartTransferAckMsg::TypeID;}
 
 
 
-FilePartTransferMsg::FilePartTransferMsg(const QString& rootUuid, const QString &uuid, int fileNo,
+FilePartTransferMsg::FilePartTransferMsg(const QString& transferId, const QString &uuid, int fileNo,
                                          int seqNo, int size, const QByteArray &data, QObject *p)
-    : FilePartTransferAckMsg(rootUuid, uuid, fileNo, seqNo, size, p)
+    : FilePartTransferAckMsg(transferId, uuid, fileNo, seqNo, size, p)
     , _data(data)
 {
 

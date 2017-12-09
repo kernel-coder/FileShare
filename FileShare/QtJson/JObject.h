@@ -191,6 +191,13 @@
     private: void x(t v){if (_##x != v) {_##x = v; emit x##Changed(v);}}
 
 // t: type, x: property name
+#define MetaPropertyProtectedSet_Ex(t, x) Q_SIGNALS: void x##Changed(t i); \
+    private: Q_PROPERTY(t x READ x WRITE x NOTIFY x##Changed) \
+    private: t _##x;  \
+    public: t x() {return _##x;} \
+    protected: void x(t v){if (_##x != v) {_##x = v; emit x##Changed(v);}}
+
+// t: type, x: property name
 #define MetaPropertyPublicSet_Ex(t, x) Q_SIGNALS: void x##Changed(t i); \
     private: Q_PROPERTY(t x READ x WRITE x NOTIFY x##Changed) \
     private: t _##x;  \

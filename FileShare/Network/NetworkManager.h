@@ -19,10 +19,6 @@ class Connection;
 class PeerManager;
 class Message;
 class ChatMsg;
-class PlayRequestMsg;
-class PlayRequestResultMsg;
-class GameCanceledMsg;
-class LineAddedMsg;
 
 class NetworkManager : public QObject
 {

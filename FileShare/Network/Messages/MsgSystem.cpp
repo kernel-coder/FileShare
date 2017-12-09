@@ -4,12 +4,8 @@
 #include "PeerViewInfoMsg.h"
 #include "ShareRequestMsg.h"
 #include "ShareResponseMsg.h"
-
+#include "TransferControlMsg.h"
 #include "ChatMsg.h"
-#include "PlayRequestMsg.h"
-#include "PlayRequestResultMsg.h"
-#include "GameCanceledMsg.h"
-#include "LineAddedMsg.h"
 #include "FileTransferMsg.h"
 #include "FilePartTransferMsg.h"
 #include <QDebug>
@@ -25,6 +21,8 @@ int FileTransferMsg::TypeID = _msgIdCounter++;
 int FileTransferAckMsg::TypeID = _msgIdCounter++;
 int FilePartTransferMsg::TypeID = _msgIdCounter++;
 int FilePartTransferAckMsg::TypeID = _msgIdCounter++;
+int TransferControlMsg::TypeID = _msgIdCounter++;
+
 
 MsgSystem::MsgSystem(QObject *parent) :
     QObject(parent)
@@ -68,6 +66,9 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
     }
     else if (msgTypeId == ChatMsg::TypeID) {
         msg = new ChatMsg();
+    }
+    else if (msgTypeId == TransferControlMsg::TypeID) {
+        msg = new TransferControlMsg();
     }
 
     if(msg){

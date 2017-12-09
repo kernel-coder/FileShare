@@ -9,18 +9,15 @@ HEADERS += \
     $$PWD/PeerManager.h \
     $$PWD/Server.h \
     $$PWD/Messages/ChatMsg.h \
-    $$PWD/Messages/GameCanceledMsg.h \
-    $$PWD/Messages/LineAddedMsg.h \
     $$PWD/Messages/Message.h \
     $$PWD/Messages/MsgSystem.h \
     $$PWD/Messages/PeerViewInfoMsg.h \
-    $$PWD/Messages/PlayRequestMsg.h \
-    $$PWD/Messages/PlayRequestResultMsg.h \
     $$PWD/Messages/ServerInfoMsg.h \
     $$PWD/Messages/ShareRequestMsg.h \
     $$PWD/Messages/ShareResponseMsg.h \
     $$PWD/Messages/FileTransferMsg.h \
-    $$PWD/Messages/FilePartTransferMsg.h
+    $$PWD/Messages/FilePartTransferMsg.h \
+    $$PWD/Messages/TransferControlMsg.h
 
 SOURCES += \
     #$$PWD/ChatWnd.cpp \
@@ -30,15 +27,12 @@ SOURCES += \
     $$PWD/PeerManager.cpp \
     $$PWD/Server.cpp \
     $$PWD/Messages/ChatMsg.cpp \
-    $$PWD/Messages/GameCanceledMsg.cpp \
-    $$PWD/Messages/LineAddedMsg.cpp \
     $$PWD/Messages/Message.cpp \
     $$PWD/Messages/MsgSystem.cpp \
     $$PWD/Messages/PeerViewInfoMsg.cpp \
-    $$PWD/Messages/PlayRequestMsg.cpp \
-    $$PWD/Messages/PlayRequestResultMsg.cpp \
     $$PWD/Messages/ServerInfoMsg.cpp \
     $$PWD/Messages/ShareRequestMsg.cpp \
     $$PWD/Messages/ShareResponseMsg.cpp \
     $$PWD/Messages/FileTransferMsg.cpp \
-    $$PWD/Messages/FilePartTransferMsg.cpp
+    $$PWD/Messages/FilePartTransferMsg.cpp \
+    $$PWD/Messages/TransferControlMsg.cpp

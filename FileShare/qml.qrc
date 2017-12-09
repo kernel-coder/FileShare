@@ -33,5 +33,9 @@
         <file>rsrc/images/settings.png</file>
         <file>rsrc/images/settings-pressed.png</file>
         <file>rsrc/images/lan512.png</file>
+        <file>rsrc/images/pause.png</file>
+        <file>rsrc/images/pause-pressed.png</file>
+        <file>rsrc/images/play.png</file>
+        <file>rsrc/images/play-pressed.png</file>
     </qresource>
 </RCC>

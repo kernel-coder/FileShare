@@ -68,6 +68,26 @@ Rectangle {
                                     (fileInfo.isSending ? "qrc:/images/rsrc/images/btn-upload-hovered.png" :
                                                       "qrc:/images/rsrc/images/btn-download-hovered.png")
                     }
+
+                    ImageButton {
+                        property bool isPlaying: true
+                        visible: isFileTransfer && (fileInfo.transferStatus == TransferStatusFlag.Pause
+                                                    || fileInfo.transferStatus == TransferStatusFlag.Running)
+                        imgNormal: isPlaying ? "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
+                        imgHover: isPlaying ? "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
+                        imgPressed: isPlaying ? "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
+                        onClicked2: {
+                            if (isPlaying) {
+                                FileMgrUIHandler.applyControlStatus(TransferStatusFlag.Pause)
+                            }
+                            else {
+                                FileMgrUIHandler.applyControlStatus(TransferStatusFlag.Pause)
+                            }
+
+                            isPlaying = !isPlaying
+                        }
+                    }
+
                     Column {
                         anchors.left: imgDirection.right; anchors.leftMargin: 5
                         anchors.right: parent.right

@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QFileInfoList>
 #include <QThread>
+#include "Messages/TransferControlMsg.h"
 
 #define FileMgrUIHandler FileTransferUIInfoHandler::me()
 
@@ -16,10 +17,12 @@ class FilePartTransferAckMsg;
 class FileSenderHandler;
 class FileReceiverHandler;
 
+
 class RootFileUIInfo : public JObject {
     Q_OBJECT
 public:
     Q_INVOKABLE explicit RootFileUIInfo(QObject* p = 0) : JObject(p) {}
+    MetaPropertyPublicSet(QString, transferId)
     MetaPropertyPublicSet(bool, isSending)
     MetaPropertyPublicSet(QString, filePathRoot)
     MetaPropertyPublicSet(QString, filePath)
@@ -27,6 +30,7 @@ public:
     MetaPropertyPublicSet(int, countFileProgress)
     MetaPropertyPublicSet(quint64, sizeTotalFile)
     MetaPropertyPublicSet(quint64, sizeFileProgress)
+    MetaPropertyPublicSet(TransferStatusFlag::ControlStatus, transferStatus)
 };
 
 
@@ -52,12 +56,14 @@ public:
     ~FileTransferUIInfoHandler();
 
     void addSenderHandler(Connection* conn, FileSenderHandler* fsh);
-    void addRootFileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg* msg);
-    void addReceiverHandler(Connection* conn, FileReceiverHandler* frh);
-    QString saveFolderPathForRootUUID(const QString& rootUuid);
+    void addReceiverHandler(Connection* conn, FileReceiverHandler* frh, FileTransferHeaderInfoMsg* msg);
+    QString saveFolderPathForTransferID(const QString& transferId);
 
 signals:
     void fileTransfer(Connection* conn, UITransferInfoItem* uiInfo);
+
+public slots:
+    void applyControlStatus(Connection* conn, UITransferInfoItem* item, TransferStatusFlag::ControlStatus status);
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);

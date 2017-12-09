@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QFileInfoList>
 
+
 class FileSenderHandler : public FileHandlerBase
 {
     Q_OBJECT
@@ -18,7 +19,7 @@ signals:
     void startingFile(Connection* conn, const QString& file);
     void sendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
     void fileSent(Connection* conn, FileTransferAckMsg* msg);
-    void filePartSent(Connection* conn, FilePartTransferAckMsg* msg);
+    void filePartSent(Connection* conn, FilePartTransferAckMsg* msg);    
 
 private slots:
     void sendRootFile();
@@ -28,12 +29,11 @@ private:
     void sendFile();
     void sendFilePart(int seqNo);
 
-private:
+private:    
     QStringList mRootFiles;
     int mCurrentRootFileIndex;
 
     // a root transfer related
-    QString mRootUuid;
     QFileInfoList mAllFiles;
     int mCurrentFileIndex;
     int mIndexOfBasePath;
@@ -43,4 +43,5 @@ private:
     QString mFileUuid;
     int mTotalSeqCount;
     QFile* mFile;
+    int mCurrentSeqNo;
 };

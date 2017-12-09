@@ -11,6 +11,7 @@
 #include <QtQml>
 #include "FileTransfer/FileTransferManager.h"
 #include "FileTransfer/FileTransferUIInfoHandler.h"
+#include "Messages/TransferControlMsg.h"
 #include "AppSettings.h"
 #include <QTime>
 #include "TrayManager.h"
@@ -23,6 +24,7 @@ void registersQmlComponents()
     qmlRegisterType<RootFileUIInfo>("com.kcl.fileshare", 1, 0, "RootFileUIInfo");
     qmlRegisterType<UITransferInfoItem>("com.kcl.fileshare", 1, 0, "UITransferInfoItem");
     qmlRegisterType<HistoryManager>("com.kcl.fileshare", 1, 0, "HistoryManager");
+    qmlRegisterType<TransferStatusFlag>("com.kcl.fileshare", 1, 0, "TransferStatusFlag");
 }
 
 
@@ -96,6 +98,7 @@ void registersSingletonObjects()
     qmlRegisterSingletonType<FileTransferManager>("com.kcl.fileshare", 1, 0, "FileMgr", fileMgrProvider);
     qmlRegisterSingletonType<FileTransferUIInfoHandler>("com.kcl.fileshare", 1, 0, "FileMgrUIHandler", fileMgrUIHandlerProvider);
     qmlRegisterSingletonType<HistoryManager>("com.kcl.fileshare", 1, 0, "HistoryMgr", historyManagerProvider);
+
 }
 
 
