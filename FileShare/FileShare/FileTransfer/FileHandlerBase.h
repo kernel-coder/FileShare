@@ -16,7 +16,7 @@ class FileHandlerBase : public QThread
 {
     Q_OBJECT
 public:
-    const int MSG_LEN = 4*1024*1024;
+    const int MSG_LEN = 1024;
     FileHandlerBase(Connection* conn, const QString& transferId = "", QObject* p = 0);
     QString transferId() const;
 
