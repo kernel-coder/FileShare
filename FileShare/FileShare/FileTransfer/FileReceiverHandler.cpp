@@ -61,12 +61,12 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
                 mFile = new QFile(filename);
                 qDebug() << "Receving file "  << filename;
                 mFile->open(QFile::WriteOnly);
-                FileTransferAckMsg* msg = new FileTransferAckMsg(mFileMsg->transferId(), mFileMsg->uuid(), mFileMsg->filename());
-                msg->basePath(mFileMsg->basePath());
-                msg->size(mFileMsg->size());
-                msg->seqCount(mFileMsg->seqCount());
-                msg->fileNo(mFileMsg->fileNo());
-                emit sendMsg(msg);
+                FileTransferAckMsg* ackMsg = new FileTransferAckMsg(mFileMsg->transferId(), mFileMsg->uuid(), mFileMsg->filename());
+                ackMsg->basePath(mFileMsg->basePath());
+                ackMsg->size(mFileMsg->size());
+                ackMsg->seqCount(mFileMsg->seqCount());
+                ackMsg->fileNo(mFileMsg->fileNo());
+                emit sendMsg(ackMsg);
             }
         }
         else if (msg->typeId() == FilePartTransferMsg::TypeID) {
@@ -81,15 +81,14 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
                    mFile->close();
                    mFile->deleteLater();
                    mFileMsg->deleteLater();
+                   if (fptm->fileNo() == mHeaderInfoMsg->fileCount()) {
+                       emit transferDone();
+                       exit();
+                       this->deleteLater();
+                   }
                }
 
                msg->deleteLater();
-
-               if (ackMsg->fileNo() == mHeaderInfoMsg->fileCount()) {
-                   emit transferDone();
-                   exit();
-                   this->deleteLater();
-               }
            }           
         }
     }
