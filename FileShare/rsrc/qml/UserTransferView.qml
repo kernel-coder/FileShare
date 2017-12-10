@@ -71,7 +71,7 @@ Rectangle {
 
                     Row {
                         anchors.right: parent.right
-                        anchors.rightMargin: 5
+                        anchors.rightMargin: 0
                         anchors.top: parent.top
                         anchors.topMargin: -5
                         spacing: 10
@@ -88,10 +88,10 @@ Rectangle {
                                             "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
                             onClicked2: {
                                 if (fileInfo.transferStatus == TransferStatusFlag.Running) {
-                                    FileMgrUIHandler.applyControlStatus(2)
+                                    FileMgrUIHandler.applyControlStatus(view.connObj, modelData, 2);
                                 }
                                 else {
-                                    FileMgrUIHandler.applyControlStatus(1)
+                                    FileMgrUIHandler.applyControlStatus(view.connObj, modelData, 1)
                                 }
                             }
                         }
