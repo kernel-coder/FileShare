@@ -38,8 +38,8 @@ public:
 class UITransferInfoItem: public JObject {
     Q_OBJECT
 public:
-    static UITransferInfoItem* create(QObject* parent, RootFileUIInfo* rootFileInfo);
-    static UITransferInfoItem* create(QObject* parent, const QString& chatMsg, bool sending);
+    static UITransferInfoItem* create(RootFileUIInfo* rootFileInfo);
+    static UITransferInfoItem* create(const QString& chatMsg, bool sending);
     Q_INVOKABLE explicit UITransferInfoItem(QObject* p = 0) : JObject(p) {}
     MetaPropertyPublicSet_Ptr(RootFileUIInfo, fileInfo)
     MetaPropertyPublicSet(bool, isFileTransfer)

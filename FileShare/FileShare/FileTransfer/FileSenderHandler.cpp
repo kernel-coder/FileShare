@@ -213,7 +213,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
 void FileSenderHandler::cleanup(bool)
 {
     if (!mTransferDone) {
-        auto failedItem = new TransferFailedItem(FileMgr);
+        auto failedItem = new TransferFailedItem();
         failedItem->transferId(transferId());
         foreach(QString rootFile, mRootFiles) {
             failedItem->appendrootFiles(rootFile);

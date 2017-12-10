@@ -48,6 +48,7 @@ void HistoryManager::onNewTransferArrived(Connection *conn, UITransferInfoItem *
     QString deviceId = conn->peerViewInfo()->deviceId();
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
     if (mhi != nullptr) {
+        item->setParent(mhi);
         mhi->appendUITransferInfoItem(item);
     }
 }

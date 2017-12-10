@@ -74,6 +74,7 @@ void FileTransferManager::addFailedTransferItem(TransferFailedItem *item)
         }
     }
 
+    item->setParent(d->FailedItems);
     d->FailedItems->appendTransferFailedItem(item);
     d->saveFailedTransfer();
 }
@@ -125,7 +126,7 @@ void FileTransferManager::sendChatTo(Connection *conn, const QString &msg)
 {
     ChatMsg* chatMsg = new ChatMsg(msg);
     conn->sendMessage(chatMsg);
-    emit chatTransfer(conn, UITransferInfoItem::create(conn, msg, true));
+    emit chatTransfer(conn, UITransferInfoItem::create(msg, true));
 }
 
 
@@ -145,7 +146,7 @@ void FileTransferManager::onNewMsgCome(Connection *conn, Message *msg)
         }
     }
     else if (msg->typeId() == ChatMsg::TypeID) {
-        emit chatTransfer(conn, UITransferInfoItem::create(conn, (qobject_cast<ChatMsg*>(msg))->string(), false));
+        emit chatTransfer(conn, UITransferInfoItem::create((qobject_cast<ChatMsg*>(msg))->string(), false));
         msg->deleteLater();
     }
 }

@@ -60,6 +60,16 @@ struct FileTransferUIInfoHandlerPrivate {
         }
         return false;
     }
+
+    void addUIInfo(RootFileUIInfo* fileInfo)
+    {
+        if (!UIInfoStore.contains(fileInfo->transferId())) {
+            UIInfoStore[fileInfo->transferId()] = fileInfo;
+            QObject::connect(fileInfo, &RootFileUIInfo::destroyed, [=](){
+                UIInfoStore.remove(fileInfo->transferId());
+            });
+        }
+    }
 };
 
 
@@ -100,8 +110,8 @@ void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransfer
             info = utii->fileInfo();
         }
         else {
-            info = new RootFileUIInfo(this);
-            emit fileTransfer(conn, UITransferInfoItem::create(conn, info));
+            info = new RootFileUIInfo();
+            emit fileTransfer(conn, UITransferInfoItem::create(info));
         }
         info->transferId(msg->transferId());
         info->isSending(true);
@@ -112,7 +122,7 @@ void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransfer
         info->sizeFileProgress(msg->progressSize());
         info->filePathRoot(sourcePath);
         info->transferStatus(TransferStatusFlag::Running);
-        d->UIInfoStore[msg->transferId()] = info;
+        d->addUIInfo(info);
     }
 }
 
@@ -182,8 +192,8 @@ void FileTransferUIInfoHandler::addReceiverHandler(Connection* conn, FileReceive
             info = utii->fileInfo();
         }
         else {
-            info = new RootFileUIInfo(this);
-            emit fileTransfer(conn, UITransferInfoItem::create(conn, info));
+            info = new RootFileUIInfo();
+            emit fileTransfer(conn, UITransferInfoItem::create(info));
         }
         info->transferId(msg->transferId());
         info->isSending(false);
@@ -194,7 +204,7 @@ void FileTransferUIInfoHandler::addReceiverHandler(Connection* conn, FileReceive
         info->sizeFileProgress(msg->progressSize());
         info->filePathRoot(NetMgr->saveFolderName());
         info->transferStatus(TransferStatusFlag::Running);
-        d->UIInfoStore[msg->transferId()] = info;        
+        d->addUIInfo(info);
     }
 
 
@@ -217,19 +227,20 @@ void FileTransferUIInfoHandler::onReceivedFilePart(Connection* conn, FilePartTra
 }
 
 
-UITransferInfoItem* UITransferInfoItem::create(QObject* parent, RootFileUIInfo* rootFileInfo)
+UITransferInfoItem* UITransferInfoItem::create(RootFileUIInfo* rootFileInfo)
 {
-    UITransferInfoItem* item = new UITransferInfoItem(parent);
+    UITransferInfoItem* item = new UITransferInfoItem();
+    rootFileInfo->setParent(item);
     item->fileInfo(rootFileInfo);
     item->isFileTransfer(true);
     return item;
 }
 
 
-UITransferInfoItem* UITransferInfoItem::create(QObject* parent, const QString& chatMsg, bool sending)
+UITransferInfoItem* UITransferInfoItem::create(const QString& chatMsg, bool sending)
 {
-    UITransferInfoItem* item = new UITransferInfoItem(parent);
-    item->fileInfo(new RootFileUIInfo(parent));
+    UITransferInfoItem* item = new UITransferInfoItem();
+    item->fileInfo(new RootFileUIInfo(item));
     item->isFileTransfer(false);
     item->chatMsg(chatMsg);
     item->isChatSending(sending);
