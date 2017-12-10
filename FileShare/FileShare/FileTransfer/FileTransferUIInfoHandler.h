@@ -63,7 +63,7 @@ signals:
     void fileTransfer(Connection* conn, UITransferInfoItem* uiInfo);
 
 public slots:
-    void applyControlStatus(Connection* conn, UITransferInfoItem* item, int status);
+    Q_INVOKABLE void applyControlStatus(Connection* conn, RootFileUIInfo* fileInfo, int status);
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);

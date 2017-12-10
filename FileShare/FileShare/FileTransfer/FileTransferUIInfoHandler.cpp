@@ -131,20 +131,18 @@ QString FileTransferUIInfoHandler::saveFolderPathForTransferID(const QString &tr
 }
 
 
-void FileTransferUIInfoHandler::applyControlStatus(Connection* conn, UITransferInfoItem* item, int istatus)
+void FileTransferUIInfoHandler::applyControlStatus(Connection* conn, RootFileUIInfo* fileInfo, int istatus)
 {
     TransferStatusFlag::ControlStatus status = (TransferStatusFlag::ControlStatus)istatus;
-    if (item->isFileTransfer()) {
-        auto hanlder = d->TransferHandlers.value(item->fileInfo()->transferId(), 0);
-        if (hanlder) {
-            hanlder->transferStatus(status);
-        }
-
-        TransferControlMsg* msg = new TransferControlMsg;
-        msg->transferId(item->fileInfo()->transferId());
-        msg->status(status);
-        conn->sendMessage(msg);
+    auto hanlder = d->TransferHandlers.value(fileInfo->transferId(), 0);
+    if (hanlder) {
+        hanlder->transferStatus(status);
     }
+
+    TransferControlMsg* msg = new TransferControlMsg;
+    msg->transferId(fileInfo->transferId());
+    msg->status(status);
+    conn->sendMessage(msg);
 }
 
 

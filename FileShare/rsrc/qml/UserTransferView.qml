@@ -87,11 +87,12 @@ Rectangle {
                             imgPressed: fileInfo.transferStatus == TransferStatusFlag.Running ?
                                             "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
                             onClicked2: {
+                                console.log("clicked pause -- ", fileInfo.transferStatus)
                                 if (fileInfo.transferStatus == TransferStatusFlag.Running) {
-                                    FileMgrUIHandler.applyControlStatus(view.connObj, modelData, 2);
+                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, 2);
                                 }
                                 else {
-                                    FileMgrUIHandler.applyControlStatus(view.connObj, modelData, 1)
+                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, 1)
                                 }
                             }
                         }
