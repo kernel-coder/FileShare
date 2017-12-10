@@ -135,8 +135,8 @@ void FileSenderHandler::sendFilePart(int seqNo)
 void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg)
 {
     if (sender == mConnection) {
-        if (msg->typeId() == FileTransferHeaderInfoMsg::TypeID) {
-            FileTransferHeaderInfoMsg* ackMsg = qobject_cast<FileTransferHeaderInfoMsg*>(msg);
+        if (msg->typeId() == FileTransferHeaderInfoAckMsg::TypeID) {
+            FileTransferHeaderInfoAckMsg* ackMsg = qobject_cast<FileTransferHeaderInfoAckMsg*>(msg);
             if (ackMsg->transferId() == transferId()) {
                 ackMsg->deleteLater();
                 sendFile();
