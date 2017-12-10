@@ -65,8 +65,9 @@ struct FileTransferUIInfoHandlerPrivate {
     {
         if (!UIInfoStore.contains(fileInfo->transferId())) {
             UIInfoStore[fileInfo->transferId()] = fileInfo;
+            QString transferId = fileInfo->transferId();
             QObject::connect(fileInfo, &RootFileUIInfo::destroyed, [=](){
-                UIInfoStore.remove(fileInfo->transferId());
+                UIInfoStore.remove(transferId);
             });
         }
     }
