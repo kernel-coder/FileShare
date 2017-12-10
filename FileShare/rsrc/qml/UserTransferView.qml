@@ -72,26 +72,27 @@ Rectangle {
                     Row {
                         anchors.right: parent.right
                         anchors.rightMargin: 5
+                        anchors.top: parent.top
+                        anchors.topMargin: -5
                         spacing: 10
 
                         ImageButton {
-                            property bool isPlaying: true
                             width: 16; height: 16
                             visible: isFileTransfer && fileInfo.sizeFileProgress < fileInfo.sizeTotalFile &&
-                                     (fileInfo.transferStatus == TransferStatusFlag.Pause
-                                                        || fileInfo.transferStatus == TransferStatusFlag.Running)
-                            imgNormal: isPlaying ? "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
-                            imgHover: isPlaying ? "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
-                            imgPressed: isPlaying ? "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
+                                     (fileInfo.transferStatus == TransferStatusFlag.Pause || fileInfo.transferStatus == TransferStatusFlag.Running)
+                            imgNormal: fileInfo.transferStatus == TransferStatusFlag.Running ?
+                                           "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
+                            imgHover: fileInfo.transferStatus == TransferStatusFlag.Running ?
+                                          "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
+                            imgPressed: fileInfo.transferStatus == TransferStatusFlag.Running ?
+                                            "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
                             onClicked2: {
-                                if (isPlaying) {
+                                if (fileInfo.transferStatus == TransferStatusFlag.Running) {
                                     FileMgrUIHandler.applyControlStatus(2)
                                 }
                                 else {
                                     FileMgrUIHandler.applyControlStatus(1)
                                 }
-
-                                isPlaying = !isPlaying
                             }
                         }
 
