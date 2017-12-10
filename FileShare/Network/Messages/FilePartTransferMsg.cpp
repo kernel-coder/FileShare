@@ -2,13 +2,14 @@
 
 
 FilePartTransferAckMsg::FilePartTransferAckMsg(const QString& transferId, const QString &uuid,
-                                               int fileNo, int seqNo, int size, QObject *p)
+                                               int fileNo, int seqNo, int size, int progressSize, QObject *p)
     : Message(p)
     , _transferId(transferId)
     , _uuid(uuid)
     , _fileNo(fileNo)
     , _seqNo(seqNo)
     , _size(size)
+    , _progressSize(progressSize)
 {
 
 }
@@ -22,6 +23,7 @@ void FilePartTransferAckMsg::write(QDataStream &buf)
     buf << _fileNo;
     buf << _seqNo;
     buf << _size;
+    buf << _progressSize;
 }
 
 
@@ -32,6 +34,7 @@ void FilePartTransferAckMsg::read(QDataStream &buf)
     buf >> _fileNo;
     buf >> _seqNo;
     buf >> _size;
+    buf >> _progressSize;
 }
 
 
@@ -41,8 +44,8 @@ int FilePartTransferAckMsg::typeId() { return FilePartTransferAckMsg::TypeID;}
 
 
 FilePartTransferMsg::FilePartTransferMsg(const QString& transferId, const QString &uuid, int fileNo,
-                                         int seqNo, int size, const QByteArray &data, QObject *p)
-    : FilePartTransferAckMsg(transferId, uuid, fileNo, seqNo, size, p)
+                                         int seqNo, int size, int progressSize, const QByteArray &data, QObject *p)
+    : FilePartTransferAckMsg(transferId, uuid, fileNo, seqNo, size, progressSize, p)
     , _data(data)
 {
 

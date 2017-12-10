@@ -16,6 +16,7 @@ class FileTransferAckMsg;
 class FilePartTransferAckMsg;
 class FileSenderHandler;
 class FileReceiverHandler;
+class FileHandlerBase;
 
 
 class RootFileUIInfo : public JObject {
@@ -55,6 +56,7 @@ public:
     static FileTransferUIInfoHandler* me();
     ~FileTransferUIInfoHandler();
 
+    FileHandlerBase* getHandler(const QString& transferId);
     void addSenderHandler(Connection* conn, FileSenderHandler* fsh);
     void addReceiverHandler(Connection* conn, FileReceiverHandler* frh, FileTransferHeaderInfoMsg* msg);
     QString saveFolderPathForTransferID(const QString& transferId);

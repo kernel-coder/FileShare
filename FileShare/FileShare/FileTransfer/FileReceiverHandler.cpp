@@ -19,7 +19,6 @@
 #include "FileTransferUIInfoHandler.h"
 
 
-
 FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg *msg, QObject *p)
     : FileHandlerBase(conn, msg->transferId(), p)
     , mHeaderInfoMsg(msg)
@@ -64,8 +63,19 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
                 filename += mFileMsg->filename();
                 mFile = new QFile(filename);
                 qDebug() << "Receving file "  << filename;
-                mFile->open(QFile::WriteOnly);
-                FileTransferAckMsg* ackMsg = new FileTransferAckMsg(mFileMsg->transferId(), mFileMsg->uuid(), mFileMsg->filename());
+                if (mFileMsg->startPos() > 0) {
+                    if (mFile->open(QFile::Append)) {
+                        qint64 cp = mFile->pos();
+                        mFile->seek(0);
+                        cp = mFile->pos();
+                        mFile->seek(mFileMsg->startPos());
+                        cp = mFile->pos();
+                    }
+                }
+                else {
+                    mFile->open(QFile::WriteOnly);
+                }
+                FileTransferAckMsg* ackMsg = new FileTransferAckMsg(mFileMsg->transferId(), mFileMsg->uuid(), mFileMsg->filename(), mFileMsg->startPos());
                 ackMsg->basePath(mFileMsg->basePath());
                 ackMsg->size(mFileMsg->size());
                 ackMsg->seqCount(mFileMsg->seqCount());
@@ -75,9 +85,9 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
         }
         else if (msg->typeId() == FilePartTransferMsg::TypeID) {
            FilePartTransferMsg* fptm = qobject_cast<FilePartTransferMsg*>(msg);
-           if (fptm->uuid() == mFileMsg->uuid()) {
+           if (mFileMsg && fptm->uuid() == mFileMsg->uuid()) {
                mFile->write(fptm->data());
-               FilePartTransferAckMsg* ackMsg = new FilePartTransferAckMsg(fptm->transferId(), fptm->uuid(), fptm->fileNo(), fptm->seqNo(), fptm->size());
+               FilePartTransferAckMsg* ackMsg = new FilePartTransferAckMsg(fptm->transferId(), fptm->uuid(), fptm->fileNo(), fptm->seqNo(), fptm->size(), fptm->progressSize());
                emit receivedFilePart(mConnection, ackMsg);
                emit sendMsg(ackMsg);
 
@@ -86,9 +96,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *m
                    mFile->deleteLater();
                    mFileMsg->deleteLater();
                    if (fptm->fileNo() == mHeaderInfoMsg->fileCount()) {
-                       emit transferDone();
-                       exit();
-                       this->deleteLater();
+                       destroyMyself(true);
                    }
                }
 

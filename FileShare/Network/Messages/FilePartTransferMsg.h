@@ -12,6 +12,7 @@ public:
                            int fileNo = -1,
                            int seqNo = -1,
                            int size  = 0,
+                           int progressSize  = 0,
                            QObject* p = 0);
 
     MetaPropertyPublicSet_Ex(QString, transferId)
@@ -19,6 +20,7 @@ public:
     MetaPropertyPublicSet_Ex(int, seqNo)
     MetaPropertyPublicSet_Ex(int, fileNo)
     MetaPropertyPublicSet_Ex(int, size)
+    MetaPropertyPublicSet_Ex(quint64, progressSize)
 
     virtual void read(QDataStream &buf);
     virtual void write(QDataStream &buf);
@@ -35,6 +37,7 @@ public:
                         int fileNo = -1,
                         int seqNo = -1,
                         int size  = 0,
+                        int progressSize  = 0,
                         const QByteArray& data = QByteArray(),
                         QObject* p = 0);
 

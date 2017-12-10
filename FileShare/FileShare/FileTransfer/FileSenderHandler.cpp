@@ -7,6 +7,7 @@
 #include "Messages/ShareResponseMsg.h"
 #include "Messages/FileTransferMsg.h"
 #include "Messages/FilePartTransferMsg.h"
+#include "FileTransferManager.h"
 #include "Utils.h"
 #include <QHash>
 #include <QPair>
@@ -20,13 +21,45 @@
 
 FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files, QObject *p)
     : FileHandlerBase(conn, "", p)
+    , mTransferDone(false)
+    , mFailedItem(0)
     , mRootFiles(files)
     , mCurrentRootFileIndex(0)
     , mCurrentFileIndex(0)
     , mFile(0)
     , mIndexOfBasePath(-1)
     , mRootTotalSize(0)
+    , mRootProgressSize(0)
+    , mCurrentSeqNo(-1)
 {
+    connect(this, &FileSenderHandler::transferStatusChanged, [=](TransferStatusFlag::ControlStatus status) {
+        switch (status) {
+            case TransferStatusFlag::Running:
+                if (mAllFiles.count()) {
+                    sendFilePart(mCurrentSeqNo + 1);
+                }
+            break;
+        }
+    });
+}
+
+
+FileSenderHandler::FileSenderHandler(Connection* conn, TransferFailedItem* item, QObject *p)
+    : FileHandlerBase(conn, item->transferId(), p)
+    , mTransferDone(false)
+    , mFailedItem(item)
+    , mCurrentRootFileIndex(item->rootFileIndex())
+    , mCurrentFileIndex(item->fileIndex())
+    , mFile(0)
+    , mIndexOfBasePath(-1)
+    , mRootTotalSize(0)
+    , mRootProgressSize(item->progressSize())
+    , mCurrentSeqNo(item->seqIndex())
+{
+    for (int i = 0; i < item->countrootFiles(); i++) {
+        mRootFiles.append(item->itemrootFilesAt(i));
+    }
+
     connect(this, &FileSenderHandler::transferStatusChanged, [=](TransferStatusFlag::ControlStatus status) {
         switch (status) {
             case TransferStatusFlag::Running:
@@ -70,16 +103,17 @@ void FileSenderHandler::sendRootFile()
         mRootTotalSize = 0;
         parseFile(fi);
         mIndexOfBasePath = fi.isDir() ? fi.absoluteFilePath().lastIndexOf(QDir(fi.absoluteFilePath()).dirName()) : -1;
-        mCurrentFileIndex = 0;
-        FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(transferId(), fi.fileName(), mAllFiles.length(), mRootTotalSize);
+        mCurrentFileIndex = mFailedItem? mFailedItem->fileIndex() : 0;
+        FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(transferId(), fi.fileName(),
+                                                                       mAllFiles.length(), mFailedItem ? mFailedItem->fileIndex() : 0,
+                                                                       mRootTotalSize, mFailedItem ? mFailedItem->progressSize() : 0);
+
         emit sendingRootFile(mConnection, msg, fi.absolutePath());
         emit sendMsg(msg);
     }
     else {
-        transferStatus(TransferStatusFlag::Finished);
-        emit transferDone();
-        exit();
-        this->deleteLater();
+        mTransferDone = true;
+        destroyMyself(true);
     }
 }
 
@@ -90,7 +124,7 @@ void FileSenderHandler::sendFile()
         QFileInfo fi = mAllFiles.at(mCurrentFileIndex);
         emit startingFile(mConnection, fi.absoluteFilePath());
         mFileUuid = QUuid::createUuid().toString();
-        FileTransferMsg* msg = new FileTransferMsg(transferId(),  mFileUuid, fi.fileName());
+        FileTransferMsg* msg = new FileTransferMsg(transferId(),  mFileUuid, fi.fileName(), mFailedItem ? mFailedItem->progressSize() : 0);
         if (mIndexOfBasePath >= 0) {
             QString filename = fi.absoluteFilePath();
             int index = filename.lastIndexOf(QDir(filename).dirName());
@@ -116,10 +150,9 @@ void FileSenderHandler::sendFile()
 void FileSenderHandler::sendFilePart(int seqNo)
 {
     if (transferStatus() == TransferStatusFlag::Running) {
-        mCurrentSeqNo = seqNo;
         if (seqNo < mTotalSeqCount) {
             QByteArray data = mFile->read(MSG_LEN);
-            FilePartTransferMsg* msg = new FilePartTransferMsg(transferId(), mFileUuid, mCurrentFileIndex + 1, seqNo, data.length(), data);
+            FilePartTransferMsg* msg = new FilePartTransferMsg(transferId(), mFileUuid, mCurrentFileIndex + 1, seqNo, data.length(), mRootProgressSize + data.length(), data);
             emit sendMsg(msg);
         }
         else {
@@ -142,14 +175,23 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
                 sendFile();
             }
         }
-        if (msg->typeId() == FileTransferAckMsg::TypeID) {
+        else if (msg->typeId() == FileTransferAckMsg::TypeID) {
             FileTransferAckMsg* ackMsg = qobject_cast<FileTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mFileUuid) {
                 emit fileSent(mConnection, ackMsg);
                 mFile = new QFile(mAllFiles.at(mCurrentFileIndex).absoluteFilePath());
                 qDebug() << "sending file "  << mFile->fileName();
                 if (mFile->open(QFile::ReadOnly)) {
-                    sendFilePart(0);
+                    if (mFailedItem) {
+                        mFile->seek(mFailedItem->progressSize());
+                        sendFilePart(mFailedItem->seqIndex() + 1);
+                        mFailedItem->deleteLater();
+                        mFailedItem = 0;
+                    }
+                    else {
+                        sendFilePart( 0);
+                    }
+
                 }
                 ackMsg->deleteLater();
             }
@@ -157,6 +199,8 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
         else if (msg->typeId() == FilePartTransferAckMsg::TypeID) {
             FilePartTransferAckMsg* ackMsg = qobject_cast<FilePartTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mFileUuid) {
+                mCurrentSeqNo = ackMsg->seqNo();
+                mRootProgressSize = ackMsg->progressSize();
                 emit filePartSent(mConnection, ackMsg);
                 sendFilePart(ackMsg->seqNo() + 1);
                 ackMsg->deleteLater();
@@ -165,3 +209,19 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
     }
 }
 
+
+void FileSenderHandler::cleanup(bool)
+{
+    if (!mTransferDone) {
+        auto failedItem = new TransferFailedItem(FileMgr);
+        failedItem->transferId(transferId());
+        foreach(QString rootFile, mRootFiles) {
+            failedItem->appendrootFiles(rootFile);
+        }
+        failedItem->rootFileIndex(mCurrentRootFileIndex);
+        failedItem->fileIndex(mCurrentFileIndex);
+        failedItem->seqIndex(mCurrentSeqNo);
+        failedItem->progressSize(mRootProgressSize);
+        FileMgr->addFailedTransferItem(failedItem);
+    }
+}

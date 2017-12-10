@@ -4,6 +4,7 @@
 #include "FileReceiverHandler.h"
 #include "NetworkManager.h"
 #include "Connection.h"
+#include "FileTransferManager.h"
 #include <QCoreApplication>
 #include <QDebug>
 #include "Messages/ShareRequestMsg.h"
@@ -71,6 +72,12 @@ FileTransferUIInfoHandler::FileTransferUIInfoHandler(QObject *p)
 FileTransferUIInfoHandler::~FileTransferUIInfoHandler() {delete d;}
 
 
+FileHandlerBase* FileTransferUIInfoHandler::getHandler(const QString& transferId)
+{
+    return d->TransferHandlers.value(transferId, 0);
+}
+
+
 void FileTransferUIInfoHandler::addSenderHandler(Connection* conn, FileSenderHandler *fsh)
 {
     connect(fsh, SIGNAL(sendingRootFile(Connection*, FileTransferHeaderInfoMsg*, QString)),
@@ -134,8 +141,9 @@ QString FileTransferUIInfoHandler::saveFolderPathForTransferID(const QString &tr
 void FileTransferUIInfoHandler::applyControlStatus(Connection* conn, RootFileUIInfo* fileInfo, int iStatus)
 {
     TransferStatusFlag::ControlStatus status = (TransferStatusFlag::ControlStatus)iStatus;
-    auto hanlder = d->TransferHandlers.value(fileInfo->transferId(), 0);
+    auto hanlder = d->TransferHandlers.value(fileInfo->transferId(), 0);    
     if (hanlder) {
+        // paused transfer
         hanlder->transferStatus(status);
         TransferControlMsg* msg = new TransferControlMsg;
         msg->transferId(fileInfo->transferId());
@@ -143,11 +151,15 @@ void FileTransferUIInfoHandler::applyControlStatus(Connection* conn, RootFileUII
         conn->sendMessage(msg);
     }
     else {
+        // failed transfer
         if (fileInfo->isSending()) {
-
+            FileMgr->resumeFailedTransfer(conn, fileInfo->transferId());
         }
         else {
-
+            TransferControlMsg* msg = new TransferControlMsg;
+            msg->transferId(fileInfo->transferId());
+            msg->status(status);
+            conn->sendMessage(msg);
         }
     }
 }
@@ -161,9 +173,9 @@ void FileTransferUIInfoHandler::addReceiverHandler(Connection* conn, FileReceive
         info->isSending(false);
         info->filePath(msg->filePath());
         info->countTotalFile(msg->fileCount());
-        info->countFileProgress(0);
+        info->countFileProgress(msg->fileIndex());
         info->sizeTotalFile(msg->totalSize());
-        info->sizeFileProgress(0);
+        info->sizeFileProgress(msg->progressSize());
         info->filePathRoot(NetMgr->saveFolderName());
         info->transferStatus(TransferStatusFlag::Running);
         d->UIInfoStore[msg->transferId()] = info;
@@ -181,7 +193,7 @@ void FileTransferUIInfoHandler::onReceivedFilePart(Connection* conn, FilePartTra
 {
     RootFileUIInfo* rfi = d->UIInfoStore.value(msg->transferId(), 0);
     if (rfi) {
-        rfi->sizeFileProgress(rfi->sizeFileProgress() + msg->size());
+        rfi->sizeFileProgress(msg->progressSize());
         rfi->countFileProgress(msg->fileNo() - 1);
         if (rfi->sizeFileProgress() == rfi->sizeTotalFile()) {
             rfi->countFileProgress(msg->fileNo());

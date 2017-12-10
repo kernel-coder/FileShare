@@ -32,8 +32,10 @@ private slots:
     void onMessageComeFrom(Connection* conn, Message* msg);
 
 protected:
+    void destroyMyself(bool success);
     virtual void handleThreadStarting() = 0;
     virtual void handleMessageComingFrom(Connection* conn, Message* msg) = 0;
+    virtual void cleanup(bool){}
 
 protected:    
     QString mTransferId;

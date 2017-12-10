@@ -4,14 +4,18 @@
 #include <QUrl>
 #include <QFileInfoList>
 
+class TransferFailedItem;
+
 
 class FileSenderHandler : public FileHandlerBase
 {
     Q_OBJECT
 public:
     FileSenderHandler(Connection* conn, const QStringList& files, QObject* p = 0);
+    FileSenderHandler(Connection *conn, TransferFailedItem* item, QObject *p = 0);
 
 protected:
+    void cleanup(bool success);
     void handleThreadStarting();
     void handleMessageComingFrom(Connection* conn, Message* msg);
 
@@ -30,6 +34,8 @@ private:
     void sendFilePart(int seqNo);
 
 private:    
+    bool mTransferDone;
+    TransferFailedItem* mFailedItem;
     QStringList mRootFiles;
     int mCurrentRootFileIndex;
 
@@ -38,10 +44,12 @@ private:
     int mCurrentFileIndex;
     int mIndexOfBasePath;
     quint64 mRootTotalSize;
+    quint64 mRootProgressSize;
 
     // a file transfer related
     QString mFileUuid;
     int mTotalSeqCount;
     QFile* mFile;
     int mCurrentSeqNo;
+
 };

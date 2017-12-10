@@ -14,12 +14,36 @@ class Message;
 struct FileTransferManagerPri;
 class UITransferInfoItem;
 
+class TransferFailedItem : public JObject {
+    Q_OBJECT
+public:
+    TransferFailedItem(QObject* p = 0) : JObject(p) {}
+    MetaPropertyPublicSet(QString, transferId)
+    MetaPropertyPublicSet_List(QString, rootFiles)
+    MetaPropertyPublicSet(int, rootFileIndex)
+    MetaPropertyPublicSet(int, fileIndex)
+    MetaPropertyPublicSet(int, seqIndex)
+    MetaPropertyPublicSet(quint64, progressSize)
+};
+
+class TransferFailedItems : public JObject {
+    Q_OBJECT
+public:
+    TransferFailedItems(QObject* p = 0) : JObject(p) {}
+    MetaPropertyPublicSet_Ptr_List(TransferFailedItem,  failedTransfers)
+};
+
 class FileTransferManager : public JObject
 {
     Q_OBJECT
     FileTransferManager(QObject* p = 0);
 public:
+    ~FileTransferManager();
     static FileTransferManager* me();
+
+    bool resumeFailedTransfer(Connection *conn, const QString& transferId);
+    void addFailedTransferItem(TransferFailedItem* item);
+    TransferFailedItem* removeFailedTransferItem(const QString& transferId);
 
 signals:
     void chatTransfer(Connection* conn, UITransferInfoItem* uiInfo);

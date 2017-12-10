@@ -1,5 +1,6 @@
 #include "FileHandlerBase.h"
 #include "Connection.h"
+#include "NetworkManager.h"
 #include "Messages/Message.h"
 #include <QUuid>
 
@@ -12,6 +13,11 @@ FileHandlerBase::FileHandlerBase(Connection *conn, const QString& transferId, QO
     mTransferId = transferId.isEmpty() ? QUuid::createUuid().toString() : transferId;
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(this, SIGNAL(started()), this, SLOT(onThreadStarted()));
+    connect(NetMgr, &NetworkManager::participantLeft, [=](Connection* conn) {
+        if (conn == mConnection) {
+            destroyMyself(false);
+        }
+    });
 }
 
 
@@ -19,6 +25,17 @@ QString FileHandlerBase::transferId() const
 {
     return mTransferId;
 }
+
+
+void FileHandlerBase::destroyMyself(bool success)
+{
+    cleanup(success);
+    transferStatus(success ? TransferStatusFlag::Finished : TransferStatusFlag::Failed);
+    emit transferDone();
+    exit();
+    this->deleteLater();
+}
+
 
 void FileHandlerBase::onThreadStarted()
 {    
