@@ -17,6 +17,7 @@ int PeerViewInfoMsg::TypeID = _msgIdCounter++;
 int ShareRequestMsg::TypeID = _msgIdCounter++;
 int ShareResponseMsg::TypeID = _msgIdCounter++;
 int FileTransferHeaderInfoMsg::TypeID = _msgIdCounter++;
+int FileTransferHeaderInfoAckMsg::TypeID = _msgIdCounter++;
 int FileTransferMsg::TypeID = _msgIdCounter++;
 int FileTransferAckMsg::TypeID = _msgIdCounter++;
 int FilePartTransferMsg::TypeID = _msgIdCounter++;
@@ -51,6 +52,9 @@ Message * MsgSystem::readAndContruct(QDataStream &stream)
     }
     else if (msgTypeId == FileTransferHeaderInfoMsg::TypeID){
         msg = new FileTransferHeaderInfoMsg();
+    }
+    else if (msgTypeId == FileTransferHeaderInfoAckMsg::TypeID){
+        msg = new FileTransferHeaderInfoAckMsg();
     }
     else if(msgTypeId == FileTransferMsg::TypeID){
         msg = new FileTransferMsg();

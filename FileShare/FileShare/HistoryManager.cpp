@@ -68,6 +68,14 @@ QVariantList HistoryManager::getHistoryForDevice(const QString &deviceId)
         if(!mhi->importFromJson(fileData)) {
             qDebug() << "Failed to read history file for device " << deviceId;
         }
+        else {
+            for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
+                auto item = mhi->itemUITransferInfoItemAt(i);
+                if (item->isFileTransfer() && item->fileInfo()->sizeFileProgress() < item->fileInfo()->sizeTotalFile()) {
+                    item->fileInfo()->transferStatus(TransferStatusFlag::Pause);
+                }
+            }
+        }
     }
 
     return mhi->histories();
@@ -79,8 +87,7 @@ void HistoryManager::onConnectionClosed(Connection *conn)
     QString deviceId = conn->peerViewInfo()->deviceId();
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
     if (mhi != nullptr) {
-        Utils::me()->writeFile(Utils::me()->machineHistoryDir(QString("%1.json").arg(deviceId)),
-                         mhi->exportToJson());
+        Utils::me()->writeFile(Utils::me()->machineHistoryDir(QString("%1.json").arg(deviceId)), mhi->exportToJson());
         d_ptr->HistoryMap.remove(deviceId);
         mhi->deleteLater();
     }

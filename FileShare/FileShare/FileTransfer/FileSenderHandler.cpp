@@ -64,7 +64,6 @@ void FileSenderHandler::parseFile(const QFileInfo &fi)
 
 void FileSenderHandler::sendRootFile()
 {
-    // We need to merge all root files into one, so that a single transfer handles all the files
     mAllFiles.clear();
     if (mCurrentRootFileIndex < mRootFiles.length()) {
         QFileInfo fi(mRootFiles.at(mCurrentRootFileIndex));
@@ -75,7 +74,6 @@ void FileSenderHandler::sendRootFile()
         FileTransferHeaderInfoMsg* msg = new FileTransferHeaderInfoMsg(transferId(), fi.fileName(), mAllFiles.length(), mRootTotalSize);
         emit sendingRootFile(mConnection, msg, fi.absolutePath());
         emit sendMsg(msg);
-        sendFile();
     }
     else {
         transferStatus(TransferStatusFlag::Finished);
@@ -137,6 +135,13 @@ void FileSenderHandler::sendFilePart(int seqNo)
 void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg)
 {
     if (sender == mConnection) {
+        if (msg->typeId() == FileTransferHeaderInfoMsg::TypeID) {
+            FileTransferHeaderInfoMsg* ackMsg = qobject_cast<FileTransferHeaderInfoMsg*>(msg);
+            if (ackMsg->transferId() == transferId()) {
+                ackMsg->deleteLater();
+                sendFile();
+            }
+        }
         if (msg->typeId() == FileTransferAckMsg::TypeID) {
             FileTransferAckMsg* ackMsg = qobject_cast<FileTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mFileUuid) {
@@ -146,16 +151,16 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
                 if (mFile->open(QFile::ReadOnly)) {
                     sendFilePart(0);
                 }
+                ackMsg->deleteLater();
             }
-            ackMsg->deleteLater();
         }
         else if (msg->typeId() == FilePartTransferAckMsg::TypeID) {
             FilePartTransferAckMsg* ackMsg = qobject_cast<FilePartTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mFileUuid) {
                 emit filePartSent(mConnection, ackMsg);
                 sendFilePart(ackMsg->seqNo() + 1);
-            }
-            ackMsg->deleteLater();
+                ackMsg->deleteLater();
+            }            
         }
     }
 }

@@ -89,10 +89,10 @@ Rectangle {
                             onClicked2: {
                                 console.log("clicked pause -- ", fileInfo.transferStatus)
                                 if (fileInfo.transferStatus == TransferStatusFlag.Running) {
-                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, 2);
+                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Pause);
                                 }
                                 else {
-                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, 1)
+                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Running)
                                 }
                             }
                         }

@@ -26,7 +26,6 @@ FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferHeaderInf
     , mFileMsg(0)
     , mFile(0)
 {
-    transferStatus(TransferStatusFlag::Running);
 }
 
 
@@ -40,7 +39,12 @@ FileReceiverHandler::~FileReceiverHandler()
 
 void FileReceiverHandler::handleThreadStarting()
 {
-
+    transferStatus(TransferStatusFlag::Running);
+    auto headerAck = new FileTransferHeaderInfoAckMsg(mHeaderInfoMsg->transferId(),
+                                                      mHeaderInfoMsg->filePath(),
+                                                      mHeaderInfoMsg->fileCount(),
+                                                      mHeaderInfoMsg->totalSize());
+    emit sendMsg(headerAck);
 }
 
 
