@@ -27,6 +27,11 @@ QString FileHandlerBase::transferId() const
 }
 
 
+Connection* FileHandlerBase::connection()
+{
+    return mConnection;
+}
+
 void FileHandlerBase::destroyMyself(bool success)
 {
     cleanup(success);

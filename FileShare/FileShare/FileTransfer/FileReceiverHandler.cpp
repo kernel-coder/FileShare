@@ -47,14 +47,14 @@ void FileReceiverHandler::handleThreadStarting()
 }
 
 
-void FileReceiverHandler::handleMessageComingFrom(Connection *sender, Message *msg)
+void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg)
 {
-    if (mConnection == sender) {
+    if (mConnection == conn) {
         if (msg->typeId() == FileTransferMsg::TypeID) {
             auto fMsg = qobject_cast<FileTransferMsg*>(msg);
             if (fMsg->transferId() == mHeaderInfoMsg->transferId()) {
                 mFileMsg = fMsg;
-                QString filename = FileMgrUIHandler->saveFolderPathForTransferID(mFileMsg->transferId());
+                QString filename = FileMgrUIHandler->saveFolderPathForTransferID(conn, mFileMsg->transferId());
                 filename = filename.replace("\\", "/");
                 if (!filename.endsWith("/")) filename += "/";
                 filename += mFileMsg->basePath();

@@ -19,6 +19,7 @@ public:
     const int MSG_LEN = 1024;
     FileHandlerBase(Connection* conn, const QString& transferId = "", QObject* p = 0);
     QString transferId() const;
+    Connection* connection();
 
 signals:
     void sendMsg(Message* msg);

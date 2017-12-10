@@ -59,7 +59,7 @@ public:
     FileHandlerBase* getHandler(const QString& transferId);
     void addSenderHandler(Connection* conn, FileSenderHandler* fsh);
     void addReceiverHandler(Connection* conn, FileReceiverHandler* frh, FileTransferHeaderInfoMsg* msg);
-    QString saveFolderPathForTransferID(const QString& transferId);
+    QString saveFolderPathForTransferID(Connection* conn, const QString& transferId);
 
 signals:
     void fileTransfer(Connection* conn, UITransferInfoItem* uiInfo);

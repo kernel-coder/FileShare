@@ -36,7 +36,6 @@ FileTransferUIInfoHandler* FileTransferUIInfoHandler::me()
 
 struct FileTransferUIInfoHandlerPrivate {
     QHash<QString, FileHandlerBase*> TransferHandlers;
-    QHash<QString, RootFileUIInfo* >  UIInfoStore;
 
     bool addTransferHandler(FileHandlerBase* handler)
     {
@@ -50,26 +49,15 @@ struct FileTransferUIInfoHandlerPrivate {
             });
 
             QObject::connect(handler, &FileHandlerBase::transferStatusChanged, [=](TransferStatusFlag::ControlStatus status) {
-                auto uiInfo = UIInfoStore.value(handler->transferId(), 0);
+                auto uiInfo = HistoryMgr->getHistoryItem(handler->connection()->peerViewInfo()->deviceId(), handler->transferId());
                 if (uiInfo) {
-                    uiInfo->transferStatus(status);
+                    uiInfo->fileInfo()->transferStatus(status);
                 }
             });
 
             return true;
         }
         return false;
-    }
-
-    void addUIInfo(RootFileUIInfo* fileInfo)
-    {
-        if (!UIInfoStore.contains(fileInfo->transferId())) {
-            UIInfoStore[fileInfo->transferId()] = fileInfo;
-            QString transferId = fileInfo->transferId();
-            QObject::connect(fileInfo, &RootFileUIInfo::destroyed, [=](){
-                UIInfoStore.remove(transferId);
-            });
-        }
     }
 };
 
@@ -104,27 +92,26 @@ void FileTransferUIInfoHandler::addSenderHandler(Connection* conn, FileSenderHan
 
 void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg *msg, const QString& sourcePath)
 {
-    if (!d->UIInfoStore.contains(msg->transferId())) {
-        RootFileUIInfo* info = 0;
-        auto utii = HistoryMgr->getHistoryItem(conn->peerViewInfo()->deviceId(), msg->transferId());
-        if (utii) {
-            info = utii->fileInfo();
-        }
-        else {
-            info = new RootFileUIInfo();
-            emit fileTransfer(conn, UITransferInfoItem::create(info));
-        }
-        info->transferId(msg->transferId());
-        info->isSending(true);
-        info->filePath(msg->filePath());
-        info->countTotalFile(msg->fileCount());
-        info->countFileProgress(msg->fileIndex());
-        info->sizeTotalFile(msg->totalSize());
-        info->sizeFileProgress(msg->progressSize());
-        info->filePathRoot(sourcePath);
-        info->transferStatus(TransferStatusFlag::Running);
-        d->addUIInfo(info);
+    UITransferInfoItem* uiInfo = HistoryMgr->getHistoryItem(conn->peerViewInfo()->deviceId(), msg->transferId());
+    RootFileUIInfo* info = 0;
+    if (uiInfo) {
+        info = uiInfo->fileInfo();
     }
+    else {
+        info = new RootFileUIInfo();
+        uiInfo = UITransferInfoItem::create(info);
+        emit fileTransfer(conn, uiInfo);
+    }
+
+    info->transferId(msg->transferId());
+    info->isSending(true);
+    info->filePath(msg->filePath());
+    info->countTotalFile(msg->fileCount());
+    info->countFileProgress(msg->fileIndex());
+    info->sizeTotalFile(msg->totalSize());
+    info->sizeFileProgress(msg->progressSize());
+    info->filePathRoot(sourcePath);
+    info->transferStatus(TransferStatusFlag::Running);
 }
 
 
@@ -136,22 +123,22 @@ void FileTransferUIInfoHandler::onFileSent(Connection* conn, FileTransferAckMsg 
 
 void FileTransferUIInfoHandler::onFilePartSent(Connection* conn, FilePartTransferAckMsg *msg)
 {
-    RootFileUIInfo* rfi = d->UIInfoStore.value(msg->transferId(), 0);
-    if (rfi) {
-        rfi->sizeFileProgress(msg->progressSize());
-        rfi->countFileProgress(msg->fileNo() - 1);
-        if (rfi->sizeFileProgress() == rfi->sizeTotalFile()) {
-            rfi->countFileProgress(msg->fileNo());
+    auto uiInfo = HistoryMgr->getHistoryItem(conn->peerViewInfo()->deviceId(), msg->transferId());
+    if (uiInfo) {
+        uiInfo->fileInfo()->sizeFileProgress(msg->progressSize());
+        uiInfo->fileInfo()->countFileProgress(msg->fileNo() - 1);
+        if (uiInfo->fileInfo()->sizeFileProgress() == uiInfo->fileInfo()->sizeTotalFile()) {
+            uiInfo->fileInfo()->countFileProgress(msg->fileNo());
         }
     }
 }
 
 
-QString FileTransferUIInfoHandler::saveFolderPathForTransferID(const QString &transferId)
+QString FileTransferUIInfoHandler::saveFolderPathForTransferID(Connection* conn, const QString &transferId)
 {
-    RootFileUIInfo* info = d->UIInfoStore.value(transferId, 0);
-    if (info) {
-        return info->filePathRoot();
+    auto uiInfo = HistoryMgr->getHistoryItem(conn->peerViewInfo()->deviceId(), transferId);
+    if (uiInfo) {
+        return uiInfo->fileInfo()->filePathRoot();
     }
     return NetMgr->saveFolderName();
 }
@@ -186,27 +173,26 @@ void FileTransferUIInfoHandler::applyControlStatus(Connection* conn, RootFileUII
 
 void FileTransferUIInfoHandler::addReceiverHandler(Connection* conn, FileReceiverHandler *frh, FileTransferHeaderInfoMsg* msg)
 {
-    if (!d->UIInfoStore.contains(msg->transferId())) {
-        RootFileUIInfo* info = 0;
-        auto utii = HistoryMgr->getHistoryItem(conn->peerViewInfo()->deviceId(), msg->transferId());
-        if (utii) {
-            info = utii->fileInfo();
-        }
-        else {
-            info = new RootFileUIInfo();
-            emit fileTransfer(conn, UITransferInfoItem::create(info));
-        }
-        info->transferId(msg->transferId());
-        info->isSending(false);
-        info->filePath(msg->filePath());
-        info->countTotalFile(msg->fileCount());
-        info->countFileProgress(msg->fileIndex());
-        info->sizeTotalFile(msg->totalSize());
-        info->sizeFileProgress(msg->progressSize());
-        info->filePathRoot(NetMgr->saveFolderName());
-        info->transferStatus(TransferStatusFlag::Running);
-        d->addUIInfo(info);
+    UITransferInfoItem* uiInfo = HistoryMgr->getHistoryItem(conn->peerViewInfo()->deviceId(), msg->transferId());
+    RootFileUIInfo* info = 0;
+    if (uiInfo) {
+        info = uiInfo->fileInfo();
     }
+    else {
+        info = new RootFileUIInfo();
+        uiInfo = UITransferInfoItem::create(info);
+        emit fileTransfer(conn, uiInfo);
+    }
+
+    info->transferId(msg->transferId());
+    info->isSending(false);
+    info->filePath(msg->filePath());
+    info->countTotalFile(msg->fileCount());
+    info->countFileProgress(msg->fileIndex());
+    info->sizeTotalFile(msg->totalSize());
+    info->sizeFileProgress(msg->progressSize());
+    info->filePathRoot(NetMgr->saveFolderName());
+    info->transferStatus(TransferStatusFlag::Running);
 
 
     if (d->addTransferHandler(frh)) {
@@ -217,12 +203,12 @@ void FileTransferUIInfoHandler::addReceiverHandler(Connection* conn, FileReceive
 
 void FileTransferUIInfoHandler::onReceivedFilePart(Connection* conn, FilePartTransferAckMsg *msg)
 {
-    RootFileUIInfo* rfi = d->UIInfoStore.value(msg->transferId(), 0);
-    if (rfi) {
-        rfi->sizeFileProgress(msg->progressSize());
-        rfi->countFileProgress(msg->fileNo() - 1);
-        if (rfi->sizeFileProgress() == rfi->sizeTotalFile()) {
-            rfi->countFileProgress(msg->fileNo());
+    auto uiInfo = HistoryMgr->getHistoryItem(conn->peerViewInfo()->deviceId(), msg->transferId());
+    if (uiInfo) {
+        uiInfo->fileInfo()->sizeFileProgress(msg->progressSize());
+        uiInfo->fileInfo()->countFileProgress(msg->fileNo() - 1);
+        if (uiInfo->fileInfo()->sizeFileProgress() == uiInfo->fileInfo()->sizeTotalFile()) {
+            uiInfo->fileInfo()->countFileProgress(msg->fileNo());
         }
     }
 }
