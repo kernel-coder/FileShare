@@ -82,6 +82,24 @@ QVariantList HistoryManager::getHistoryForDevice(const QString &deviceId)
 }
 
 
+UITransferInfoItem* HistoryManager::getHistoryItem(const QString &deviceId, const QString& transferId)
+{
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
+    if (mhi == nullptr) {
+        return 0;
+    }
+    else {
+        for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
+            auto item = mhi->itemUITransferInfoItemAt(i);
+            if (item->isFileTransfer() && item->fileInfo()->transferId() == transferId) {
+                return item;
+            }
+        }
+    }
+    return 0;
+}
+
+
 void HistoryManager::onConnectionClosed(Connection *conn)
 {
     QString deviceId = conn->peerViewInfo()->deviceId();

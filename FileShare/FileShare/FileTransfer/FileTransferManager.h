@@ -17,7 +17,7 @@ class UITransferInfoItem;
 class TransferFailedItem : public JObject {
     Q_OBJECT
 public:
-    TransferFailedItem(QObject* p = 0) : JObject(p) {}
+    Q_INVOKABLE TransferFailedItem(QObject* p = 0) : JObject(p) {}
     MetaPropertyPublicSet(QString, transferId)
     MetaPropertyPublicSet_List(QString, rootFiles)
     MetaPropertyPublicSet(int, rootFileIndex)
