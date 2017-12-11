@@ -34,3 +34,6 @@ void StatusViewer::showTip(QString msg, int timeout)
         mTimer.start();
     }
 }
+
+
+

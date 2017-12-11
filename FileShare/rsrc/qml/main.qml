@@ -34,7 +34,7 @@ Window {
             onStatusChanged: {
                 if( mainLoader.status == Loader.Ready ) {
                     splash.visible = false
-                    TrayMgr.showMessage("LAN SHaring", "App loaded!")
+                    TrayMgr.showMessage("LAN Sharing", "App loaded!")
                     NetMgr.initialize();                    
                 }
             }

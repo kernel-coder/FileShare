@@ -11,7 +11,7 @@ class StatusViewer : public QObject
 {
     Q_OBJECT
     StatusViewer(QObject *pParent = 0);
-public:
+public:    
     void showTip(QString msg, int timeout = 5000);
     static StatusViewer *me();
 

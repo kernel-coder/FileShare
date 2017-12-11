@@ -1,6 +1,4 @@
-#ifndef TRAYMANAGER_H
-#define TRAYMANAGER_H
-
+#pragma once
 #include <QSystemTrayIcon>
 
 #define TrayMgr TrayManager::me()
@@ -14,8 +12,8 @@ public:
 
 signals:
     void activateWindow();
+    void alertAppMessage(const QString& title, const QString& msg, const QString& description);
 
 public slots:
+    void showAppMessage(const QString& title, const QString& msg, const QString& description = "");
 };
-
-#endif // TRAYMANAGER_H

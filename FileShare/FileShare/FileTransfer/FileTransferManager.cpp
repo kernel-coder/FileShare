@@ -11,6 +11,7 @@
 #include "FileTransferUIInfoHandler.h"
 #include "FileSenderHandler.h"
 #include "FileReceiverHandler.h"
+#include "TrayManager.h"
 #include "Utils.h"
 
 
@@ -105,6 +106,9 @@ bool FileTransferManager::resumeFailedTransfer(Connection *conn, const QString &
         FileMgrUIHandler->addSenderHandler(conn, handler);
         handler->start();
         return true;
+    }
+    else {
+        TrayMgr->showAppMessage("LAN Sharing", "Failed to resume", QString("No item found with transfer id %1").arg(transferId));
     }
     return false;
 }

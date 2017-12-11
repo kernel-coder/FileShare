@@ -174,11 +174,9 @@ void FileTransferUIInfoHandler::applyControlStatus(Connection* conn, RootFileUII
 void FileTransferUIInfoHandler::deleteItem(Connection* conn, RootFileUIInfo* fileInfo)
 {
     HistoryMgr->removeHistoryItem(conn, fileInfo->transferId());
-
     auto handler = d->TransferHandlers.value(fileInfo->transferId(), 0);
     if (handler) {
         handler->destroyMyself(TransferStatusFlag::Delete);
-
         TransferControlMsg* msg = new TransferControlMsg;
         msg->transferId(fileInfo->transferId());
         msg->status(TransferStatusFlag::Delete);

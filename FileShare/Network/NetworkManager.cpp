@@ -3,7 +3,6 @@
 #include "PeerManager.h"
 #include <QHostInfo>
 #include "Messages/ChatMsg.h"
-#include "StatusViewer.h"
 #include "Messages/PeerViewInfoMsg.h"
 #include <QCoreApplication>
 #include "Utils.h"
@@ -172,7 +171,6 @@ void NetworkManager::onReadyForUse()
         mPeers.insert(key, conn);
         qDebug() << "peer connected, total peer count " << mPeers.size();
         emit newParticipant(conn);
-        StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just come in the network"), LONG_DURATION);
     }
 }
 
@@ -205,7 +203,6 @@ void NetworkManager::removeConnection(Connection *conn)
         if (iter.value() == conn) {
             mPeers.remove(iter.key());
             emit participantLeft(conn);
-            StatusViewer::me()->showTip(conn->peerViewInfo()->name() + tr(" has just left from the network"), LONG_DURATION);
             qDebug() << "peer left, total peer count " << mPeers.size();
             break;
         }

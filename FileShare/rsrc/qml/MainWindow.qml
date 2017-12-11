@@ -2,13 +2,24 @@ import QtQuick 2.3
 import QtQuick.Window 2.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.2
+import QtQuick.Dialogs 1.2
 import "controls"
 import com.kcl.fileshare 1.0
 
 
 Item {
+    id: mainWindow
     anchors.fill: parent
     property var peersModel : ListModel{}
+
+    function showMessage(title, msg, desc) {
+        messageBox.visible = true
+        msgDlg.title = title
+        msgDlg.text = msg
+        msgDlg.detailedText = desc
+        msgDlg.open()
+    }
+
 
     Rectangle {
         id: titlebar
@@ -276,30 +287,25 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-    //        {
-    //        var connection = {peerViewInfo: {name:'Peer 1', status: PeerViewInfoMsg.Free, port: 145}};
-    //        var view = compUserView.createObject(container, {connObj: connection})
-    //        view.connObj = connection
-    //        view.color = "red"
-    //        container.addView(view)
-    //        peersModel.append({connObj :  connection})
-    //        }
-    //        {
-    //        var connection = {peerViewInfo: {name:'Peer 2', status: PeerViewInfoMsg.Busy, port: 146}};
-    //        var view = compUserView.createObject(container, {connObj: connection})
-    //        view.color = "black"
-    //        view.connObj = connection
-    //        container.addView(view)
-    //        peersModel.append({connObj :  connection})
-    //        }
-    //        {
-    //        var connection = {peerViewInfo: {name:'Peer 3', status: PeerViewInfoMsg.Free, port: 145}};
-    //        var view = compUserView.createObject(container, {connObj: connection})
-    //        view.color = "maroon"
-    //        view.connObj = connection
-    //        container.addView(view)
-    //        peersModel.append({connObj :  connection})
-    //        }
+    Item {
+        id: messageBox
+        visible: false
+
+        Rectangle {
+            anchors.fill: parent
+            color: "white"
+            opacity: 0.6
+        }
+
+        MessageDialog {
+            id: msgDlg
+            onAccepted: messageBox.visible = false
+            onRejected: messageBox.visible = false
+        }
+    }
+
+    Connections {
+        target: TrayMgr
+        onAlertAppMessage: mainWindow.showMessage(title, msg, description)
     }
 }

@@ -39,3 +39,9 @@ TrayManager::TrayManager(QObject *parent) : QSystemTrayIcon(parent)
     show();
     setToolTip("LAN Sharing");
 }
+
+
+void TrayManager::showAppMessage(const QString &title, const QString &msg, const QString &description)
+{
+    emit alertAppMessage(title, msg, description);
+}
