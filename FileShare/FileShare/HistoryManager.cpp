@@ -49,7 +49,7 @@ void HistoryManager::onNewTransferArrived(Connection *conn, UITransferInfoItem *
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
     if (mhi != nullptr) {
         item->setParent(mhi);
-        mhi->appendUITransferInfoItem(item);
+        mhi->appendhistories(item);
     }
 }
 
@@ -83,8 +83,8 @@ QVariantList HistoryManager::getHistoryForDevice(Connection* conn)
             qDebug() << "Failed to read history file for device " << deviceId;
         }
         else {
-            for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
-                auto item = mhi->itemUITransferInfoItemAt(i);
+            for (int i = 0; i < mhi->counthistories(); i++) {
+                auto item = mhi->itemhistoriesAt(i);
                 if (item->isFileTransfer() && item->fileInfo()->sizeFileProgress() < item->fileInfo()->sizeTotalFile()) {
                     item->fileInfo()->transferStatus(TransferStatusFlag::Pause);
                 }
@@ -100,10 +100,9 @@ UITransferInfoItem* HistoryManager::getHistoryItem(Connection* conn, const QStri
 {
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
     if (mhi) {
-        for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
-            auto item = mhi->itemUITransferInfoItemAt(i);
+        for (int i = 0; i < mhi->counthistories(); i++) {
+            auto item = mhi->itemhistoriesAt(i);
             if (item->isFileTransfer() && item->fileInfo()->transferId() == transferId) {
-                emit historyItemRemoved(conn, item);
                 return item;
             }
         }
@@ -116,10 +115,12 @@ bool HistoryManager::removeHistoryItem(Connection* conn, const QString& transfer
 {
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
     if (mhi) {
-        for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
-            auto item = mhi->itemUITransferInfoItemAt(i);
+        for (int i = 0; i < mhi->counthistories(); i++) {
+            auto item = mhi->itemhistoriesAt(i);
             if (item->isFileTransfer() && item->fileInfo()->transferId() == transferId) {
-                mhi->removeUITransferInfoItemAt(i);
+                mhi->removehistoriesAt(i);
+                emit historyItemRemoved(conn, item);
+                item->deleteLater();
                 return true;
             }
         }

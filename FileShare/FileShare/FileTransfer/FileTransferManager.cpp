@@ -67,15 +67,15 @@ FileTransferManager::~FileTransferManager()
 
 void FileTransferManager::addFailedTransferItem(TransferFailedItem *item)
 {
-    for (int i = 0; i < d->FailedItems->countTransferFailedItem(); i++) {
-        if (d->FailedItems->itemTransferFailedItemAt(i)->transferId() == item->transferId()) {
-            d->FailedItems->removeTransferFailedItemAt(i)->deleteLater();
+    for (int i = 0; i < d->FailedItems->countfailedTransfers(); i++) {
+        if (d->FailedItems->itemfailedTransfersAt(i)->transferId() == item->transferId()) {
+            d->FailedItems->removefailedTransfersAt(i)->deleteLater();
             break;
         }
     }
 
     item->setParent(d->FailedItems);
-    d->FailedItems->appendTransferFailedItem(item);
+    d->FailedItems->appendfailedTransfers(item);
     d->saveFailedTransfer();
 }
 
@@ -83,9 +83,9 @@ void FileTransferManager::addFailedTransferItem(TransferFailedItem *item)
 TransferFailedItem* FileTransferManager::removeFailedTransferItem(const QString &transferId)
 {
     TransferFailedItem* item = 0;
-    for (int i = 0; i < d->FailedItems->countTransferFailedItem(); i++) {
-        if (d->FailedItems->itemTransferFailedItemAt(i)->transferId() == transferId) {
-            item = d->FailedItems->removeTransferFailedItemAt(i);
+    for (int i = 0; i < d->FailedItems->countfailedTransfers(); i++) {
+        if (d->FailedItems->itemfailedTransfersAt(i)->transferId() == transferId) {
+            item = d->FailedItems->removefailedTransfersAt(i);
             break;
         }
     }

@@ -141,14 +141,14 @@
     private: Q_PROPERTY(QVariantList x READ x WRITE x NOTIFY x##Changed) \
     PropertyPrivateSet(QVariantList, x) \
     private: Q_INVOKABLE void _type##x(const QString& prop){registerPtrProperty(prop, &t::staticMetaObject);} \
-    void append##t(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.append(v); emit x##Changed(_##x);}} \
-    void insert##t(int ind, t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.insert(ind,v); emit x##Changed(_##x);}} \
-    void remove##t(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);}} \
-    t* remove##t##At(int ind){t* i = _##x.at(ind).value<t*>(); QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);} return i;} \
-    Q_INVOKABLE void removeAll##t() {for (int i = _##x.length() - 1; i >= 0; i--) (_##x.at(i).value<t*>())->deleteLater(); _##x.clear(); emit x##Changed(_##x);} \
+    void append##x(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.append(v); emit x##Changed(_##x);}} \
+    void insert##x(int ind, t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.insert(ind,v); emit x##Changed(_##x);}} \
+    void remove##x(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);}} \
+    t* remove##x##At(int ind){t* i = _##x.at(ind).value<t*>(); QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);} return i;} \
+    Q_INVOKABLE void removeAll##x() {for (int i = _##x.length() - 1; i >= 0; i--) (_##x.at(i).value<t*>())->deleteLater(); _##x.clear(); emit x##Changed(_##x);} \
     public: Q_INVOKABLE int count##t()const {return _##x.length();} \
-    Q_INVOKABLE t* item##t##At(int i) {return _##x.at(i).value<t*>();} \
-    Q_INVOKABLE bool item##t##Exist(t* i) const {QVariant v = QVariant::fromValue(i); if (v.isValid()) { return _##x.contains(v);} else return false;}
+    Q_INVOKABLE t* item##x##At(int i) {return _##x.at(i).value<t*>();} \
+    Q_INVOKABLE bool item##x##Exist(t* i) const {QVariant v = QVariant::fromValue(i); if (v.isValid()) { return _##x.contains(v);} else return false;}
 
 
 // t: type, x: property name
@@ -156,14 +156,14 @@
     private: Q_PROPERTY(QVariantList x READ x WRITE x NOTIFY x##Changed) \
     PropertyProtectedSet(QVariantList, x) \
     protected: Q_INVOKABLE void _type##x(const QString& prop){registerPtrProperty(prop, &t::staticMetaObject);} \
-    void append##t(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.append(v); emit x##Changed(_##x);}} \
-    void insert##t(int ind, t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.insert(ind,v); emit x##Changed(_##x);}} \
-    void remove##t(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);}} \
-    t* remove##t##At(int ind){t* i = _##x.at(ind).value<t*>(); QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);} return i;} \
-    Q_INVOKABLE void removeAll##t() {for (int i = _##x.length() - 1; i >= 0; i--) (_##x.at(i).value<t*>())->deleteLater(); _##x.clear(); emit x##Changed(_##x);} \
-    public: Q_INVOKABLE int count##t()const {return _##x.length();} \
-    Q_INVOKABLE t* item##t##At(int i) {return _##x.at(i).value<t*>();} \
-    Q_INVOKABLE bool item##t##Exist(t* i) const {QVariant v = QVariant::fromValue(i); if (v.isValid()) { return _##x.contains(v);} else return false;}
+    void append##x(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.append(v); emit x##Changed(_##x);}} \
+    void insert##x(int ind, t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.insert(ind,v); emit x##Changed(_##x);}} \
+    void remove##x(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);}} \
+    t* remove##x##At(int ind){t* i = _##x.at(ind).value<t*>(); QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);} return i;} \
+    Q_INVOKABLE void removeAll##x() {for (int i = _##x.length() - 1; i >= 0; i--) (_##x.at(i).value<t*>())->deleteLater(); _##x.clear(); emit x##Changed(_##x);} \
+    public: Q_INVOKABLE int count##x()const {return _##x.length();} \
+    Q_INVOKABLE t* item##x##At(int i) {return _##x.at(i).value<t*>();} \
+    Q_INVOKABLE bool item##x##Exist(t* i) const {QVariant v = QVariant::fromValue(i); if (v.isValid()) { return _##x.contains(v);} else return false;}
 
 
 // t: type, x: property name
@@ -171,14 +171,14 @@
     private: Q_PROPERTY(QVariantList x READ x WRITE x NOTIFY x##Changed) \
     PropertyPublicSet(QVariantList, x) \
     public: Q_INVOKABLE void _type##x(const QString& prop){registerPtrProperty(prop, &t::staticMetaObject);} \
-    Q_INVOKABLE void append##t(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.append(v);  emit x##Changed(_##x);}} \
-    Q_INVOKABLE void insert##t(int ind, t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.insert(ind,v); emit x##Changed(_##x);}} \
-    Q_INVOKABLE void remove##t(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);}} \
-    Q_INVOKABLE t* remove##t##At(int ind){t* i = _##x.at(ind).value<t*>(); QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);} return i;} \
-    Q_INVOKABLE int count##t()const {return _##x.length();} \
-    Q_INVOKABLE void removeAll##t() {for (int i = _##x.length() - 1; i >= 0; i--) (_##x.at(i).value<t*>())->deleteLater(); _##x.clear(); emit x##Changed(_##x);} \
-    Q_INVOKABLE t* item##t##At(int i) {return _##x.at(i).value<t*>();} \
-    Q_INVOKABLE bool item##t##Exist(t* i) const {QVariant v = QVariant::fromValue(i); if (v.isValid()) { return _##x.contains(v);} else return false;}
+    Q_INVOKABLE void append##x(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.append(v);  emit x##Changed(_##x);}} \
+    Q_INVOKABLE void insert##x(int ind, t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.insert(ind,v); emit x##Changed(_##x);}} \
+    Q_INVOKABLE void remove##x(t* i){QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);}} \
+    Q_INVOKABLE t* remove##x##At(int ind){t* i = _##x.at(ind).value<t*>(); QVariant v = QVariant::fromValue(i); if (v.isValid()) { _##x.removeAll(v); emit x##Changed(_##x);} return i;} \
+    Q_INVOKABLE int count##x()const {return _##x.length();} \
+    Q_INVOKABLE void removeAll##x() {for (int i = _##x.length() - 1; i >= 0; i--) (_##x.at(i).value<t*>())->deleteLater(); _##x.clear(); emit x##Changed(_##x);} \
+    Q_INVOKABLE t* item##x##At(int i) {return _##x.at(i).value<t*>();} \
+    Q_INVOKABLE bool item##x##Exist(t* i) const {QVariant v = QVariant::fromValue(i); if (v.isValid()) { return _##x.contains(v);} else return false;}
 
 
 

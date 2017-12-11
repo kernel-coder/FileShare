@@ -13,7 +13,7 @@ Rectangle {
     property ListModel transferHistoryModel : ListModel{}
     function indexOfItem(item) {
         for(var i = 0; i < transferHistoryModel.count; i++) {
-            if (transferHistoryModel.get(i) == item) {
+            if (transferHistoryModel.get(i).fileInfo.transferId == item.fileInfo.transferId) {
                 return i;
             }
         }
@@ -264,6 +264,7 @@ Rectangle {
         onHistoryItemRemoved : {
             if (conn == view.connObj) {
                 var ioi = indexOfItem(item)
+                console.log('index ioi: ', ioi)
                 if (ioi >= 0) {
                     transferHistoryModel.remove(ioi, 1)
                 }
