@@ -20,6 +20,7 @@ public:
     FileHandlerBase(Connection* conn, const QString& transferId = "", QObject* p = 0);
     QString transferId() const;
     Connection* connection();
+    void destroyMyself(TransferStatusFlag::ControlStatus reason);
 
 signals:
     void sendMsg(Message* msg);
@@ -32,11 +33,10 @@ private slots:
     void onThreadStarted();
     void onMessageComeFrom(Connection* conn, Message* msg);
 
-protected:
-    void destroyMyself(bool success);
+protected:    
     virtual void handleThreadStarting() = 0;
     virtual void handleMessageComingFrom(Connection* conn, Message* msg) = 0;
-    virtual void cleanup(bool){}
+    virtual void cleanup(TransferStatusFlag::ControlStatus){}
 
 protected:    
     QString mTransferId;

@@ -15,7 +15,7 @@ public:
     FileSenderHandler(Connection *conn, TransferFailedItem* item, QObject *p = 0);
 
 protected:
-    void cleanup(bool success);
+    void cleanup(TransferStatusFlag::ControlStatus);
     void handleThreadStarting();
     void handleMessageComingFrom(Connection* conn, Message* msg);
 

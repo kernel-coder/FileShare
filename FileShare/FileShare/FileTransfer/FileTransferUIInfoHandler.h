@@ -66,6 +66,7 @@ signals:
 
 public slots:
     void applyControlStatus(Connection* conn, RootFileUIInfo* item, int status);
+    void deleteItem(Connection* conn, RootFileUIInfo* item);
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);

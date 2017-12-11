@@ -2,6 +2,7 @@
 #include "Connection.h"
 #include "NetworkManager.h"
 #include "Messages/Message.h"
+#include "HistoryManager.h"
 #include <QUuid>
 
 
@@ -15,7 +16,7 @@ FileHandlerBase::FileHandlerBase(Connection *conn, const QString& transferId, QO
     connect(this, SIGNAL(started()), this, SLOT(onThreadStarted()));
     connect(NetMgr, &NetworkManager::participantLeft, [=](Connection* conn) {
         if (conn == mConnection) {
-            destroyMyself(false);
+            destroyMyself(TransferStatusFlag::Failed);
         }
     });
 }
@@ -32,10 +33,10 @@ Connection* FileHandlerBase::connection()
     return mConnection;
 }
 
-void FileHandlerBase::destroyMyself(bool success)
+void FileHandlerBase::destroyMyself(TransferStatusFlag::ControlStatus reason)
 {
-    cleanup(success);
-    transferStatus(success ? TransferStatusFlag::Finished : TransferStatusFlag::Failed);
+    transferStatus(reason);
+    cleanup(reason);
     emit transferDone();
     exit();
     this->deleteLater();
@@ -57,6 +58,10 @@ void FileHandlerBase::onMessageComeFrom(Connection *conn, Message *msg)
             TransferControlMsg* tcmsg = qobject_cast<TransferControlMsg*>(msg);
             if (tcmsg->transferId() == mTransferId) {
                 transferStatus(tcmsg->status());
+                if (tcmsg->status() == TransferStatusFlag::Delete) {
+                    destroyMyself(TransferStatusFlag::Delete);
+                    HistoryMgr->removeHistoryItem(conn, tcmsg->transferId());
+                }
             }
         }
         else {

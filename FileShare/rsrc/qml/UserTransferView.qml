@@ -10,10 +10,18 @@ Rectangle {
     color: "transparent"
     anchors.fill: parent
 
-    property var transferHistoryModel : ListModel{}
+    property ListModel transferHistoryModel : ListModel{}
+    function indexOfItem(item) {
+        for(var i = 0; i < transferHistoryModel.count; i++) {
+            if (transferHistoryModel.get(i) == item) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     function initialize() {
-        var historyItems = HistoryMgr.getHistoryForDevice(connObj.peerViewInfo.deviceId)
+        var historyItems = HistoryMgr.getHistoryForDevice(connObj)
         for (var i = 0; i < historyItems.length; i++) {
             transferHistoryModel.append(historyItems[i]);
         }
@@ -102,6 +110,7 @@ Rectangle {
                             imgNormal: "qrc:/images/rsrc/images/btn-cancel.png"
                             imgHover: "qrc:/images/rsrc/images/btn-cancel.png"
                             imgPressed: "qrc:/images/rsrc/images/btn-cancel-pressed.png"
+                            onClicked2: FileMgrUIHandler.deleteItem(view.connObj, fileInfo);
                         }
                     }
 
@@ -245,6 +254,18 @@ Rectangle {
                 transferHistoryModel.append(uiInfo)
                 if (!appWindow.visible || appWindow.visibility == Window.Minimized) {
                     TrayMgr.showMessage(view.connObj.peerViewInfo.name, uiInfo.chatMsg)
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: HistoryMgr
+        onHistoryItemRemoved : {
+            if (conn == view.connObj) {
+                var ioi = indexOfItem(item)
+                if (ioi >= 0) {
+                    transferHistoryModel.remove(ioi, 1)
                 }
             }
         }

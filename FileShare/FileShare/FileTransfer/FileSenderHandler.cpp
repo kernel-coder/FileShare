@@ -21,7 +21,6 @@
 
 FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files, QObject *p)
     : FileHandlerBase(conn, "", p)
-    , mTransferDone(false)
     , mFailedItem(0)
     , mRootFiles(files)
     , mCurrentRootFileIndex(0)
@@ -46,7 +45,6 @@ FileSenderHandler::FileSenderHandler(Connection* conn, const QStringList& files,
 
 FileSenderHandler::FileSenderHandler(Connection* conn, TransferFailedItem* item, QObject *p)
     : FileHandlerBase(conn, item->transferId(), p)
-    , mTransferDone(false)
     , mFailedItem(item)
     , mCurrentRootFileIndex(item->rootFileIndex())
     , mCurrentFileIndex(item->fileIndex())
@@ -112,8 +110,7 @@ void FileSenderHandler::sendRootFile()
         emit sendMsg(msg);
     }
     else {
-        mTransferDone = true;
-        destroyMyself(true);
+        destroyMyself(TransferStatusFlag::Finished);
     }
 }
 
@@ -210,9 +207,9 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
 }
 
 
-void FileSenderHandler::cleanup(bool)
+void FileSenderHandler::cleanup(TransferStatusFlag::ControlStatus reason)
 {
-    if (!mTransferDone) {
+    if (reason == TransferStatusFlag::Failed) {
         auto failedItem = new TransferFailedItem();
         failedItem->transferId(transferId());
         foreach(QString rootFile, mRootFiles) {

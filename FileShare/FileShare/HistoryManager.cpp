@@ -54,8 +54,21 @@ void HistoryManager::onNewTransferArrived(Connection *conn, UITransferInfoItem *
 }
 
 
-QVariantList HistoryManager::getHistoryForDevice(const QString &deviceId)
+void HistoryManager::onConnectionClosed(Connection *conn)
 {
+    QString deviceId = conn->peerViewInfo()->deviceId();
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
+    if (mhi != nullptr) {
+        Utils::me()->writeFile(Utils::me()->machineHistoryDir(QString("%1.json").arg(deviceId)), mhi->exportToJson());
+        d_ptr->HistoryMap.remove(deviceId);
+        mhi->deleteLater();
+    }
+}
+
+
+QVariantList HistoryManager::getHistoryForDevice(Connection* conn)
+{
+    QString deviceId = conn->peerViewInfo()->deviceId();
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
     if (mhi == nullptr) {
         mhi = new MachineHistoryItem(this);
@@ -83,31 +96,33 @@ QVariantList HistoryManager::getHistoryForDevice(const QString &deviceId)
 }
 
 
-UITransferInfoItem* HistoryManager::getHistoryItem(const QString &deviceId, const QString& transferId)
+UITransferInfoItem* HistoryManager::getHistoryItem(Connection* conn, const QString& transferId)
 {
-    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
-    if (mhi == nullptr) {
-        return 0;
-    }
-    else {
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
+    if (mhi) {
         for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
             auto item = mhi->itemUITransferInfoItemAt(i);
             if (item->isFileTransfer() && item->fileInfo()->transferId() == transferId) {
+                emit historyItemRemoved(conn, item);
                 return item;
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
 
-void HistoryManager::onConnectionClosed(Connection *conn)
+bool HistoryManager::removeHistoryItem(Connection* conn, const QString& transferId)
 {
-    QString deviceId = conn->peerViewInfo()->deviceId();
-    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(deviceId, nullptr);
-    if (mhi != nullptr) {
-        Utils::me()->writeFile(Utils::me()->machineHistoryDir(QString("%1.json").arg(deviceId)), mhi->exportToJson());
-        d_ptr->HistoryMap.remove(deviceId);
-        mhi->deleteLater();
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
+    if (mhi) {
+        for (int i = 0; i < mhi->countUITransferInfoItem(); i++) {
+            auto item = mhi->itemUITransferInfoItemAt(i);
+            if (item->isFileTransfer() && item->fileInfo()->transferId() == transferId) {
+                mhi->removeUITransferInfoItemAt(i);
+                return true;
+            }
+        }
     }
+    return false;
 }

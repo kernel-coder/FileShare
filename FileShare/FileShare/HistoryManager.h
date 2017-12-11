@@ -24,12 +24,15 @@ public:
     explicit HistoryManager(QObject *parent = 0);
     static HistoryManager* me();
 
-    Q_INVOKABLE QVariantList getHistoryForDevice(const QString& deviceId);
-    UITransferInfoItem* getHistoryItem(const QString &deviceId, const QString& transferId);
+    Q_INVOKABLE QVariantList getHistoryForDevice(Connection* conn);
+    UITransferInfoItem* getHistoryItem(Connection* conn, const QString& transferId);
+    bool removeHistoryItem(Connection* conn, const QString& transferId);
 
 signals:
+    void historyItemRemoved(Connection* conn, UITransferInfoItem* item);
 
 public slots:
+
 
 private slots:
     void onNewTransferArrived(Connection* conn, UITransferInfoItem* item);

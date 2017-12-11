@@ -96,7 +96,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
                    mFile->deleteLater();
                    mFileMsg->deleteLater();
                    if (fptm->fileNo() == mHeaderInfoMsg->fileCount()) {
-                       destroyMyself(true);
+                       destroyMyself(TransferStatusFlag::Finished);
                    }
                }
 
