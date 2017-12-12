@@ -11,18 +11,14 @@
 #include <QNetworkSession>
 
 
-static const qint32 BroadcastInterval = 10000;
 static const unsigned BroadcastPort = 45000;
 
 
 PeerManager::PeerManager(NetworkManager *netMgr, QObject *parent) 
 : QObject(parent)
 , mpNetManager(netMgr)
-{
-    updateAddresses();
+{    
     mnServerPort = 0;    
-
-    mBroadcastTimer.setInterval(BroadcastInterval);
     connect(&mBroadcastTimer, SIGNAL(timeout()), SLOT(sendBroadcastDatagram()));
 }
 
@@ -35,6 +31,8 @@ PeerManager::~PeerManager()
 
 void PeerManager::initialize()
 {
+    updateAddresses();
+    mBroadcastTimer.setInterval(NetMgr->broadcastInterval());
     mBroadcastSocket.bind(QHostAddress::Any, BroadcastPort, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
     connect(&mBroadcastSocket, SIGNAL(readyRead()), SLOT(readBroadcastDatagram()));
 }
@@ -60,6 +58,12 @@ void PeerManager::startBroadcasting(bool on)
 }
 
 
+void PeerManager::updateBCInterval(int interval)
+{
+    mBroadcastTimer.setInterval(interval);
+}
+
+
 bool PeerManager::isLocalHostAddress(const QHostAddress &address)
 {
     foreach (QHostAddress localAddress, mIPAddresses){
@@ -78,7 +82,7 @@ void PeerManager::sendBroadcastDatagram()
         return;
     }
 
-    qDebug() << "Starting BC...";
+    //qDebug() << "Starting BC...";
     QMutexLocker locker(&mMutex);
     QByteArray datagram = serverInfo();
     bool bValidBroadcastAddresses = true;

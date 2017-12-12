@@ -27,7 +27,8 @@ NetworkManager::NetworkManager(QObject *parent) :
     _username = s.value("username", QHostInfo::localHostName()).toString();
     _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();
     _broadcastingEnabled = s.value("bcenabled", true).toBool();
-    _saveFolderName = s.value("savedFolderName", Utils::me()->dataDirCommon()).toString();
+    _broadcastInterval = s.value("bcinterval", 5000).toFloat();
+    _saveFolderName = s.value("savedFolderName", Utils::me()->dataDirCommon()).toString();    
 
     mpPeerManager = new PeerManager(this, this);
     _port = mServer.serverPort();
@@ -50,12 +51,22 @@ void NetworkManager::initialize()
     updateBCEnabledChanged(_broadcastingEnabled);
 }
 
+
 void NetworkManager::updateBCEnabledChanged(bool on)
 {
     broadcastingEnabled(on);
     QSettings s;
     s.setValue("bcenabled", on);
     mpPeerManager->startBroadcasting(on);
+}
+
+
+void NetworkManager::updateBCIntervalChanged(qreal value)
+{
+    broadcastInterval(value);
+    QSettings s;
+    s.setValue("bcinterval", value);
+    mpPeerManager->updateBCInterval((int)value);
 }
 
 

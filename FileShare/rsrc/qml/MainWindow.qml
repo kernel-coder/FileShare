@@ -57,7 +57,7 @@ Item {
                     anchors.fill: parent
                     horizontalAlignment: Qt.AlignHCenter
                     verticalAlignment: Qt.AlignVCenter
-                    onAccepted:  {
+                    onAccepted: {
                         if (text.trim().length > 0) {
                             NetMgr.username = text.trim()
                             NetMgr.broadcastUserInfoChanged()

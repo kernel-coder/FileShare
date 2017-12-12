@@ -37,6 +37,7 @@ public:
     MetaPropertyPublicSet_Ex(int, port)
     MetaPropertyPublicSet_Ex(PeerViewInfoMsg::PeerStatus, status)
     MetaPropertyPublicSet_Ex(bool, broadcastingEnabled)
+    MetaPropertyPublicSet_Ex(qreal, broadcastInterval)
 
     void sendMessage(Connection *conn, Message *msg);
     Connection *hasConnection(const QHostAddress &senderIp, int nSenderPort);
@@ -56,6 +57,7 @@ public slots:
     void initialize();
     void updateSavedFolderPath(const QString& path);
     void updateBCEnabledChanged(bool on);
+    void updateBCIntervalChanged(qreal value);
     void connectManual(const QString& host, int port);
     void broadcastUserInfoChanged();
 

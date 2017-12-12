@@ -1,5 +1,4 @@
-#ifndef PEERMANAGER_H
-#define PEERMANAGER_H
+#pragma once
 
 #include <QObject>
 #include <QHostAddress>
@@ -24,6 +23,7 @@ public:
     void setServerPort(int nPort);
     QByteArray userName() const;
     void startBroadcasting(bool on);
+    void updateBCInterval(int interval);
     bool isLocalHostAddress(const QHostAddress &address);    
 
 signals:
@@ -53,5 +53,3 @@ private:
     int mnServerPort;
     QMutex mMutex;
 };
-
-#endif // PEERMANAGER_H

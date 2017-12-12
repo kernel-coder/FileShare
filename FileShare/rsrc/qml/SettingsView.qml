@@ -47,6 +47,19 @@ Rectangle {
                     }
                 }
             }
+
+            LabelEx {
+                text: ",  Interval"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            SpinBox {
+                enabled: NetMgr.broadcastingEnabled
+                minimumValue: 1000
+                maximumValue: 100000
+                value: NetMgr.broadcastInterval
+                onValueChanged: NetMgr.updateBCIntervalChanged(value)
+            }
         }
 
         Row {
