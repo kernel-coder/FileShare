@@ -51,5 +51,4 @@ private:
     int mTotalSeqCount;
     QFile* mFile;
     int mCurrentSeqNo;
-
 };

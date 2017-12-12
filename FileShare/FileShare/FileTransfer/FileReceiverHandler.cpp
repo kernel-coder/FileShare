@@ -24,6 +24,7 @@ FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferHeaderInf
     , mHeaderInfoMsg(msg)
     , mFileMsg(0)
     , mFile(0)
+    , mFileFlushMark(0)
 {
 }
 
@@ -53,6 +54,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
         if (msg->typeId() == FileTransferMsg::TypeID) {
             auto fMsg = qobject_cast<FileTransferMsg*>(msg);
             if (fMsg->transferId() == mHeaderInfoMsg->transferId()) {
+                mFileFlushMark = 0;
                 mFileMsg = fMsg;
                 QString filename = FileMgrUIHandler->saveFolderPathForTransferID(conn, mFileMsg->transferId());
                 filename = filename.replace("\\", "/");
@@ -62,7 +64,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
                 if (!filename.endsWith("/")) filename += "/";
                 filename += mFileMsg->filename();
                 mFile = new QFile(filename);
-                qDebug() << "Receving file "  << filename;
+                qDebug() << "Receving file: "  << filename;
                 if (mFileMsg->startPos() > 0) {
                     if (mFile->open(QFile::Append)) {
                         qint64 cp = mFile->pos();
@@ -86,12 +88,19 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
         else if (msg->typeId() == FilePartTransferMsg::TypeID) {
            FilePartTransferMsg* fptm = qobject_cast<FilePartTransferMsg*>(msg);
            if (mFileMsg && fptm->uuid() == mFileMsg->uuid()) {
+               mFileFlushMark++;
                mFile->write(fptm->data());
+               if (mFileFlushMark * MSG_LEN / ONE_MB >= 100) {
+                   // if it is 100 MB, lets flush it
+                   mFile->flush();
+                   mFileFlushMark = 0;
+               }
                FilePartTransferAckMsg* ackMsg = new FilePartTransferAckMsg(fptm->transferId(), fptm->uuid(), fptm->fileNo(), fptm->seqNo(), fptm->size(), fptm->progressSize());
                emit receivedFilePart(mConnection, ackMsg);
                emit sendMsg(ackMsg);
 
                if (fptm->seqNo() + 1 == mFileMsg->seqCount()) {
+                   qDebug() << "File Received: "  << mFile->fileName();
                    mFile->close();
                    mFile->deleteLater();
                    mFileMsg->deleteLater();

@@ -47,7 +47,7 @@ void FileTransferHeaderInfoMsg::read(QDataStream &buf)
 int FileTransferHeaderInfoMsg::typeId() { return FileTransferHeaderInfoMsg::TypeID;}
 
 
-FileTransferMsg::FileTransferMsg(const QString& transferId, const QString& uuid, const QString& filename, qint64 startPos, QObject* p)
+FileTransferMsg::FileTransferMsg(const QString& transferId, const QString& uuid, const QString& filename, quint64 startPos, QObject* p)
     : Message(p)
     , _transferId(transferId)
     , _uuid(uuid)
@@ -88,7 +88,7 @@ int FileTransferMsg::typeId() { return FileTransferMsg::TypeID;}
 
 FileTransferAckMsg::FileTransferAckMsg(const QString& transferId,
                                        const QString& uuid,
-                                       const QString& filename, qint64 startPos, QObject* p)
+                                       const QString& filename, quint64 startPos, QObject* p)
     : FileTransferMsg(transferId, uuid, filename, startPos, p)
 {
 }

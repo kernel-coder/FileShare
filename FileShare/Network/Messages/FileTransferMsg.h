@@ -52,7 +52,7 @@ public:
     FileTransferMsg(const QString& transferId = ""
             , const QString& uuid = ""
             , const QString& filename = ""
-            , qint64 startPos = 0
+            , quint64 startPos = 0
             , QObject* p = 0);
 
     MetaPropertyPublicSet_Ex(QString, transferId)
@@ -60,9 +60,9 @@ public:
     MetaPropertyPublicSet_Ex(QString, basePath)
     MetaPropertyPublicSet_Ex(QString, filename)
     MetaPropertyPublicSet_Ex(int, fileNo)
-    MetaPropertyPublicSet_Ex(qint64, size)
+    MetaPropertyPublicSet_Ex(quint64, size)
     MetaPropertyPublicSet_Ex(int, seqCount)
-    MetaPropertyPublicSet_Ex(qint64, startPos)
+    MetaPropertyPublicSet_Ex(quint64, startPos)
 
     virtual void read(QDataStream &buf);
     virtual void write(QDataStream &buf);
@@ -78,7 +78,7 @@ public:
     FileTransferAckMsg(const QString& transferId = ""
             , const QString& uuid = ""
             , const QString& filename = ""
-            , qint64 startPos = 0
+            , quint64 startPos = 0
             , QObject* p = 0);
 
     virtual int typeId();

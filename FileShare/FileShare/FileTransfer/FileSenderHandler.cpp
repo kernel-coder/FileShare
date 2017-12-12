@@ -52,7 +52,7 @@ FileSenderHandler::FileSenderHandler(Connection* conn, TransferFailedItem* item,
     , mIndexOfBasePath(-1)
     , mRootTotalSize(0)
     , mRootProgressSize(item->progressSize())
-    , mCurrentSeqNo(item->seqIndex())
+    , mCurrentSeqNo(item->seqIndex())    
 {
     for (int i = 0; i < item->countrootFiles(); i++) {
         mRootFiles.append(item->itemrootFilesAt(i));
@@ -153,6 +153,7 @@ void FileSenderHandler::sendFilePart(int seqNo)
             emit sendMsg(msg);
         }
         else {
+            qDebug() << "File sent: "  << mFile->fileName();
             mFile->close();
             mFile->deleteLater();
             mCurrentFileIndex++;
@@ -177,7 +178,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
             if (ackMsg->uuid() == mFileUuid) {
                 emit fileSent(mConnection, ackMsg);
                 mFile = new QFile(mAllFiles.at(mCurrentFileIndex).absoluteFilePath());
-                qDebug() << "sending file "  << mFile->fileName();
+                qDebug() << "Sending file: "  << mFile->fileName();
                 if (mFile->open(QFile::ReadOnly)) {
                     if (mFailedItem) {
                         mFile->seek(mFailedItem->progressSize());

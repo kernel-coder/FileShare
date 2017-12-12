@@ -23,4 +23,5 @@ private:
     FileTransferHeaderInfoMsg* mHeaderInfoMsg;
     FileTransferMsg* mFileMsg;
     QFile* mFile;
+    int mFileFlushMark;
 };
