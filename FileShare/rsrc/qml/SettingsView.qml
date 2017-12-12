@@ -11,6 +11,44 @@ Rectangle {
     color: "#666666"
     Column {
         anchors.centerIn: parent
+        spacing: 10
+
+        Row {
+            spacing: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            LabelEx {
+                text: NetMgr.status == PeerViewInfoMsg.Free ? "Available" : "Busy"
+            }
+
+            CheckBox {
+                anchors.verticalCenter: parent.verticalCenter
+                checked: NetMgr.status == PeerViewInfoMsg.Free
+                onClicked: {
+                    NetMgr.status = checked ? PeerViewInfoMsg.Free : PeerViewInfoMsg.Busy
+                    NetMgr.broadcastUserInfoChanged()
+                }
+            }
+        }
+
+        Row {
+            spacing: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            LabelEx {
+                text: "Broadcast"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            CheckBox {
+                anchors.verticalCenter: parent.verticalCenter
+                checked: NetMgr.broadcastingEnabled
+                onClicked: {
+                    if (checked != NetMgr.broadcastingEnabled) {
+                        NetMgr.updateBCEnabledChanged(checked)
+                    }
+                }
+            }
+        }
+
         Row {
             spacing: 5
             LabelEx {text: "Save To:"}

@@ -67,38 +67,7 @@ Item {
                 }
             }
             LabelEx {
-                text: " on port " + NetMgr.port + ", "
-            }
-
-            LabelEx {
-                text: NetMgr.status == PeerViewInfoMsg.Free ? "Available" : "Busy"
-            }
-            CheckBox {
-                anchors.verticalCenter: parent.verticalCenter
-                checked: NetMgr.status == PeerViewInfoMsg.Free
-                onClicked: {
-                    NetMgr.status = checked ? PeerViewInfoMsg.Free : PeerViewInfoMsg.Busy
-                    NetMgr.broadcastUserInfoChanged()
-                }
-            }
-        }
-        Row {
-            anchors.right: btnSettings.left; anchors.rightMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
-            LabelEx {
-                text: "Broadcast"
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            CheckBox {
-                anchors.verticalCenter: parent.verticalCenter
-                checked: NetMgr.broadcastingEnabled
-                onClicked: {
-                    if (checked != NetMgr.broadcastingEnabled) {
-                        NetMgr.updateBCEnabledChanged(checked)
-                    }
-                }
+                text: " on port " + NetMgr.port
             }
         }
 
