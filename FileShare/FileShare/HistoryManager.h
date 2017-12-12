@@ -25,8 +25,10 @@ public:
     static HistoryManager* me();
 
     Q_INVOKABLE QVariantList getHistoryForDevice(Connection* conn);
-    UITransferInfoItem* getHistoryItem(Connection* conn, const QString& transferId);
-    bool removeHistoryItem(Connection* conn, const QString& transferId);
+    UITransferInfoItem* getHistoryItemByTransferId(Connection* conn, const QString& transferId);
+    bool removeHistoryItemByTransferId(Connection* conn, const QString& transferId);
+    UITransferInfoItem* getHistoryItemByItemId(Connection* conn, const QString& itemId);
+    bool removeHistoryItemByItemId(Connection* conn, const QString& itemId);
 
 signals:
     void historyItemRemoved(Connection* conn, UITransferInfoItem* item);

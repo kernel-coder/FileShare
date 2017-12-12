@@ -96,7 +96,7 @@ QVariantList HistoryManager::getHistoryForDevice(Connection* conn)
 }
 
 
-UITransferInfoItem* HistoryManager::getHistoryItem(Connection* conn, const QString& transferId)
+UITransferInfoItem* HistoryManager::getHistoryItemByTransferId(Connection* conn, const QString& transferId)
 {
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
     if (mhi) {
@@ -111,13 +111,46 @@ UITransferInfoItem* HistoryManager::getHistoryItem(Connection* conn, const QStri
 }
 
 
-bool HistoryManager::removeHistoryItem(Connection* conn, const QString& transferId)
+bool HistoryManager::removeHistoryItemByTransferId(Connection* conn, const QString& transferId)
 {
     MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
     if (mhi) {
         for (int i = 0; i < mhi->counthistories(); i++) {
             auto item = mhi->itemhistoriesAt(i);
             if (item->isFileTransfer() && item->fileInfo()->transferId() == transferId) {
+                mhi->removehistoriesAt(i);
+                emit historyItemRemoved(conn, item);
+                item->deleteLater();
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+UITransferInfoItem* HistoryManager::getHistoryItemByItemId(Connection* conn, const QString& itemId)
+{
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
+    if (mhi) {
+        for (int i = 0; i < mhi->counthistories(); i++) {
+            auto item = mhi->itemhistoriesAt(i);
+            if (item->itemId() == itemId) {
+                return item;
+            }
+        }
+    }
+    return nullptr;
+}
+
+
+bool HistoryManager::removeHistoryItemByItemId(Connection* conn, const QString& itemId)
+{
+    MachineHistoryItem* mhi = d_ptr->HistoryMap.value(conn->peerViewInfo()->deviceId(), nullptr);
+    if (mhi) {
+        for (int i = 0; i < mhi->counthistories(); i++) {
+            auto item = mhi->itemhistoriesAt(i);
+            if (item->itemId() == itemId) {
                 mhi->removehistoriesAt(i);
                 emit historyItemRemoved(conn, item);
                 item->deleteLater();

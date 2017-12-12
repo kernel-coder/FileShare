@@ -60,7 +60,7 @@ void FileHandlerBase::onMessageComeFrom(Connection *conn, Message *msg)
                 transferStatus(tcmsg->status());
                 if (tcmsg->status() == TransferStatusFlag::Delete) {
                     destroyMyself(TransferStatusFlag::Delete);
-                    HistoryMgr->removeHistoryItem(conn, tcmsg->transferId());
+                    HistoryMgr->removeHistoryItemByTransferId(conn, tcmsg->transferId());
                 }
             }
         }

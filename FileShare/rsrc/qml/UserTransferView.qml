@@ -13,7 +13,7 @@ Rectangle {
     property ListModel transferHistoryModel : ListModel{}
     function indexOfItem(item) {
         for(var i = 0; i < transferHistoryModel.count; i++) {
-            if (transferHistoryModel.get(i).fileInfo.transferId == item.fileInfo.transferId) {
+            if (transferHistoryModel.get(i).itemId == item.itemId) {
                 return i;
             }
         }
@@ -61,6 +61,12 @@ Rectangle {
                 color: "#444444"
                 anchors.left: parent.left; anchors.right: parent.right
                 height: 40
+                MouseArea {
+                    id: mouseItem
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+
                 Item {
                     anchors.fill: parent
                     anchors.margins: 5
@@ -75,43 +81,6 @@ Rectangle {
                                   :
                                     (fileInfo.isSending ? "qrc:/images/rsrc/images/btn-upload-hovered.png" :
                                                       "qrc:/images/rsrc/images/btn-download-hovered.png")
-                    }
-
-                    Row {
-                        anchors.right: parent.right
-                        anchors.rightMargin: 0
-                        anchors.top: parent.top
-                        anchors.topMargin: -5
-                        spacing: 10
-
-                        ImageButton {
-                            width: 16; height: 16
-                            visible: isFileTransfer && fileInfo.sizeFileProgress < fileInfo.sizeTotalFile &&
-                                     (fileInfo.transferStatus == TransferStatusFlag.Pause || fileInfo.transferStatus == TransferStatusFlag.Running)
-                            imgNormal: fileInfo.transferStatus == TransferStatusFlag.Running ?
-                                           "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
-                            imgHover: fileInfo.transferStatus == TransferStatusFlag.Running ?
-                                          "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
-                            imgPressed: fileInfo.transferStatus == TransferStatusFlag.Running ?
-                                            "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
-                            onClicked2: {
-                                console.log("clicked pause -- ", fileInfo.transferStatus)
-                                if (fileInfo.transferStatus == TransferStatusFlag.Running) {
-                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Pause);
-                                }
-                                else {
-                                    FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Running)
-                                }
-                            }
-                        }
-
-                        ImageButton {
-                            width: 16; height: 16
-                            imgNormal: "qrc:/images/rsrc/images/btn-cancel.png"
-                            imgHover: "qrc:/images/rsrc/images/btn-cancel.png"
-                            imgPressed: "qrc:/images/rsrc/images/btn-cancel-pressed.png"
-                            onClicked2: FileMgrUIHandler.deleteItem(view.connObj, fileInfo);
-                        }
                     }
 
                     Column {
@@ -135,6 +104,7 @@ Rectangle {
                         }
                     }
                 }
+
                 LabelEx {
                     anchors.fill: parent
                     anchors.margins: 2
@@ -160,6 +130,44 @@ Rectangle {
                     visible: !isFileTransfer && !isChatSending
                     text : view.connObj.peerViewInfo.name + "# " + chatMsg
                     onLinkActivated: Utils.openUrl(link)
+                }
+
+                Row {
+                    anchors.right: parent.right
+                    anchors.rightMargin: 0
+                    anchors.top: parent.top
+                    anchors.topMargin: 0
+                    spacing: 10
+                    visible: mouseItem.containsMouse
+
+                    ImageButton {
+                        width: 16; height: 16
+                        visible: isFileTransfer && fileInfo.sizeFileProgress < fileInfo.sizeTotalFile &&
+                                 (fileInfo.transferStatus == TransferStatusFlag.Pause || fileInfo.transferStatus == TransferStatusFlag.Running)
+                        imgNormal: fileInfo.transferStatus == TransferStatusFlag.Running ?
+                                       "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
+                        imgHover: fileInfo.transferStatus == TransferStatusFlag.Running ?
+                                      "qrc:/images/rsrc/images/pause.png" : "qrc:/images/rsrc/images/play.png"
+                        imgPressed: fileInfo.transferStatus == TransferStatusFlag.Running ?
+                                        "qrc:/images/rsrc/images/pause-pressed.png" : "qrc:/images/rsrc/images/play-pressed.png"
+                        onClicked2: {
+                            console.log("clicked pause -- ", fileInfo.transferStatus)
+                            if (fileInfo.transferStatus == TransferStatusFlag.Running) {
+                                FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Pause);
+                            }
+                            else {
+                                FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Running)
+                            }
+                        }
+                    }
+
+                    ImageButton {
+                        width: 16; height: 16
+                        imgNormal: "qrc:/images/rsrc/images/btn-cancel.png"
+                        imgHover: "qrc:/images/rsrc/images/btn-cancel.png"
+                        imgPressed: "qrc:/images/rsrc/images/btn-cancel-pressed.png"
+                        onClicked2: FileMgrUIHandler.deleteItem(view.connObj, itemId);
+                    }
                 }
             }
         }

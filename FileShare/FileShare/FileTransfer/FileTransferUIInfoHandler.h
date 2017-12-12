@@ -41,6 +41,7 @@ public:
     static UITransferInfoItem* create(RootFileUIInfo* rootFileInfo);
     static UITransferInfoItem* create(const QString& chatMsg, bool sending);
     Q_INVOKABLE explicit UITransferInfoItem(QObject* p = 0) : JObject(p) {}
+    MetaPropertyPublicSet(QString, itemId)
     MetaPropertyPublicSet_Ptr(RootFileUIInfo, fileInfo)
     MetaPropertyPublicSet(bool, isFileTransfer)
     MetaPropertyPublicSet(QString, chatMsg)
@@ -66,7 +67,7 @@ signals:
 
 public slots:
     void applyControlStatus(Connection* conn, RootFileUIInfo* item, int status);
-    void deleteItem(Connection* conn, RootFileUIInfo* item);
+    void deleteItem(Connection* conn, const QString& itemId);
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
