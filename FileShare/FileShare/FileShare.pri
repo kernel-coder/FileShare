@@ -9,7 +9,6 @@ SOURCES += $$PWD/main.cpp \
     $$PWD/FileTransfer/FileHandlerBase.cpp \
     $$PWD/FileTransfer/FileSenderHandler.cpp \
     $$PWD/FileTransfer/FileReceiverHandler.cpp \
-    $$PWD/FileTransfer/FileTransferUIInfoHandler.cpp \
     $$PWD/FileTransfer/FileTransferManager.cpp
 
 HEADERS += \
@@ -21,5 +20,4 @@ HEADERS += \
     $$PWD/FileTransfer/FileHandlerBase.h \
     $$PWD/FileTransfer/FileSenderHandler.h \
     $$PWD/FileTransfer/FileReceiverHandler.h \
-    $$PWD/FileTransfer/FileTransferUIInfoHandler.h \
     $$PWD/FileTransfer/FileTransferManager.h

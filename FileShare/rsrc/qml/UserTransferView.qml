@@ -155,10 +155,10 @@ Rectangle {
                         onClicked2: {
                             console.log("clicked pause -- ", fileInfo.transferStatus)
                             if (fileInfo.transferStatus == TransferStatusFlag.Running) {
-                                FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Pause);
+                                FileMgr.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Pause);
                             }
                             else {
-                                FileMgrUIHandler.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Running)
+                                FileMgr.applyControlStatus(view.connObj, fileInfo, TransferStatusFlag.Running)
                             }
                         }
                     }
@@ -169,7 +169,7 @@ Rectangle {
                         imgNormal: "qrc:/images/rsrc/images/btn-cancel.png"
                         imgHover: "qrc:/images/rsrc/images/btn-cancel.png"
                         imgPressed: "qrc:/images/rsrc/images/btn-cancel-pressed.png"
-                        onClicked2: FileMgrUIHandler.deleteItem(view.connObj, itemId);
+                        onClicked2: FileMgr.deleteItem(view.connObj, itemId);
                     }
                 }
             }
@@ -245,9 +245,8 @@ Rectangle {
           }
       ]
 
-
     Connections {
-        target: FileMgrUIHandler
+        target: FileMgr
         onFileTransfer: {
             if (conn == view.connObj) {
                 transferHistoryModel.append(uiInfo)
@@ -256,10 +255,7 @@ Rectangle {
                 }
             }
         }
-    }
 
-    Connections {
-        target: FileMgr
         onChatTransfer: {
             if (conn == view.connObj) {
                 transferHistoryModel.append(uiInfo)

@@ -37,7 +37,7 @@ HistoryManager::HistoryManager(QObject *parent) : QObject(parent)
 
     connect(FileMgr, SIGNAL(chatTransfer(Connection*,UITransferInfoItem*)),
             SLOT(onNewTransferArrived(Connection*,UITransferInfoItem*)));
-    connect(FileMgrUIHandler, SIGNAL(fileTransfer(Connection*,UITransferInfoItem*)),
+    connect(FileMgr, SIGNAL(fileTransfer(Connection*,UITransferInfoItem*)),
             SLOT(onNewTransferArrived(Connection*,UITransferInfoItem*)));
     connect(NetMgr, SIGNAL(participantLeft(Connection*)), SLOT(onConnectionClosed(Connection*)));
 }

@@ -16,7 +16,7 @@
 #include <QUuid>
 #include <QtMath>
 #include <QThread>
-#include "FileTransferUIInfoHandler.h"
+#include "FileTransferManager.h"
 #include "AppSettings.h"
 
 
@@ -57,7 +57,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
             if (fMsg->transferId() == mHeaderInfoMsg->transferId()) {
                 mFileFlushMark = 0;
                 mFileMsg = fMsg;
-                QString filename = FileMgrUIHandler->saveFolderPathForTransferID(conn, mFileMsg->transferId());
+                QString filename = FileMgr->saveFolderPathForTransferID(conn, mFileMsg->transferId());
                 filename = filename.replace("\\", "/");
                 if (!filename.endsWith("/")) filename += "/";
                 filename += mFileMsg->basePath();
