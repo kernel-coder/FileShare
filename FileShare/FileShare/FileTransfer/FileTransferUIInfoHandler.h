@@ -22,7 +22,7 @@ class FileHandlerBase;
 class RootFileUIInfo : public JObject {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit RootFileUIInfo(QObject* p = 0) : JObject(p) {}
+    Q_INVOKABLE explicit RootFileUIInfo(QObject* p = 0);
     MetaPropertyPublicSet(QString, transferId)
     MetaPropertyPublicSet(bool, isSending)
     MetaPropertyPublicSet(QString, filePathRoot)
@@ -40,7 +40,7 @@ class UITransferInfoItem: public JObject {
 public:
     static UITransferInfoItem* create(RootFileUIInfo* rootFileInfo);
     static UITransferInfoItem* create(const QString& chatMsg, bool sending);
-    Q_INVOKABLE explicit UITransferInfoItem(QObject* p = 0) : JObject(p) {}
+    Q_INVOKABLE explicit UITransferInfoItem(QObject* p = 0);
     MetaPropertyPublicSet(QString, itemId)
     MetaPropertyPublicSet_Ptr(RootFileUIInfo, fileInfo)
     MetaPropertyPublicSet(bool, isFileTransfer)
