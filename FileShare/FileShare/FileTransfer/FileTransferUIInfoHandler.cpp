@@ -21,7 +21,18 @@
 #include <QUuid>
 #include <QtMath>
 #include <QThread>
+#include <QQmlEngine>
 
+
+RootFileUIInfo::RootFileUIInfo(QObject *p) : JObject(p)
+{
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+}
+
+UITransferInfoItem::UITransferInfoItem(QObject *p) : JObject(p)
+{
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
+}
 
 
 FileTransferUIInfoHandler* FileTransferUIInfoHandler::me()
