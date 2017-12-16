@@ -28,7 +28,8 @@ AppSettings::AppSettings(QObject* p) : JObject(p)
 
 AppSettings::~AppSettings()
 {
-   //updateAppGeometry(_appPosX, _appPosY, _appWidth, _appHeight);
+   QSettings s;
+   s.setValue("skippExistingFile", _skippExistingFile);
 }
 
 void AppSettings::updateAppGeometry(qreal x, qreal y, qreal w, qreal h)
