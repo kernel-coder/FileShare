@@ -103,6 +103,7 @@ private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
     void onFilePartSent(Connection* conn, FilePartTransferAckMsg* msg);
     void onReceivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);
+    void onTransferDone();
 
 private:
     FileTransferManagerPrivate* d;

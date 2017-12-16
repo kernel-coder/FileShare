@@ -27,6 +27,28 @@ UITransferInfoItem::UITransferInfoItem(QObject *p) : JObject(p)
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
+UITransferInfoItem* UITransferInfoItem::create(RootFileUIInfo* rootFileInfo)
+{
+    UITransferInfoItem* item = new UITransferInfoItem();
+    item->itemId(QUuid::createUuid().toString());
+    rootFileInfo->setParent(item);
+    item->fileInfo(rootFileInfo);
+    item->isFileTransfer(true);
+    return item;
+}
+
+
+UITransferInfoItem* UITransferInfoItem::create(const QString& chatMsg, bool sending)
+{
+    UITransferInfoItem* item = new UITransferInfoItem();
+    item->itemId(QUuid::createUuid().toString());
+    item->fileInfo(new RootFileUIInfo(item));
+    item->isFileTransfer(false);
+    item->chatMsg(chatMsg);
+    item->isChatSending(sending);
+    return item;
+}
+
 
 FileTransferManager* FileTransferManager::me()
 {
@@ -56,6 +78,7 @@ struct FileTransferManagerPrivate {
 
     ~FileTransferManagerPrivate()
     {
+        TransferHandlers.clear();
         saveFailedTransfer();
     }
 
@@ -69,11 +92,7 @@ struct FileTransferManagerPrivate {
         if (!TransferHandlers.contains(handler->transferId())) {
             TransferHandlers[handler->transferId()] = handler;
 
-            QObject::connect(handler, &FileHandlerBase::transferDone, [=]() {
-                if (TransferHandlers.contains(handler->transferId())) {
-                    TransferHandlers.remove(handler->transferId());
-                }
-            });
+            QObject::connect(handler, SIGNAL(transferDone()), q, SLOT(onTransferDone()));
 
             QObject::connect(handler, &FileHandlerBase::transferStatusChanged, [=](TransferStatusFlag::ControlStatus status) {
                 auto uiInfo = HistoryMgr->getHistoryItemByTransferId(handler->connection(), handler->transferId());
@@ -335,24 +354,10 @@ void FileTransferManager::onReceivedFilePart(Connection* conn, FilePartTransferA
 }
 
 
-UITransferInfoItem* UITransferInfoItem::create(RootFileUIInfo* rootFileInfo)
+void FileTransferManager::onTransferDone()
 {
-    UITransferInfoItem* item = new UITransferInfoItem();
-    item->itemId(QUuid::createUuid().toString());
-    rootFileInfo->setParent(item);
-    item->fileInfo(rootFileInfo);
-    item->isFileTransfer(true);
-    return item;
-}
-
-
-UITransferInfoItem* UITransferInfoItem::create(const QString& chatMsg, bool sending)
-{
-    UITransferInfoItem* item = new UITransferInfoItem();
-    item->itemId(QUuid::createUuid().toString());
-    item->fileInfo(new RootFileUIInfo(item));
-    item->isFileTransfer(false);
-    item->chatMsg(chatMsg);
-    item->isChatSending(sending);
-    return item;
+    auto handler = qobject_cast<FileHandlerBase*>(sender());
+    if (d->TransferHandlers.contains(handler->transferId())) {
+        d->TransferHandlers.remove(handler->transferId());
+    }
 }
