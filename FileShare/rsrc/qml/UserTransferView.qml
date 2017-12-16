@@ -60,13 +60,7 @@ Rectangle {
             delegate:  Rectangle {
                 color: "#444444"
                 anchors.left: parent.left; anchors.right: parent.right
-                height: 40
-                MouseArea {
-                    id: mouseItem
-                    anchors.fill: parent
-                    hoverEnabled: true
-                }
-
+                height: 40                
                 Item {
                     anchors.fill: parent
                     anchors.margins: 5
@@ -105,6 +99,7 @@ Rectangle {
                     }
                 }
 
+
                 LabelEx {
                     anchors.fill: parent
                     anchors.margins: 2
@@ -132,15 +127,22 @@ Rectangle {
                     onLinkActivated: Utils.openUrl(link)
                 }
 
+                MouseArea {
+                    id: mouseItem
+                    anchors.fill: parent
+                    hoverEnabled: true
+                }
+
                 Row {
                     anchors.right: parent.right
                     anchors.rightMargin: 0
                     anchors.top: parent.top
                     anchors.topMargin: 0
                     spacing: 10
-                    visible: mouseItem.containsMouse
+                    visible: mouseItem.containsMouse || btnPlayPause.containsMouse || btnClose.containsMouse
 
                     ImageButton {
+                        id: btnPlayPause
                         width: 16; height: 16
                         visible: isFileTransfer && fileInfo.sizeFileProgress < fileInfo.sizeTotalFile &&
                                  (fileInfo.transferStatus == TransferStatusFlag.Pause || fileInfo.transferStatus == TransferStatusFlag.Running)
@@ -162,6 +164,7 @@ Rectangle {
                     }
 
                     ImageButton {
+                        id: btnClose
                         width: 16; height: 16
                         imgNormal: "qrc:/images/rsrc/images/btn-cancel.png"
                         imgHover: "qrc:/images/rsrc/images/btn-cancel.png"
@@ -260,7 +263,7 @@ Rectangle {
         onChatTransfer: {
             if (conn == view.connObj) {
                 transferHistoryModel.append(uiInfo)
-                if (!appWindow.visible || appWindow.visibility == Window.Minimized) {
+                if (!appWindow.visible /*|| appWindow.visibility == Window.Minimized*/) {
                     TrayMgr.showMessage(view.connObj.peerViewInfo.name, uiInfo.chatMsg)
                 }
             }

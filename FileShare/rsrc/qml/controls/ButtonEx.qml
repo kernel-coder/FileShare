@@ -8,6 +8,8 @@ Button {
     property int    iTag: -1
     property bool radioMode: false
 
+    property bool containsMouse: hovered || pressed
+
     signal clicked2(Button sender)
     signal toggled(Button sender, bool isOn)
 
