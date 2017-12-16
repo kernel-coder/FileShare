@@ -82,8 +82,6 @@ void FileTransferUIInfoHandler::addSenderHandler(Connection* conn, FileSenderHan
 {
     connect(fsh, SIGNAL(sendingRootFile(Connection*, FileTransferHeaderInfoMsg*, QString)),
             SLOT(onSendingRootFile(Connection*, FileTransferHeaderInfoMsg*, QString)));
-    connect(fsh, SIGNAL(fileSent(Connection*, FileTransferAckMsg*)),
-            SLOT(onFileSent(Connection*, FileTransferAckMsg*)));
     connect(fsh, SIGNAL(filePartSent(Connection*, FilePartTransferAckMsg*)),
             SLOT(onFilePartSent(Connection*, FilePartTransferAckMsg*)));
     d->addTransferHandler(fsh);
@@ -112,12 +110,6 @@ void FileTransferUIInfoHandler::onSendingRootFile(Connection* conn, FileTransfer
     info->sizeFileProgress(msg->progressSize());
     info->filePathRoot(sourcePath);
     info->transferStatus(TransferStatusFlag::Running);
-}
-
-
-void FileTransferUIInfoHandler::onFileSent(Connection* conn, FileTransferAckMsg *msg)
-{
-
 }
 
 

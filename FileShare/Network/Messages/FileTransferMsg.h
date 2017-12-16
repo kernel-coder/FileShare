@@ -78,8 +78,12 @@ public:
     FileTransferAckMsg(const QString& transferId = ""
             , const QString& uuid = ""
             , const QString& filename = ""
+            , bool skipping = false
             , quint64 startPos = 0
             , QObject* p = 0);
 
+    MetaPropertyPublicSet_Ex(bool, skipping)
+    virtual void read(QDataStream &buf);
+    virtual void write(QDataStream &buf);
     virtual int typeId();
 };

@@ -16,13 +16,12 @@ public:
 
 protected:
     void cleanup(TransferStatusFlag::ControlStatus);
-    void handleThreadStarting();
+    void handleInitialize();
     void handleMessageComingFrom(Connection* conn, Message* msg);
 
 signals:
     void startingFile(Connection* conn, const QString& file);
     void sendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
-    void fileSent(Connection* conn, FileTransferAckMsg* msg);
     void filePartSent(Connection* conn, FilePartTransferAckMsg* msg);    
 
 private slots:

@@ -71,7 +71,6 @@ public slots:
 
 private slots:
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
-    void onFileSent(Connection* conn, FileTransferAckMsg* msg);
     void onFilePartSent(Connection* conn, FilePartTransferAckMsg* msg);
     void onReceivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);
 

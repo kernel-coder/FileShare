@@ -2,7 +2,7 @@
 
 
 FilePartTransferAckMsg::FilePartTransferAckMsg(const QString& transferId, const QString &uuid,
-                                               int fileNo, int seqNo, int size, int progressSize, QObject *p)
+                                               int fileNo, int seqNo, int size, quint64 progressSize, QObject *p)
     : Message(p)
     , _transferId(transferId)
     , _uuid(uuid)
@@ -44,7 +44,7 @@ int FilePartTransferAckMsg::typeId() { return FilePartTransferAckMsg::TypeID;}
 
 
 FilePartTransferMsg::FilePartTransferMsg(const QString& transferId, const QString &uuid, int fileNo,
-                                         int seqNo, int size, int progressSize, const QByteArray &data, QObject *p)
+                                         int seqNo, int size, quint64 progressSize, const QByteArray &data, QObject *p)
     : FilePartTransferAckMsg(transferId, uuid, fileNo, seqNo, size, progressSize, p)
     , _data(data)
 {

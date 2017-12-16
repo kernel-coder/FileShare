@@ -16,7 +16,7 @@ signals:
     void receivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);
 
 protected:
-    void handleThreadStarting();
+    void handleInitialize();
     void handleMessageComingFrom(Connection* conn, Message* msg);
 
 private:

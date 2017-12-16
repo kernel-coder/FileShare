@@ -17,6 +17,7 @@
 #include <QtMath>
 #include <QThread>
 #include "FileTransferUIInfoHandler.h"
+#include "AppSettings.h"
 
 
 FileReceiverHandler::FileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg *msg, QObject *p)
@@ -37,7 +38,7 @@ FileReceiverHandler::~FileReceiverHandler()
 }
 
 
-void FileReceiverHandler::handleThreadStarting()
+void FileReceiverHandler::handleInitialize()
 {
     transferStatus(TransferStatusFlag::Running);
     auto headerAck = new FileTransferHeaderInfoAckMsg(mHeaderInfoMsg->transferId(),
@@ -63,26 +64,45 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
                 Utils::me()->makePath(filename);
                 if (!filename.endsWith("/")) filename += "/";
                 filename += mFileMsg->filename();
-                mFile = new QFile(filename);
-                qDebug() << "Receving file: "  << filename;
-                if (mFileMsg->startPos() > 0) {
-                    if (mFile->open(QFile::Append)) {
-                        qint64 cp = mFile->pos();
-                        mFile->seek(0);
-                        cp = mFile->pos();
-                        mFile->seek(mFileMsg->startPos());
-                        cp = mFile->pos();
+                bool skipping = false;
+                if (AppSettings::me()->skippExistingFile()) {
+                    QFileInfo fi(filename);
+                    if (fi.exists() && fi.size() == mFileMsg->size()) {
+                        skipping = true;
                     }
                 }
-                else {
-                    mFile->open(QFile::WriteOnly);
-                }
-                FileTransferAckMsg* ackMsg = new FileTransferAckMsg(mFileMsg->transferId(), mFileMsg->uuid(), mFileMsg->filename(), mFileMsg->startPos());
+
+                FileTransferAckMsg* ackMsg = new FileTransferAckMsg(mFileMsg->transferId(),
+                                                                    mFileMsg->uuid(),
+                                                                    mFileMsg->filename(),
+                                                                    skipping,
+                                                                    mFileMsg->startPos());
                 ackMsg->basePath(mFileMsg->basePath());
                 ackMsg->size(mFileMsg->size());
                 ackMsg->seqCount(mFileMsg->seqCount());
                 ackMsg->fileNo(mFileMsg->fileNo());
                 emit sendMsg(ackMsg);
+
+                if (skipping) {
+                    mFileMsg->deleteLater();
+                    mFileMsg = 0;
+                }
+                else {
+                    mFile = new QFile(filename);
+                    qDebug() << "Receving file: "  << filename;
+                    if (mFileMsg->startPos() > 0) {
+                        if (mFile->open(QFile::Append)) {
+                            qint64 cp = mFile->pos();
+                            mFile->seek(0);
+                            cp = mFile->pos();
+                            mFile->seek(mFileMsg->startPos());
+                            cp = mFile->pos();
+                        }
+                    }
+                    else {
+                        mFile->open(QFile::WriteOnly);
+                    }
+                }
             }
         }
         else if (msg->typeId() == FilePartTransferMsg::TypeID) {
@@ -101,6 +121,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
 
                if (fptm->seqNo() + 1 == mFileMsg->seqCount()) {
                    qDebug() << "File Received: "  << mFile->fileName();
+                   mFile->flush();
                    mFile->close();
                    mFile->deleteLater();
                    mFileMsg->deleteLater();

@@ -104,7 +104,7 @@ bool FileTransferManager::resumeFailedTransfer(Connection *conn, const QString &
     if (item) {
         FileSenderHandler* handler = new FileSenderHandler(conn, item, this);
         FileMgrUIHandler->addSenderHandler(conn, handler);
-        handler->start();
+        handler->initialize();
         return true;
     }
     else {
@@ -121,7 +121,7 @@ void FileTransferManager::shareFilesTo(Connection *conn, const QList<QUrl> &urls
     foreach (QString rootFile, files) {
         FileSenderHandler* handler = new FileSenderHandler(conn, QStringList(rootFile), this);
         FileMgrUIHandler->addSenderHandler(conn, handler);
-        handler->start();
+        handler->initialize();
     }
 }
 
@@ -139,7 +139,7 @@ void FileTransferManager::onNewMsgCome(Connection *conn, Message *msg)
     if (msg->typeId() == FileTransferHeaderInfoMsg::TypeID) {
         FileReceiverHandler* handler = new FileReceiverHandler(conn, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
         FileMgrUIHandler->addReceiverHandler(conn, handler, qobject_cast<FileTransferHeaderInfoMsg*>(msg));
-        handler->start();
+        handler->initialize();
     }
     else if (msg->typeId() == TransferControlMsg::TypeID) {
         auto cmsg = qobject_cast<TransferControlMsg*>(msg);

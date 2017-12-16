@@ -58,6 +58,9 @@ FileTransferMsg::FileTransferMsg(const QString& transferId, const QString& uuid,
 }
 
 
+int FileTransferMsg::typeId() { return FileTransferMsg::TypeID;}
+
+
 void FileTransferMsg::write(QDataStream &buf)
 {
     buf << typeId();
@@ -83,15 +86,28 @@ void FileTransferMsg::read(QDataStream &buf)
 }
 
 
-int FileTransferMsg::typeId() { return FileTransferMsg::TypeID;}
-
-
 FileTransferAckMsg::FileTransferAckMsg(const QString& transferId,
                                        const QString& uuid,
-                                       const QString& filename, quint64 startPos, QObject* p)
+                                       const QString& filename,
+                                       bool skipping,
+                                       quint64 startPos, QObject* p)
     : FileTransferMsg(transferId, uuid, filename, startPos, p)
+    , _skipping(skipping)
 {
 }
 
 
 int FileTransferAckMsg::typeId() { return FileTransferAckMsg::TypeID;}
+
+void FileTransferAckMsg::write(QDataStream &buf)
+{
+    FileTransferMsg::write(buf);
+    buf << _skipping;
+}
+
+
+void FileTransferAckMsg::read(QDataStream &buf)
+{
+    FileTransferMsg::read(buf);
+    buf >> _skipping;
+}

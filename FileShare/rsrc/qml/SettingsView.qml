@@ -63,6 +63,25 @@ Rectangle {
         }
 
         Row {
+            spacing: 2
+            anchors.horizontalCenter: parent.horizontalCenter
+            LabelEx {
+                text: "Skip Existing File"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            CheckBox {
+                anchors.verticalCenter: parent.verticalCenter
+                checked: AppSettings.skippExistingFile
+                onClicked: {
+                    if (checked != AppSettings.skippExistingFile) {
+                        AppSettings.skippExistingFile = checked
+                    }
+                }
+            }
+        }
+
+        Row {
             spacing: 5
             LabelEx {text: "Save To:"}
             TextField{id: tfPath; width: 200; text: NetMgr.saveFolderName}

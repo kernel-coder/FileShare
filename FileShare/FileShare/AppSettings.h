@@ -13,6 +13,7 @@ public:
     MetaPropertyPublicSet_Ex(qreal, appPosY)
     MetaPropertyPublicSet_Ex(qreal, appWidth)
     MetaPropertyPublicSet_Ex(qreal, appHeight)
+    MetaPropertyPublicSet_Ex(bool, skippExistingFile)
 
 public slots:
     void updateAppGeometry(qreal x, qreal y, qreal w, qreal h);

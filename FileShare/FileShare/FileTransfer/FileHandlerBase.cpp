@@ -7,13 +7,12 @@
 
 
 FileHandlerBase::FileHandlerBase(Connection *conn, const QString& transferId, QObject *p)
-    : QThread(p)
+    : QObject(p)
     , mConnection(conn)
     , _transferStatus(TransferStatusFlag::NotStarted)
 {
     mTransferId = transferId.isEmpty() ? QUuid::createUuid().toString() : transferId;
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-    connect(this, SIGNAL(started()), this, SLOT(onThreadStarted()));
     connect(NetMgr, &NetworkManager::participantLeft, [=](Connection* conn) {
         if (conn == mConnection) {
             destroyMyself(TransferStatusFlag::Failed);
@@ -38,16 +37,15 @@ void FileHandlerBase::destroyMyself(TransferStatusFlag::ControlStatus reason)
     transferStatus(reason);
     cleanup(reason);
     emit transferDone();
-    exit();
     this->deleteLater();
 }
 
 
-void FileHandlerBase::onThreadStarted()
+void FileHandlerBase::initialize()
 {    
     connect(mConnection, SIGNAL(newMessageArrived(Connection*,Message*)), this, SLOT(onMessageComeFrom(Connection*,Message*)));
     connect(this, SIGNAL(sendMsg(Message*)), mConnection, SLOT(sendMessage(Message*)));
-    handleThreadStarting();
+    handleInitialize();
 }
 
 

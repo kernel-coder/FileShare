@@ -22,6 +22,7 @@ AppSettings::AppSettings(QObject* p) : JObject(p)
     _appPosY = s.value("appPosY", 0).toReal();
     _appWidth = W_CHECK(s.value("appWidth", 680).toReal());
     _appHeight = H_CHECK(s.value("appHeight", 480).toReal());
+    _skippExistingFile = s.value("skippExistingFile", true).toBool();
 }
 
 

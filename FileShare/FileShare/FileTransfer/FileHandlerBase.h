@@ -12,7 +12,7 @@ class FileTransferAckMsg;
 class FilePartTransferAckMsg;
 class QFile;
 
-class FileHandlerBase : public QThread
+class FileHandlerBase : public QObject
 {
     Q_OBJECT
 public:
@@ -23,6 +23,9 @@ public:
     Connection* connection();
     void destroyMyself(TransferStatusFlag::ControlStatus reason);
 
+public slots:
+    void initialize();
+
 signals:
     void sendMsg(Message* msg);
     void transferDone();
@@ -30,12 +33,11 @@ signals:
 public:
     MetaPropertyPublicSet_Ex(TransferStatusFlag::ControlStatus, transferStatus)
 
-private slots:
-    void onThreadStarted();
+private slots:    
     void onMessageComeFrom(Connection* conn, Message* msg);
 
 protected:    
-    virtual void handleThreadStarting() = 0;
+    virtual void handleInitialize() = 0;
     virtual void handleMessageComingFrom(Connection* conn, Message* msg) = 0;
     virtual void cleanup(TransferStatusFlag::ControlStatus){}
 
