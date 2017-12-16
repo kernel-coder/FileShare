@@ -19,7 +19,7 @@ Connection::Connection(QObject *parent)
 {
     QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     _id = ++cRefCounter;
-    qDebug() << "Conn Construction " << _id;
+    //qDebug() << "Conn Construction " << _id;
     connect(this, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(this, SIGNAL(readyRead()), this, SLOT(onDataReadReady()));
 }
@@ -27,19 +27,19 @@ Connection::Connection(QObject *parent)
 
 Connection::~Connection()
 {
-    qDebug() << "Conn Destruction " << _id;
+    //qDebug() << "Conn Destruction " << _id;
 }
 
 
 void Connection::onConnected()
 {
-    qDebug() << "Connected";
+    //qDebug() << "Connected";
     QTimer::singleShot(100, this, SLOT(sendClientViewInfo()));
 }
 
 void Connection::onDataReadReady()
 {
-    qDebug() << "GOT BYTES " << bytesAvailable();
+    //qDebug() << "GOT BYTES " << bytesAvailable();
     QMutexLocker locker(&mMutex);
     QDataStream in(this);
     in.setVersion(QDataStream::Qt_4_6);
@@ -55,7 +55,7 @@ void Connection::onDataReadReady()
 
         mMsgSize = 0;
         Message *msg = MsgSystem::readAndContruct(in);
-        qDebug() << QString("Message %1 receiving from %2").arg(msg->metaObject()->className()).arg(_id);
+        //qDebug() << QString("Message %1 receiving from %2").arg(msg->metaObject()->className()).arg(_id);
 
         if(msg){
             if(msg->typeId() == PeerViewInfoMsg::TypeID) {
@@ -71,7 +71,7 @@ void Connection::onDataReadReady()
                             sendClientViewInfo();
                         }
                         peerViewInfo(pvi);
-                        qDebug() << "Firing readyForuse fired " << _id;
+                        //qDebug() << "Firing readyForuse fired " << _id;
                         emit readyForUse();
                     }
                 }
@@ -96,7 +96,7 @@ void Connection::sendClientViewInfo()
 void Connection::sendMessage(Message *msg)
 {
     if(msg){
-        qDebug() << QString("Message %1 sending to %2").arg(msg->metaObject()->className()).arg(_id);
+        //qDebug() << QString("Message %1 sending to %2").arg(msg->metaObject()->className()).arg(_id);
         QByteArray block;
         QDataStream stream(&block, QIODevice::ReadWrite);
         stream.setVersion(QDataStream::Qt_4_6);

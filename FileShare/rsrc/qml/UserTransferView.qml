@@ -275,7 +275,6 @@ Rectangle {
         onHistoryItemRemoved : {
             if (conn == view.connObj) {
                 var ioi = indexOfItem(item)
-                console.log('index ioi: ', ioi)
                 if (ioi >= 0) {
                     transferHistoryModel.remove(ioi, 1)
                 }
