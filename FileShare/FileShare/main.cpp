@@ -102,45 +102,80 @@ void registersSingletonObjects()
 }
 
 
+class FileShareApp : public QApplication {
+public:
+    FileShareApp(int argc, char* argv[])
+        : QApplication(argc, argv) {}
+
+    bool notify(QObject* receiver, QEvent* event)
+    {
+        try {
+            return QApplication::notify(receiver, event);
+        }
+        catch (std::exception &e) {
+            qFatal("Error %s sending event %s to object %s (%s)",
+                e.what(), typeid(*event).name(), qPrintable(receiver->objectName()),
+                typeid(*receiver).name());
+        }
+        catch (...) {
+            qFatal("Error <unknown> sending event %s to object %s (%s)",
+                typeid(*event).name(), qPrintable(receiver->objectName()),
+                typeid(*receiver).name());
+        }
+
+        // qFatal aborts, so this isn't really necessary
+        // but you might continue if you use a different logging lib
+        return false;
+    }
+};
+
 int main(int argc, char *argv[])
 {
-    atexit(appCleanup);
-    qRegisterMetaType<QMap<QString, QByteArray>>("QMap<QString,QByteArray>");
-    qRegisterMetaType<QHostAddress>("QHostAddress");
-    qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
-    qRegisterMetaType<QList<UITransferInfoItem*>>("QList<UITransferInfoItem>");
+    int returnCode = 0;
+    try {
+        atexit(appCleanup);
+        qRegisterMetaType<QMap<QString, QByteArray>>("QMap<QString,QByteArray>");
+        qRegisterMetaType<QHostAddress>("QHostAddress");
+        qRegisterMetaType<QAbstractSocket::SocketError>("QAbstractSocket::SocketError");
+        qRegisterMetaType<QList<UITransferInfoItem*>>("QList<UITransferInfoItem>");
 
-    qInstallMessageHandler(customMessageHandler);
+        qInstallMessageHandler(customMessageHandler);
 
-    QApplication app(argc, argv);
-    app.setOrganizationName("KCL");
-    app.setApplicationName("QFileShare");
+        FileShareApp app(argc, argv);
+        app.setOrganizationName("KCL");
+        app.setApplicationName("QFileShare");
 
-    QsLogging::Logger& logger = QsLogging::Logger::instance();
-    logger.setLoggingLevel(QsLogging::TraceLevel);
-    QsLogging::DestinationPtr debugDestination(
-           QsLogging::DestinationFactory::MakeDebugOutputDestination() );
-        logger.addDestination(debugDestination.get());
+        QsLogging::Logger& logger = QsLogging::Logger::instance();
+        logger.setLoggingLevel(QsLogging::TraceLevel);
+        QsLogging::DestinationPtr debugDestination(
+               QsLogging::DestinationFactory::MakeDebugOutputDestination() );
+            logger.addDestination(debugDestination.get());
 
-    const QString sLogPath = Utils::me()->findUniqueLogFilename("log-fs.txt");
-    QsLogging::DestinationPtr fileDestination(
-         QsLogging::DestinationFactory::MakeFileDestination(sLogPath));
-    logger.addDestination(fileDestination.get());
+        const QString sLogPath = Utils::me()->findUniqueLogFilename("log-fs.txt");
+        QsLogging::DestinationPtr fileDestination(
+             QsLogging::DestinationFactory::MakeFileDestination(sLogPath));
+        logger.addDestination(fileDestination.get());
 
-    registersQmlComponents();
-    registersSingletonObjects();
+        registersQmlComponents();
+        registersSingletonObjects();
 
-    TrayMgr->showMessage("LAN Sharing", "Starting...", QSystemTrayIcon::Information);
+        TrayMgr->showMessage("LAN Sharing", "Starting...", QSystemTrayIcon::Information);
 
-    AppSettings::me();
-    NetworkManager::me();
-    FileTransferManager::me();
-    FileTransferUIInfoHandler::me();
+        AppSettings::me();
+        NetworkManager::me();
+        FileTransferManager::me();
+        FileTransferUIInfoHandler::me();
 
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/qml/rsrc/qml/main.qml")));    
+        QQmlApplicationEngine engine;
+        engine.load(QUrl(QStringLiteral("qrc:/qml/rsrc/qml/main.qml")));
 
-
-
-    return app.exec();
+        returnCode = app.exec();
+    }
+    catch (std::exception &e) {
+        qFatal("std exception: %s ", e.what());
+    }
+    catch (...) {
+        qFatal("App crashed: Unknown exception");
+    }
+    return returnCode;
 }
