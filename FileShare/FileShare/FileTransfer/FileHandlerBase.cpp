@@ -12,7 +12,6 @@ FileHandlerBase::FileHandlerBase(Connection *conn, const QString& transferId, QO
     , _transferStatus(TransferStatusFlag::NotStarted)
 {
     mTransferId = transferId.isEmpty() ? QUuid::createUuid().toString() : transferId;
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
     connect(NetMgr, &NetworkManager::participantLeft, [=](Connection* conn) {
         if (conn == mConnection) {
             destroyMyself(TransferStatusFlag::Failed);

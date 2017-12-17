@@ -306,8 +306,12 @@ void FileTransferManager::deleteItem(Connection* conn, const QString& itemId)
             msg->status(TransferStatusFlag::Delete);
             conn->sendMessage(msg);
         }
+        auto failedItem = removeFailedTransferItem(uiItem->fileInfo()->transferId());
+        if (failedItem) {
+            failedItem->deleteLater();
+        }
     }
-    HistoryMgr->removeHistoryItemByItemId(conn, itemId);
+    HistoryMgr->removeHistoryItemByItemId(conn, itemId);    
 }
 
 
