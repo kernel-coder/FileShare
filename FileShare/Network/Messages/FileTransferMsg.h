@@ -61,7 +61,7 @@ public:
     MetaPropertyPublicSet_Ex(QString, filename)
     MetaPropertyPublicSet_Ex(int, fileNo)
     MetaPropertyPublicSet_Ex(quint64, size)
-    MetaPropertyPublicSet_Ex(int, seqCount)
+    MetaPropertyPublicSet_Ex(qint64, seqCount)
     MetaPropertyPublicSet_Ex(quint64, startPos)
 
     virtual void read(QDataStream &buf);

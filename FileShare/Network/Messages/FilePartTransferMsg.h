@@ -10,14 +10,14 @@ public:
     FilePartTransferAckMsg(const QString& transferId = "",
                            const QString& uuid = "",
                            int fileNo = -1,
-                           int seqNo = -1,
+                           qint64 seqNo = -1,
                            int size  = 0,
                            quint64 progressSize  = 0,
                            QObject* p = 0);
 
     MetaPropertyPublicSet_Ex(QString, transferId)
     MetaPropertyPublicSet_Ex(QString, uuid)
-    MetaPropertyPublicSet_Ex(int, seqNo)
+    MetaPropertyPublicSet_Ex(qint64, seqNo)
     MetaPropertyPublicSet_Ex(int, fileNo)
     MetaPropertyPublicSet_Ex(int, size)
     MetaPropertyPublicSet_Ex(quint64, progressSize)
@@ -35,7 +35,7 @@ public:
     FilePartTransferMsg(const QString& transferId = "",
                         const QString& uuid = "",
                         int fileNo = -1,
-                        int seqNo = -1,
+                        qint64 seqNo = -1,
                         int size  = 0,
                         quint64 progressSize  = 0,
                         const QByteArray& data = QByteArray(),

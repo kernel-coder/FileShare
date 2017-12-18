@@ -21,7 +21,8 @@ protected:
 
 private:
     FileTransferHeaderInfoMsg* mHeaderInfoMsg;
-    FileTransferMsg* mFileMsg;
     QFile* mFile;
     int mFileFlushMark;
+    QString mFileUUID;
+    qint64 mFileSeqCount;
 };

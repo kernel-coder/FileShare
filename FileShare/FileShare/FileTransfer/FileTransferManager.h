@@ -59,7 +59,7 @@ public:
     MetaPropertyPublicSet_List(QString, rootFiles)
     MetaPropertyPublicSet(int, rootFileIndex)
     MetaPropertyPublicSet(int, fileIndex)
-    MetaPropertyPublicSet(int, seqIndex)
+    MetaPropertyPublicSet(qint64, seqIndex)
     MetaPropertyPublicSet(quint64, progressSize)
 };
 

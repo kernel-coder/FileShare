@@ -30,7 +30,7 @@ private slots:
 private:
     void parseFile(const QFileInfo& file);
     void sendFile();
-    void sendFilePart(int seqNo);
+    void sendFilePart(qint64 seqNo);
 
 private:    
     bool mTransferDone;
@@ -47,7 +47,7 @@ private:
 
     // a file transfer related
     QString mFileUuid;
-    int mTotalSeqCount;
+    qint64 mTotalSeqCount;
     QFile* mFile;
-    int mCurrentSeqNo;
+    qint64 mCurrentSeqNo;
 };

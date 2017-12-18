@@ -144,7 +144,7 @@ void FileSenderHandler::sendFile()
 }
 
 
-void FileSenderHandler::sendFilePart(int seqNo)
+void FileSenderHandler::sendFilePart(qint64 seqNo)
 {
     if (transferStatus() == TransferStatusFlag::Running) {
         if (seqNo < mTotalSeqCount) {
