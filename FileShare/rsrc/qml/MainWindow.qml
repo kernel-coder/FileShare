@@ -13,11 +13,10 @@ Item {
     property var peersModel : ListModel{}
 
     function showMessage(title, msg, desc) {
-        messageBox.visible = true
-        msgDlg.title = title
-        msgDlg.text = msg
-        msgDlg.detailedText = desc
-        msgDlg.open()
+        lblMsgBoxTitle.text = title
+        lblMsgBoxMessage.text = msg
+        lblMsgBoxDescription.text = desc
+        messageBox.visible = true        
     }
 
 
@@ -256,20 +255,49 @@ Item {
         }
     }
 
-    Item {
+    Rectangle {
         id: messageBox
         visible: false
-
-        Rectangle {
+        anchors.left: parent.left;
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: 150
+        color: "white"
+        opacity: 1
+        Column {
             anchors.fill: parent
-            color: "white"
-            opacity: 0.6
-        }
+            anchors.margins: 5
+            spacing: 10
+            LabelEx {
+                id: lblMsgBoxTitle
+                anchors.horizontalCenter: parent.horizontalCenter
+                wrapMode: Text.NoWrap
+                font.pixelSize: 24
+                elide: Text.ElideMiddle
+                color: "#D03A41"
+            }
 
-        MessageDialog {
-            id: msgDlg
-            onAccepted: messageBox.visible = false
-            onRejected: messageBox.visible = false
+            LabelEx {
+                id: lblMsgBoxMessage
+                anchors.left: parent.left
+                anchors.right: parent.right
+                horizontalAlignment: Qt.AlignHCenter
+                wrapMode: Text.WordWrap
+                font.pixelSize: 16
+                color: "#444444"
+                elide: Text.ElideRight
+            }
+
+            LabelEx {
+                id: lblMsgBoxDescription
+                anchors.left: parent.left
+                anchors.right: parent.right
+                horizontalAlignment: Qt.AlignHCenter
+                wrapMode: Text.WordWrap
+                font.pixelSize: 10
+                color: "gray"
+                elide: Text.ElideRight
+            }
         }
     }
 
