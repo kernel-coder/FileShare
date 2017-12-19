@@ -299,6 +299,17 @@ Item {
                 elide: Text.ElideRight
             }
         }
+
+        ImageButton {
+            id: btnClose
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.margins: 5
+            imgNormal: "qrc:/images/rsrc/images/btn-cancel.png"
+            imgHover: "qrc:/images/rsrc/images/btn-cancel.png"
+            imgPressed: "qrc:/images/rsrc/images/btn-cancel-pressed.png"
+            onClicked2: messageBox.visible = false
+        }
     }
 
     Connections {
