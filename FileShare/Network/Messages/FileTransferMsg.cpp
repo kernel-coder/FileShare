@@ -68,6 +68,7 @@ void FileTransferMsg::write(QDataStream &buf)
     buf << _uuid;
     buf << _basePath;
     buf << _filename;
+    buf << _fileNo;
     buf << _size;
     buf << _seqCount;
     buf << _startPos;
@@ -81,6 +82,7 @@ void FileTransferMsg::read(QDataStream &buf)
     buf >> _uuid;
     buf >> _basePath;
     buf >> _filename;
+    buf >> _fileNo;
     buf >> _size;
     buf >> _seqCount;
     buf >> _startPos;
