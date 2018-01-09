@@ -12,9 +12,6 @@ public:
     FileReceiverHandler(Connection* conn, FileTransferHeaderInfoMsg* msg, QObject* p = 0);
     ~FileReceiverHandler();
 
-signals:
-    void receivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);
-
 protected:
     void handleInitialize();
     void handleMessageComingFrom(Connection* conn, Message* msg);

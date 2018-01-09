@@ -21,8 +21,7 @@ protected:
 
 signals:
     void startingFile(Connection* conn, const QString& file);
-    void sendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
-    void filePartSent(Connection* conn, FilePartTransferAckMsg* msg);    
+    void sendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);    
 
 private slots:
     void sendRootFile();

@@ -132,6 +132,7 @@ void FileSenderHandler::sendFile()
             msg->basePath("");
         }
         msg->size(fi.size());
+        msg->progressSize(mRootProgressSize + fi.size());
         msg->fileNo(mCurrentFileIndex + 1);
         mTotalSeqCount = qCeil(((qreal)msg->size())/MSG_LEN);
         msg->seqCount(mTotalSeqCount);
@@ -157,10 +158,13 @@ void FileSenderHandler::sendFilePart(qint64 seqNo)
                                                                data);
             emit sendMsg(msg);
         }
-        else {
-            qDebug() << "File sent: "  << mFile->fileName();
-            mFile->close();
-            mFile->deleteLater();
+        else {            
+            if (mFile) {
+                qDebug() << "File sent: "  << mFile->fileName();
+                mFile->close();
+                mFile->deleteLater();
+                mFile = nullptr;
+            }
             mCurrentFileIndex++;
             sendFile();
         }
@@ -181,15 +185,16 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
         else if (msg->typeId() == FileTransferAckMsg::TypeID) {
             FileTransferAckMsg* ackMsg = qobject_cast<FileTransferAckMsg*>(msg);
             if (ackMsg->uuid() == mFileUuid) {
-                if (ackMsg->skipping()) {
-                    mRootProgressSize += ackMsg->size();
+                if (ackMsg->skipping()) {                    
+                    emit transferInfoUpdated(mConnection, ackMsg->transferId(), ackMsg->progressSize(), ackMsg->fileNo());
+                    mRootProgressSize = ackMsg->progressSize();
                     mCurrentFileIndex++;
                     sendFile();
                 }
                 else {
-                    mFile = new QFile(mAllFiles.at(mCurrentFileIndex).absoluteFilePath());
-                    qDebug() << "Sending file: "  << mFile->fileName();
+                    mFile = new QFile(mAllFiles.at(mCurrentFileIndex).absoluteFilePath());                    
                     if (mFile->open(QFile::ReadOnly)) {
+                        qDebug() << "Sending file: " << mFile->fileName();
                         if (mFailedItem) {
                             mFile->seek(mFailedItem->progressSize());
                             sendFilePart(mFailedItem->seqIndex() + 1);
@@ -197,8 +202,12 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
                             mFailedItem = 0;
                         }
                         else {
-                            sendFilePart( 0);
+                            sendFilePart(0);
                         }
+                    }
+                    else {
+                        qDebug() << "Failed to open file: " << mFile->fileName();
+                        sendFilePart(mTotalSeqCount);
                     }
                 }
                 ackMsg->deleteLater();
@@ -209,7 +218,7 @@ void FileSenderHandler::handleMessageComingFrom(Connection *sender, Message *msg
             if (ackMsg->uuid() == mFileUuid) {
                 mCurrentSeqNo = ackMsg->seqNo();
                 mRootProgressSize = ackMsg->progressSize();
-                emit filePartSent(mConnection, ackMsg);
+                emit transferInfoUpdated(mConnection, ackMsg->transferId(), ackMsg->progressSize(), ackMsg->fileNo());
                 sendFilePart(ackMsg->seqNo() + 1);
                 ackMsg->deleteLater();
             }            

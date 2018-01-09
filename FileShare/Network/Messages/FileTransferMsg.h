@@ -63,6 +63,7 @@ public:
     MetaPropertyPublicSet_Ex(quint64, size)
     MetaPropertyPublicSet_Ex(qint64, seqCount)
     MetaPropertyPublicSet_Ex(quint64, startPos)
+    MetaPropertyPublicSet_Ex(quint64, progressSize)
 
     virtual void read(QDataStream &buf);
     virtual void write(QDataStream &buf);

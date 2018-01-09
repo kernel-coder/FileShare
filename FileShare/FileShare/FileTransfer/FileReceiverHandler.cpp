@@ -69,6 +69,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
                     QFileInfo fi(filename);
                     if (fi.exists() && fi.size() == fMsg->size()) {
                         skipping = true;
+                        emit transferInfoUpdated(mConnection, fMsg->transferId(), fMsg->progressSize(), fMsg->fileNo());
                     }
                 }
 
@@ -98,6 +99,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
                                                                     fMsg->startPos());
                 ackMsg->basePath(fMsg->basePath());
                 ackMsg->size(fMsg->size());
+                ackMsg->progressSize(fMsg->progressSize());
                 ackMsg->seqCount(fMsg->seqCount());
                 ackMsg->fileNo(fMsg->fileNo());
                 emit sendMsg(ackMsg);
@@ -115,7 +117,7 @@ void FileReceiverHandler::handleMessageComingFrom(Connection *conn, Message *msg
                    mFileFlushMark = 0;
                }
                FilePartTransferAckMsg* ackMsg = new FilePartTransferAckMsg(fptm->transferId(), fptm->uuid(), fptm->fileNo(), fptm->seqNo(), fptm->size(), fptm->progressSize());
-               emit receivedFilePart(mConnection, ackMsg);
+               emit transferInfoUpdated(mConnection, ackMsg->transferId(), ackMsg->progressSize(), ackMsg->fileNo());
                emit sendMsg(ackMsg);
 
                if (fptm->seqNo() + 1 == mFileSeqCount) {

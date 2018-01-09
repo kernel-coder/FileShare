@@ -29,6 +29,7 @@ public slots:
 signals:
     void sendMsg(Message* msg);
     void transferDone();
+    void transferInfoUpdated(Connection* conn, const QString& transferId, quint64 progressSize, int fileNo);
 
 public:
     MetaPropertyPublicSet_Ex(TransferStatusFlag::ControlStatus, transferStatus)

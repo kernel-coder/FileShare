@@ -213,8 +213,8 @@ void FileTransferManager::addSenderHandler(Connection* conn, FileSenderHandler *
 {
     connect(fsh, SIGNAL(sendingRootFile(Connection*, FileTransferHeaderInfoMsg*, QString)),
             SLOT(onSendingRootFile(Connection*, FileTransferHeaderInfoMsg*, QString)));
-    connect(fsh, SIGNAL(filePartSent(Connection*, FilePartTransferAckMsg*)),
-            SLOT(onFilePartSent(Connection*, FilePartTransferAckMsg*)));
+    connect(fsh, SIGNAL(transferInfoUpdated(Connection*,QString,quint64,int)),
+            SLOT(onTransferInfoUpdated(Connection*,QString,quint64,int)));
     d->addTransferHandler(fsh);
 }
 
@@ -244,14 +244,14 @@ void FileTransferManager::onSendingRootFile(Connection* conn, FileTransferHeader
 }
 
 
-void FileTransferManager::onFilePartSent(Connection* conn, FilePartTransferAckMsg *msg)
+void FileTransferManager::onTransferInfoUpdated(Connection* conn, const QString& transferId, quint64 progressSize, int fileNo)
 {
-    auto uiInfo = HistoryMgr->getHistoryItemByTransferId(conn, msg->transferId());
+    auto uiInfo = HistoryMgr->getHistoryItemByTransferId(conn, transferId);
     if (uiInfo) {
-        uiInfo->fileInfo()->sizeFileProgress(msg->progressSize());
-        uiInfo->fileInfo()->countFileProgress(msg->fileNo() - 1);
+        uiInfo->fileInfo()->sizeFileProgress(progressSize);
+        uiInfo->fileInfo()->countFileProgress(fileNo - 1);
         if (uiInfo->fileInfo()->sizeFileProgress() == uiInfo->fileInfo()->sizeTotalFile()) {
-            uiInfo->fileInfo()->countFileProgress(msg->fileNo());
+            uiInfo->fileInfo()->countFileProgress(fileNo);
         }
     }
 }
@@ -340,20 +340,8 @@ void FileTransferManager::addReceiverHandler(Connection* conn, FileReceiverHandl
 
 
     if (d->addTransferHandler(frh)) {
-        connect(frh, SIGNAL(receivedFilePart(Connection*, FilePartTransferAckMsg*)), SLOT(onReceivedFilePart(Connection*, FilePartTransferAckMsg*)));
-    }
-}
-
-
-void FileTransferManager::onReceivedFilePart(Connection* conn, FilePartTransferAckMsg *msg)
-{
-    auto uiInfo = HistoryMgr->getHistoryItemByTransferId(conn, msg->transferId());
-    if (uiInfo) {
-        uiInfo->fileInfo()->sizeFileProgress(msg->progressSize());
-        uiInfo->fileInfo()->countFileProgress(msg->fileNo() - 1);
-        if (uiInfo->fileInfo()->sizeFileProgress() == uiInfo->fileInfo()->sizeTotalFile()) {
-            uiInfo->fileInfo()->countFileProgress(msg->fileNo());
-        }
+        connect(frh, SIGNAL(transferInfoUpdated(Connection*,QString,quint64,int)),
+                SLOT(onTransferInfoUpdated(Connection*,QString,quint64,int)));
     }
 }
 

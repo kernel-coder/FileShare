@@ -101,8 +101,7 @@ public slots:
 private slots:
     void onNewMsgCome(Connection *sender, Message *msg);
     void onSendingRootFile(Connection* conn, FileTransferHeaderInfoMsg* msg, const QString& sourcePath);
-    void onFilePartSent(Connection* conn, FilePartTransferAckMsg* msg);
-    void onReceivedFilePart(Connection* conn, FilePartTransferAckMsg* msg);
+    void onTransferInfoUpdated(Connection* conn, const QString& transferId, quint64 progressSize, int fileNo);
     void onTransferDone();
 
 private:
