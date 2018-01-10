@@ -4,6 +4,7 @@
 #include "Messages/Message.h"
 #include "HistoryManager.h"
 #include <QUuid>
+#include <QQmlEngine>
 
 
 FileHandlerBase::FileHandlerBase(Connection *conn, const QString& transferId, QObject *p)
@@ -11,6 +12,7 @@ FileHandlerBase::FileHandlerBase(Connection *conn, const QString& transferId, QO
     , mConnection(conn)
     , _transferStatus(TransferStatusFlag::NotStarted)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     mTransferId = transferId.isEmpty() ? QUuid::createUuid().toString() : transferId;
     connect(NetMgr, &NetworkManager::participantLeft, [=](Connection* conn) {
         if (conn == mConnection) {

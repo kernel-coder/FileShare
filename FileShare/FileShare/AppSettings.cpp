@@ -1,7 +1,7 @@
 #include "AppSettings.h"
 #include <QSettings>
 #include <QCoreApplication>
-
+#include <QQmlEngine>
 
 #define W_CHECK(x) qMax(680., x)
 #define H_CHECK(x) qMax(480., x)
@@ -17,6 +17,7 @@ AppSettings* AppSettings::me()
 
 AppSettings::AppSettings(QObject* p) : JObject(p)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QSettings s;
     _appPosX = s.value("appPosX", 0).toReal();
     _appPosY = s.value("appPosY", 0).toReal();

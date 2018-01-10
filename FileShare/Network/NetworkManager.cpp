@@ -6,6 +6,7 @@
 #include "Messages/PeerViewInfoMsg.h"
 #include <QCoreApplication>
 #include "Utils.h"
+#include <QQmlEngine>
 
 #define IP_PORT_PAIR(ip, port) QString("%1:%2").arg(ip).arg(port)
 
@@ -23,6 +24,7 @@ NetworkManager* NetworkManager::me()
 NetworkManager::NetworkManager(QObject *parent) :
         QObject(parent)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     QSettings s;
     _username = s.value("username", QHostInfo::localHostName()).toString();
     _status = (PeerViewInfoMsg::PeerStatus)s.value("userstatus", (int)PeerViewInfoMsg::Free).toInt();

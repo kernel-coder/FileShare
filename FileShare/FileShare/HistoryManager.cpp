@@ -6,6 +6,7 @@
 #include "Utils.h"
 #include <QHash>
 #include <QDebug>
+#include <QQmlEngine>
 
 class HistoryManagerPrivate {
     HistoryManager* q_ptr;
@@ -33,6 +34,7 @@ HistoryManager* HistoryManager::me()
 
 HistoryManager::HistoryManager(QObject *parent) : QObject(parent)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     d_ptr = new HistoryManagerPrivate(this);
 
     connect(FileMgr, SIGNAL(chatTransfer(Connection*,UITransferInfoItem*)),
@@ -40,6 +42,12 @@ HistoryManager::HistoryManager(QObject *parent) : QObject(parent)
     connect(FileMgr, SIGNAL(fileTransfer(Connection*,UITransferInfoItem*)),
             SLOT(onNewTransferArrived(Connection*,UITransferInfoItem*)));
     connect(NetMgr, SIGNAL(participantLeft(Connection*)), SLOT(onConnectionClosed(Connection*)));
+}
+
+HistoryManager::~HistoryManager()
+{
+    delete d_ptr;
+    d_ptr = nullptr;
 }
 
 

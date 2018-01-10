@@ -1,11 +1,13 @@
 #include "StatusViewer.h"
 #include <QCoreApplication>
 #include <QDebug>
+#include <QQmlEngine>
 
 StatusViewer* StatusViewer::mpMe = NULL;
 
 StatusViewer::StatusViewer(QObject *pParent):QObject(pParent)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     connect(&mTimer, &QTimer::timeout, [=] () {
         this->mTimer.stop();
         emit msgChanged("");

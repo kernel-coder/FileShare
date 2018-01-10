@@ -111,6 +111,7 @@ struct FileTransferManagerPrivate {
 FileTransferManager::FileTransferManager(QObject *p)
  : QObject(p)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     d = new FileTransferManagerPrivate(this);
     connect(NetMgr, SIGNAL(newMsgCome(Connection*, Message*)), SLOT(onNewMsgCome(Connection*, Message*)));
 }

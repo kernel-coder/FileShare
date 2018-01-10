@@ -21,8 +21,9 @@ class HistoryManager : public QObject
 {
     Q_OBJECT    
 public:
-    explicit HistoryManager(QObject *parent = 0);
     static HistoryManager* me();
+    explicit HistoryManager(QObject *parent = 0);
+    ~HistoryManager();
 
     Q_INVOKABLE QVariantList getHistoryForDevice(Connection* conn);
     UITransferInfoItem* getHistoryItemByTransferId(Connection* conn, const QString& transferId);

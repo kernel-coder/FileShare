@@ -1,6 +1,7 @@
 #include "TrayManager.h"
 #include <QMenu>
 #include <QApplication>
+#include <QQmlEngine>
 
 class TrayManagerPrivate {
 public:
@@ -23,6 +24,7 @@ TrayManager* TrayManager::me()
 
 TrayManager::TrayManager(QObject *parent) : QSystemTrayIcon(parent)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
     setIcon(QIcon(QPixmap(":/images/rsrc/images/btn-install.png")));
 
     QMenu* menu = new QMenu;

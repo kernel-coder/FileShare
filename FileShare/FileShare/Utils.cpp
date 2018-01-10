@@ -8,7 +8,7 @@
 #include <QString>
 #include <QUuid>
 #include <QSettings>
-
+#include <QQmlEngine>
 
 Utils* Utils::me()
 {
@@ -21,6 +21,7 @@ Utils* Utils::me()
 
 Utils::Utils(QObject *parent) : QObject(parent)
 {
+    QQmlEngine::setObjectOwnership(this, QQmlEngine::CppOwnership);
 }
 
 
